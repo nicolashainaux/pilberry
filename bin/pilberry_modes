@@ -6,7 +6,6 @@
 #
 
 # import sys
-# from rotary_class import RotaryEncoder
 
 import time
 import RPIO
@@ -36,6 +35,8 @@ def socket_callback(socket, val):
 
 # TCP socket server callback on port 8080
 RPIO.add_tcp_callback(8080, socket_callback)
+
+print("Waiting for TCP interrupts...\n")
 
 # Blocking main epoll loop
 RPIO.wait_for_interrupts()

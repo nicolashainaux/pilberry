@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from abc import ABCMeta, abstractmethod
-from base import Cloneable
+from base import Clonable
 
 HANDLE = {'CMD_DIR_UP' : handle_cmd_dir_up,
           'CMD_DIR_DOWN' : handle_cmd_dir_down,
@@ -13,7 +13,7 @@ HANDLE = {'CMD_DIR_UP' : handle_cmd_dir_up,
           'CMD_CHMOD' : handle_cmd_chmod
          }
 
-class State(Cloneable, metaclass=ABCMeta):
+class State(Clonable, metaclass=ABCMeta):
 
     # def handle(self, cmd):
     #    self.locals()['handle_cmd_' + cmd]()
