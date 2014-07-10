@@ -49,7 +49,7 @@ current_state = STATE_A.clone()
 
 def socket_callback(socket, val):
     print("socket %s: '%s'" % (socket.fileno(), val))
-    socket.send("echo: %s\n" % val)
+    socket.send(bytes("echo: %s\n" % val, 'utf-8'))
 
 # TCP socket server callback on port 8080
 RPIO.add_tcp_callback(8080, socket_callback)
