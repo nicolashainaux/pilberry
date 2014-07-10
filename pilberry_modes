@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+# import sys
+
+import time
+import RPIO
+
+from lib.states.State_A import State_A
+#from lib.states.State_B import State_B
+#from lib.states.State_C import State_C
+#from lib.states.State_D import State_D
+#from lib.states.State_E import State_E
+
+##
+# @todo read the mode list from appropriate conf file
+MODES_LIST = ['SDHC']
+
+STATE_A = State_A()
+#STATE_B = State_B()
+#STATE_C = State_C()
+#STATE_D = State_D()
+#STATE_E = State_E()
+
+global current_state
+
+current_state = STATE_A.clone()
+
+def socket_callback(socket, val):
+    print("socket %s: '%s'" % (socket.fileno(), val))
+    socket.send("echo: %s\n" % val)
+
+# TCP socket server callback on port 8080
+RPIO.add_tcp_callback(8080, socket_callback)
+
+print("Waiting for TCP interrupts...\n")
+
+# Blocking main epoll loop
+RPIO.wait_for_interrupts()
