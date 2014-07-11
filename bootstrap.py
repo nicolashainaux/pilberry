@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Pilberry runs a car radio based on Raspberry Pi
@@ -22,41 +21,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Python packages|modules imports
-import time
-import pickle
-import RPIO
+import sys, os
 
 # Pilberry packages|modules imports
-import bootstrap
-from lib.states.State_A import State_A
-#from lib.states.State_B import State_B
-#from lib.states.State_C import State_C
-#from lib.states.State_D import State_D
-#from lib.states.State_E import State_E
+from lib import globals
 
-##
-# @todo read the mode list from appropriate conf file
-MODES_LIST = ['SDHC']
-
-STATE_A = State_A()
-#STATE_B = State_B()
-#STATE_C = State_C()
-#STATE_D = State_D()
-#STATE_E = State_E()
-
-
-current_state = STATE_A.clone()
-
-
-def socket_callback(socket, data):
-    print("received data: %s" % (pickle.loads(data)))
-    #print(str(cmd == bytes("CMD_A1", 'utf-8')))
-    #socket.send(bytes("echo: %s\n" % val, 'utf-8'))
-
-# TCP socket server callback on port 8080
-RPIO.add_tcp_callback(31416, socket_callback)
-
-print("Waiting for TCP interrupts...\n")
-
-# Blocking main epoll loop
-RPIO.wait_for_interrupts()
+globals.PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
+globals.CONF_DIR = globals.PILBERRY_ROOT + 'etc/'
+globals.SOCKETS_CONF = globals.CONF_DIR + 'sockets.conf'

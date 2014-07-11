@@ -20,34 +20,11 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from .State import State
+class _globals:
+    class ConstError(TypeError): pass
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
 
+import sys
 
-class State_A(State):
-
-    def __init__(self):
-        pass
-
-    def handle_cmd_dir_up(self):
-        print("handle_cmd_dir_up from State_A")
-
-    def handle_cmd_dir_down(self):
-        print("handle_cmd_dir_down from State_A")
-
-    def handle_cmd_play(self):
-        print("handle_cmd_play from State_A")
-
-    def handle_cmd_prev(self):
-        print("handle_cmd_prev from State_A")
-
-    def handle_cmd_next(self):
-        print("handle_cmd_next from State_A")
-
-    def handle_cmd_esc(self):
-        print("handle_cmd_esc from State_A")
-
-    def handle_cmd_stop(self):
-        print("handle_cmd_stop from State_A")
-
-    def handle_cmd_chmod(self):
-        print("handle_cmd_chmod from State_A")
+sys.modules[__name__]=_globals()
