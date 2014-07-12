@@ -27,7 +27,7 @@ import pickle
 import RPIO
 
 # Pilberry packages|modules imports
-import bootstrap
+#import bootstrap
 from lib.states.State_A import State_A
 #from lib.states.State_B import State_B
 #from lib.states.State_C import State_C

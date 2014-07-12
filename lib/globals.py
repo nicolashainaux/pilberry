@@ -20,11 +20,8 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-class _globals:
-    class ConstError(TypeError): pass
-    def __setattr__(self, name, value):
-        self.__dict__[name] = value
+import sys, os
 
-import sys
-
-sys.modules[__name__]=_globals()
+PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
+CONF_DIR = PILBERRY_ROOT + 'etc/'
+SOCKETS_CONF = CONF_DIR + 'sockets.conf'
