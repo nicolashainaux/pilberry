@@ -20,12 +20,17 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
+# Python packages|modules imports
 from abc import ABCMeta, abstractmethod
+
+# Pilberry packages|modules imports
 from ..base import Clonable
 
 
-
+##
+# @class State
+# @brief Abstract class that provides the handle() method for
+#        all State_* subclasses
 class State(Clonable, metaclass=ABCMeta):
 
     # def handle(self, cmd):

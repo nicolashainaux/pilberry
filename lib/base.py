@@ -26,11 +26,6 @@
 # Any Clonable are provided the clone() method, no need to reimplement it
 class Clonable(object):
 
-
-
-
-
-    # --------------------------------------------------------------------------
     ##
     #   @brief Returns a deep copy of the object
     def clone(self):

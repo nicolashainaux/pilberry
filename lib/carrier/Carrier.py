@@ -28,15 +28,22 @@ import pickle
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONF
 
-
+##
+# @class Carrier
+# @brief Carrier objects are dedicated to 'pack' and transmit data
+#        to a given address
 class Carrier(object):
 
+    ##
+    #   @brief This initializer builds the list of available sockets.
     def __init__(self):
         self._sockets_available = configparser.ConfigParser()
         self._sockets_available.read(SOCKETS_CONF)
         self._sockets_enabled = {}
 
-
+    ##
+    #   @brief Connects to the destination socket if it is not connected yet,
+    #          then 'packs' and sends the data.
     def send(self, dest, data):
         if not dest in self._sockets_enabled.keys():
             self._sockets_enabled[dest] = socket.socket(socket.AF_INET,
@@ -53,11 +60,17 @@ class Carrier(object):
 
         self._sockets_enabled[dest].send(pickle.dumps(data))
 
-
+    ##
+    #   @brief To be sure to close the connections, whatever happens, we must
+    #          define an __enter__() and an __exit__() methods in order to be
+    #          able to use the object in a with statement.
     def __enter__(self):
         return self
 
-
+    ##
+    #   @brief To be sure to close the connections, whatever happens, we must
+    #          define an __enter__() and an __exit__() methods in order to be
+    #          able to use the object in a with statement.
     def __exit__(self, type, value, traceback):
         for dest in self._sockets_enabled:
             self._sockets_enabled[dest].close()

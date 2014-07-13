@@ -20,8 +20,12 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+# Global variables
+
+# Pilberry packages|modules imports
 import sys, os
 
+current_state
 PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
 CONF_DIR = PILBERRY_ROOT + 'etc/'
 SOCKETS_CONF = CONF_DIR + 'sockets.conf'

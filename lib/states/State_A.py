@@ -20,9 +20,12 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
 from .State import State
 
-
+##
+# @class State_A
+# @brief
 class State_A(State):
 
     def __init__(self):
