@@ -25,7 +25,6 @@
 # Pilberry packages|modules imports
 import sys, os
 
-current_state
 PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
 CONF_DIR = PILBERRY_ROOT + 'etc/'
 SOCKETS_CONF = CONF_DIR + 'sockets.conf'

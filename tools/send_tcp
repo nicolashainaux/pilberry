@@ -23,8 +23,24 @@
 
 # This is a simple script that sends a data to a destination socket
 
+# Python packages|modules imports
+import argparse
+import os.path
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
 
+parser = argparse.ArgumentParser(description='Sends a message to a dest process')
+parser.add_argument('dest process', metavar='dest', type=str, nargs='+',
+                   help='the "adress" of the destination process')
+parser.add_argument('content', metavar='content', type=str, nargs='+',
+                   help='the content to send')
+
+args = vars(parser.parse_args())
+
+print(args['dest process'][0] + " " + args['content'][0])
+
 with Carrier() as C:
-    C.send('MODES', 'CMD_A1')
+    C.send(args['dest process'][0], args['content'][0])
