@@ -25,9 +25,6 @@
 
 # Python packages|modules imports
 import argparse
-import os.path
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
@@ -39,8 +36,6 @@ parser.add_argument('content', metavar='content', type=str, nargs='+',
                    help='the content to send')
 
 args = vars(parser.parse_args())
-
-print(args['dest process'][0] + " " + args['content'][0])
 
 with Carrier() as C:
     C.send(args['dest process'][0], args['content'][0])
