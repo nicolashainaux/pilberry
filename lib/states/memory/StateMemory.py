@@ -20,37 +20,72 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+# Python packages|modules imports
+from abc import ABCMeta, abstractmethod
 
-from .State import State
 
 ##
-# @class State_A
-# @brief
-class State_A(State):
+# @class State
+# @brief Abstract class that provides the handle() method for
+#        all State_* subclasses
+class State(object, metaclass=ABCMeta):
 
+    # def handle(self, cmd):
+    #    self.locals()['handle_cmd_' + cmd]()
+
+    @abstractmethod
     def __init__(self):
         pass
 
+    @abstractmethod
+    def init(self):
+        pass
+
+    @abstractmethod
+    def quit(self):
+        pass
+
+    @abstractmethod
     def handle_cmd_dir_up(self):
-        print("handle_cmd_dir_up from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_dir_down(self):
-        print("handle_cmd_dir_down from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_play(self):
-        print("handle_cmd_play from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_prev(self):
-        print("handle_cmd_prev from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_next(self):
-        print("handle_cmd_next from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_esc(self):
-        print("handle_cmd_esc from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_stop(self):
-        print("handle_cmd_stop from State_A")
+        pass
 
+    @abstractmethod
     def handle_cmd_chmod(self):
-        print("handle_cmd_chmod from State_A")
+        pass
+
+    HANDLE = {'CMD_DIR_UP' : 'handle_cmd_dir_up',
+              'CMD_DIR_DOWN' : 'handle_cmd_dir_down',
+              'CMD_PLAY' : 'handle_cmd_play',
+              'CMD_PREV' : 'handle_cmd_prev',
+              'CMD_NEXT' : 'handle_cmd_next',
+              'CMD_ESC' : 'handle_cmd_esc',
+              'CMD_STOP' : 'handle_cmd_stop',
+              'CMD_CHMOD' : 'handle_cmd_chmod'
+             }
+
+    def handle(self, cmd):
+        getattr(self, self.HANDLE[cmd])()

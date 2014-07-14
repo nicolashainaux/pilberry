@@ -20,63 +20,45 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Python packages|modules imports
-from abc import ABCMeta, abstractmethod
-
 # Pilberry packages|modules imports
-from ..base import Clonable
-
+from .StateMemory import State
 
 ##
-# @class State
-# @brief Abstract class that provides the handle() method for
-#        all State_* subclasses
-class State(Clonable, metaclass=ABCMeta):
+# @class State_C
+# @brief
+class State_C(State):
 
-    # def handle(self, cmd):
-    #    self.locals()['handle_cmd_' + cmd]()
+    def __init__(self):
+        pass
 
-    @abstractmethod
+    def init(self):
+        pass
+
+    def quit(self):
+        pass
+
     def handle_cmd_dir_up(self):
-        pass
+        print("handle_cmd_dir_up from State_C")
 
-    @abstractmethod
     def handle_cmd_dir_down(self):
-        pass
+        print("handle_cmd_dir_down from State_C")
 
-    @abstractmethod
     def handle_cmd_play(self):
-        pass
+        print("handle_cmd_play from State_C")
 
-    @abstractmethod
     def handle_cmd_prev(self):
-        pass
+        print("handle_cmd_prev from State_C")
 
-    @abstractmethod
     def handle_cmd_next(self):
-        pass
+        print("handle_cmd_next from State_C")
 
-    @abstractmethod
     def handle_cmd_esc(self):
-        pass
+        print("handle_cmd_esc from State_C")
 
-    @abstractmethod
     def handle_cmd_stop(self):
-        pass
+        print("handle_cmd_stop from State_C")
 
-    @abstractmethod
     def handle_cmd_chmod(self):
-        pass
+        print("handle_cmd_chmod from State_C")
 
-    HANDLE = {'CMD_DIR_UP' : handle_cmd_dir_up,
-              'CMD_DIR_DOWN' : handle_cmd_dir_down,
-              'CMD_PLAY' : handle_cmd_play,
-              'CMD_PREV' : handle_cmd_prev,
-              'CMD_NEXT' : handle_cmd_next,
-              'CMD_ESC' : handle_cmd_esc,
-              'CMD_STOP' : handle_cmd_stop,
-              'CMD_CHMOD' : handle_cmd_chmod
-             }
 
-    def handle(self, cmd):
-        HANDLE[cmd]()
