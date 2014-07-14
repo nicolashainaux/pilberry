@@ -25,6 +25,10 @@
 # Pilberry packages|modules imports
 import sys, os
 
+#YES = ['Y', 'YES', 'Yes', 'True', 'TRUE', 1, "ON", "On", "on"]
+#NO = ['N', 'NO', 'No', 'False', 'FALSE', 0, "OFF", "Off", "off"]
 PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
 CONF_DIR = PILBERRY_ROOT + 'etc/'
 SOCKETS_CONF = CONF_DIR + 'sockets.conf'
+MODES_CONF = CONF_DIR + 'modes.conf'
+CMD_CONF = CONF_DIR + 'cmd.conf'
