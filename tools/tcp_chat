@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# This is a simple tcp chat to a destination socket
+
+# Python packages|modules imports
+import sys
+import argparse
+
+# Pilberry packages|modules imports
+from lib.carrier.Carrier import Carrier
+
+parser = argparse.ArgumentParser(description='Sends a message to a dest process')
+parser.add_argument('dest process', metavar='dest', type=str, nargs='+',
+                   help='the "adress" of the destination process')
+
+args = vars(parser.parse_args())
+
+with Carrier() as C:
+    while True:
+        x = input(str(args['dest process'][0]) + "> ")
+        if "" == x:
+            C.send(args['dest process'][0], 'CMD_A1')
+        elif "DONE" == x or "QUIT" == x:
+            print("Shutting down.")
+            if "QUIT" == x:
+                C.send(args['dest process'][0], x)
+            sys.exit()
+        else:
+            C.send(args['dest process'][0], x)
+
+
+
+

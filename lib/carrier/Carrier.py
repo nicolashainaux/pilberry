@@ -26,7 +26,7 @@ import configparser
 import pickle
 
 # Pilberry packages|modules imports
-from lib.globals import SOCKETS_CONF
+from lib.globals import SOCKET_CONFIG
 
 ##
 # @class Carrier
@@ -37,8 +37,7 @@ class Carrier(object):
     ##
     #   @brief This initializer builds the list of available sockets.
     def __init__(self):
-        self._sockets_available = configparser.ConfigParser()
-        self._sockets_available.read(SOCKETS_CONF)
+        self._sockets_available = SOCKET_CONFIG
         self._sockets_enabled = {}
 
     ##

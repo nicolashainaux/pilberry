@@ -22,61 +22,38 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Python packages|modules imports
-import time
+import sys
 import pickle
-import configparser
 import RPIO
 
 # Pilberry packages|modules imports
-from lib.globals import MODES_CONF, CMD_CONF, SOCKETS_CONF
+from lib.globals import modes_list, cmd_match_list, current_mode, MODES_PORT
 from lib.states.memory.StateMemory_A import State_A as MState_A
 from lib.states.memory.StateMemory_B import State_B as MState_B
 from lib.states.memory.StateMemory_C import State_C as MState_C
 from lib.states.memory.StateMemory_D import State_D as MState_D
 from lib.states.memory.StateMemory_E import State_E as MState_E
 
-# Read the modes' list from appropriate conf file
-MODES_CONFIG = configparser.ConfigParser()
-MODES_CONFIG.read(MODES_CONF)
-modes_list = []
-for s in MODES_CONFIG.sections():
-    if MODES_CONFIG[s].getboolean('ENABLED'):
-        modes_list.append(s)
-
-##
-#   @todo   At startup, define the current_mode as last used mode
-current_mode = modes_list[0]
-
-# Read the modes' list from appropriate conf file
-CMD_CONFIG = configparser.ConfigParser()
-CMD_CONFIG.optionxform = lambda option: option
-CMD_CONFIG.read(CMD_CONF)
-cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode]['TYPE']])
-
-# Get the port from sockets' conf file
-SOCKET_CONFIG = configparser.ConfigParser()
-SOCKET_CONFIG.read(SOCKETS_CONF)
-MODES_PORT = int(SOCKET_CONFIG['MODES']['PORT'])
-
 ##
 #   @todo   At startup, get the last data...
 current_state = MState_A()
 
-
 def socket_callback(socket, data):
-    cmd = cmd_match_list[pickle.loads(data)]
-    print(cmd)
-    if cmd == 'CMD_CHMOD':
-        ##
-        #   @todo   Implement changing mode
-        print("Now we change the mode")
+    raw_cmd = pickle.loads(data)
+    if raw_cmd == 'QUIT':
+        print("Shutting down server")
+        sys.exit()
     else:
-        current_state.handle(cmd)
-
-
-    #print("received data: %s" % (pickle.loads(data)))
-    #print(str(cmd == bytes("CMD_A1", 'utf-8')))
-    #socket.send(bytes("echo: %s\n" % val, 'utf-8'))
+        cmd = cmd_match_list[raw_cmd]
+        print(cmd)
+        if cmd == 'CMD_CHMOD':
+            ##
+            #   @todo   Implement changing mode
+            print("Now we change the mode")
+        elif cmd == 'QUIT':
+            sys.exit()
+        else:
+            current_state.handle(cmd)
 
 # TCP socket server callback on port 8080
 RPIO.add_tcp_callback(MODES_PORT, socket_callback)
