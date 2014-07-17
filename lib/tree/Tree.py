@@ -45,10 +45,11 @@ class Node(object):
     #   @param  id : the id of the file, to get infos from the database
     #   @param  add_children : boolean to tell if we want to create children
     #                          at once
-    def __init__(self, parent, id, add_children):
+    def __init__(self, parent, id, position, add_children):
         self._parent = parent
         self._id = id         # unique identifier for the file, in the database?
         #self._id3_tags = ... # extract them from the database, as a dict
+        self._position = position # this should be an int
 
         self._display = ... # Create it from the infos and according to
                             # the chosen view (defined in conf file)
@@ -64,7 +65,7 @@ class Node(object):
                             # then create them according to conf file (which
                             # kind of view...). Take all info
                             # from database and create each new i-th Node in
-                            # this list with Node(self, id[i], False).
+                            # this list with Node(self, id[i], i, False).
                             # Maybe use the method add_children() for that?
                             # It should be all the same...
 
@@ -110,6 +111,7 @@ class Node(object):
     parent = property(get_parent, doc="Parent Node")
     children = property(get_children, doc="Children Nodes, if any")
     id = property(get_id, doc="The id is a unique identifier in the database")
+    position = property(get_id, doc="Position of the Node among its brothers")
 
 
     ##
@@ -133,17 +135,68 @@ class Tree(object):
     #                from the database
     def __init__(self, id):
         self._nodes = Node(None, id, True)
-        self._current_node = self._nodes
+        # We set current_node as the first node found in root/,
+        # otherwise we'll have to enter root to see anything
+        self._neighbours_list = self._nodes.children
+        self._current_node = self._nodes.children[0]
 
 
     ##
     #   @brief
+    #   @todo   Maybe raise an exception if already at the root, to let the
+    #           call function/method know when it didn't jump to parent.
+    #           Or maybe NOT raise an exception, if the current Node is returned
+    #           it should be enough: if nothing changes, then just keep the
+    #           same thing displayed!
+    #   @return The new current Node
+    def move_to_parent(self):
+        if self._current_node.parent != None:
+            self._current_node = self._current_node.parent
+            if self._current_node.parent != None:
+                self._neighbours_list = self._current_node.parent.children
+            else:
+                self._neighbours_list = [self]
+
+    ##
+    #   @brief
     def move_to_first_child(self):
-        if not self.current_node.is_a_leaf():
-            self.set_current_node(self.current_node.child[0])
+        # /!\outdated notations/!\
+        #if not self.current_node.is_a_leaf():
+        #    self.set_current_node(self.current_node.child[0])
 
 
     ##
     #   @brief
     def move_to_next_node(self):
-        self.set_current_node = self.current_node.parent.
+        # We compute the new position with a modulo to go to first position if
+        # we were at end and vice-versa
+        # CHECK THE FORMULA
+        new_position = (self._current_node.position + 1) \
+                                                    % len(self._neighbours_list)
+        self._current_node = self._neighbours_list[new_position]
+        self._neighbours_list =
+
+
+    ##
+    #   @brief
+    def move_to_prev_node(self):
+        # We compute the new position with a modulo to go to first position if
+        # we were at end and vice-versa
+        # CHECK THE FORMULA
+        new_position = (self._current_node.position - 1) \
+                                                    % len(self._neighbours_list)
+        self._current_node = self._neighbours_list[new_position]
+        self._neighbours_list =
+
+
+
+    ##
+    #   @brief
+    def jump_to_1st_child_of_next_parent(self):
+        #
+
+
+    ##
+    #   @brief
+    def jump_to_1st_child_of_prev_parent(self):
+        #
