@@ -28,6 +28,7 @@ import RPIO
 
 # Pilberry packages|modules imports
 from lib.globals import modes_list, cmd_match_list, current_mode, MODES_PORT
+from lib.globals import current_state
 from lib.states.memory.StateMemory_A import State_A as MState_A
 from lib.states.memory.StateMemory_B import State_B as MState_B
 from lib.states.memory.StateMemory_C import State_C as MState_C
@@ -36,7 +37,7 @@ from lib.states.memory.StateMemory_E import State_E as MState_E
 
 ##
 #   @todo   At startup, get the last data...
-current_state = MState_A()
+current_state[current_mode] = MState_A()
 
 def socket_callback(socket, data):
     raw_cmd = pickle.loads(data)
@@ -53,7 +54,7 @@ def socket_callback(socket, data):
         elif cmd == 'QUIT':
             sys.exit()
         else:
-            current_state.handle(cmd)
+            current_state[current_mode].handle(cmd)
 
 # TCP socket server callback on port 8080
 RPIO.add_tcp_callback(MODES_PORT, socket_callback)

@@ -1,0 +1,20 @@
+# New scheme ?
+# Maybe rather in yaml ?
+# OR MAYBE just put that in scripts that will be
+# called from StateMemory_*.handle_cmd*()
+# and thus can be modified easily by each user.
+
+[STATEMEMORY_A]
+CMD_SELECT1=
+CMD_SELECT1=
+CMD_SELECT1=
+CMD_SELECT1=
+CMD_SELECT1=switch_to_B()
+CMD_SELECT2=
+.
+.
+.
+CMD_UP1=
+.
+.
+.
