@@ -29,36 +29,14 @@
 
 
 ##
-# @class Info
-# @brief This contains all kind of information that may be available from
-#        a Node, it reads it, from the database, using the unique id,
-#        and let it accessible as from a dictionnary.
-#        For instance, it should be possible to get, if n is a Node:
-#        n.info['file_name'], n.info['id3_tags'] (?),
-#        n.info['Artist'], n.info['Album'] etc.
-class Info(object):
-
-    ##
-    #   @brief
-    def __init__(self, id):
-        self._file_name = ... # extract it from database?
-        #self._id3_tags = ... # extract them from the database, as a dict
-        self._content = {'file_name' : self._file_name,
-                         #'id3_tags' : self._id3_tags
-                         }
-
-    ##
-    #   @brief
-    def __getitem__(self, key):
-        if key in self._content:
-            return self._content[key]
-        #elif key in self._id3_tags:
-        #    return self._content['id3_tags'][key]
-
-
-##
 # @class Node
-# @brief This matches both the inner nodes and leaves of the tree
+# @brief This matches both the inner nodes and leaves of the tree.
+#        A Node contains also all kind of information that may be available,
+#        it gets it at its creation, from the database using the unique id,
+#        and lets it accessible as from a dictionnary.
+#        For instance, it should be possible to get, if current_node is a Node:
+#        current_node['file_name'], current_node['id3_tags'],
+#        current_node['Artist'], current_node['Album'] etc.
 class Node(object):
 
     ##
@@ -70,7 +48,15 @@ class Node(object):
     def __init__(self, parent, id, add_children):
         self._parent = parent
         self._id = id         # unique identifier for the file, in the database?
-        self._info = Info(id)
+        #self._id3_tags = ... # extract them from the database, as a dict
+
+        self._display = ... # Create it from the infos and according to
+                            # the chosen view (defined in conf file)
+
+        self._content = {'file_name' : ...,  # get it from database
+                         'display' : self._display
+                         #'id3_tags' : self._id3_tags
+                         }
 
         self._children = [] # and if the current node does have children in
                             # this view, AND if we want to dive one step more
@@ -82,8 +68,15 @@ class Node(object):
                             # Maybe use the method add_children() for that?
                             # It should be all the same...
 
-        self._display = ... # Create it from the infos and according to
-                            # the chosen view (defined in conf file)
+
+    ##
+    #   @brief
+    def __getitem__(self, key):
+        if key in self._content:
+            return self._content[key]
+        #elif key in self._id3_tags:
+        #    return self._content['id3_tags'][key]
+
 
 
     ##
@@ -109,12 +102,6 @@ class Node(object):
 
     ##
     #   @brief
-    def get_info(self):
-        return self._info
-
-
-    ##
-    #   @brief
     def get_id(self):
         return self._id
 
@@ -122,7 +109,6 @@ class Node(object):
 
     parent = property(get_parent, doc="Parent Node")
     children = property(get_children, doc="Children Nodes, if any")
-    info = property(get_info, doc="All info contained in the Node")
     id = property(get_id, doc="The id is a unique identifier in the database")
 
 
