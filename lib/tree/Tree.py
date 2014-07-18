@@ -20,108 +20,11 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
 # Python packages|modules imports
 
 
 # Pilberry packages|modules imports
-
-
-
-##
-# @class Node
-# @brief This matches both the inner nodes and leaves of the tree.
-#        A Node contains also all kind of information that may be available,
-#        it gets it at its creation, from the database using the unique id,
-#        and lets it accessible as from a dictionnary.
-#        For instance, it should be possible to get, if current_node is a Node:
-#        current_node['file_name'], current_node['id3_tags'],
-#        current_node['Artist'], current_node['Album'] etc.
-class Node(object):
-
-    ##
-    #   @brief
-    #   @param  parent : the parent Node
-    #   @param  id : the id of the file, to get infos from the database
-    #   @param  add_children : boolean to tell if we want to create children
-    #                          at once
-    def __init__(self, parent, id, position, add_children):
-        self._parent = parent
-        self._id = id         # unique identifier for the file, in the database?
-        #self._id3_tags = ... # extract them from the database, as a dict
-        self._position = position # this should be an int
-
-        self._display = ... # Create it from the infos and according to
-                            # the chosen view (defined in conf file)
-
-        self._content = {'file_name' : ...,  # get it from database
-                         'display' : self._display
-                         #'id3_tags' : self._id3_tags
-                         }
-
-        self._children = [] # and if the current node does have children in
-                            # this view, AND if we want to dive one step more
-                            # into the tree (add_children is True),
-                            # then create them according to conf file (which
-                            # kind of view...). Take all info
-                            # from database and create each new i-th Node in
-                            # this list with Node(self, id[i], i, False).
-                            # Maybe use the method add_children() for that?
-                            # It should be all the same...
-
-
-    ##
-    #   @brief
-    def __getitem__(self, key):
-        if key in self._content:
-            return self._content[key]
-        #elif key in self._id3_tags:
-        #    return self._content['id3_tags'][key]
-
-
-
-    ##
-    #   @brief  Checks if current Node is actually a leaf
-    def is_a_leaf(self):
-        # /!\ Take care, this should not only be:
-        #return len(self._children) == 0
-        # This should actually check, in the database, if self has really
-        # children or not, according to the current view
-
-
-    ##
-    #   @brief
-    def get_parent(self):
-        return self._parent
-
-
-    ##
-    #   @brief
-    def get_children(self):
-        return self._children
-
-
-    ##
-    #   @brief
-    def get_id(self):
-        return self._id
-
-
-
-    parent = property(get_parent, doc="Parent Node")
-    children = property(get_children, doc="Children Nodes, if any")
-    id = property(get_id, doc="The id is a unique identifier in the database")
-    position = property(get_id, doc="Position of the Node among its brothers")
-
-
-    ##
-    #   @brief
-    def add_children(self):
-        if not self.is_a_leaf():
-            # define all what children would be, according to the chosen view
-            # and add them to self._children
-            # should be same algorithm as in __init__()
-
+from .Node import Node
 
 
 ##
@@ -133,36 +36,45 @@ class Tree(object):
     #   @brief
     #   @param  id : this will be the id of the root node, has to be taken
     #                from the database
+    #                We could change it for just the root_path/, what
+    #                will be accessible from the conf file, and let
+    #                __init__() itself get the matching id from the database
     def __init__(self, id):
-        self._nodes = Node(None, id, True)
+        # We'll first define the children until a depth of 2: e.g. the first
+        # level directly under the root, and their children also (like the
+        # level "Artists" + the level "Albums")
+        self._nodes = Node(None, id, 0, 2)
         # We set current_node as the first node found in root/,
         # otherwise we'll have to enter root to see anything
         self._neighbours_list = self._nodes.children
         self._current_node = self._nodes.children[0]
 
 
-    ##
-    #   @brief
-    #   @todo   Maybe raise an exception if already at the root, to let the
-    #           call function/method know when it didn't jump to parent.
-    #           Or maybe NOT raise an exception, if the current Node is returned
-    #           it should be enough: if nothing changes, then just keep the
-    #           same thing displayed!
-    #   @return The new current Node
-    def move_to_parent(self):
-        if self._current_node.parent != None:
-            self._current_node = self._current_node.parent
-            if self._current_node.parent != None:
-                self._neighbours_list = self._current_node.parent.children
-            else:
-                self._neighbours_list = [self]
 
     ##
     #   @brief
-    def move_to_first_child(self):
-        # /!\outdated notations/!\
-        #if not self.current_node.is_a_leaf():
-        #    self.set_current_node(self.current_node.child[0])
+    def get_current_node(self):
+        return self._current_node
+
+
+
+    current_node = property(get_current_node, doc="Current Node in the Tree")
+
+
+
+    ##
+    #   @brief  Moves to the parent Node. Returns the new current Node.
+    #   @return Node
+    def move_to_parent(self):
+        if self.current_node.parent != None:
+            self._current_node = self.current_node.parent
+            if self.current_node.parent != None:
+                self._neighbours_list = self.current_node.parent.children
+            else:
+                self._neighbours_list = [self]
+
+        return self.current_node
+
 
 
     ##
@@ -170,11 +82,13 @@ class Tree(object):
     def move_to_next_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        # CHECK THE FORMULA
-        new_position = (self._current_node.position + 1) \
+        new_position = (self.current_node.position + 1) \
                                                     % len(self._neighbours_list)
         self._current_node = self._neighbours_list[new_position]
-        self._neighbours_list =
+        # self._neighbours_list remains the same
+
+        return self.current_node
+
 
 
     ##
@@ -182,21 +96,55 @@ class Tree(object):
     def move_to_prev_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        # CHECK THE FORMULA
-        new_position = (self._current_node.position - 1) \
+        new_position = (self.current_node.position - 1) \
                                                     % len(self._neighbours_list)
         self._current_node = self._neighbours_list[new_position]
-        self._neighbours_list =
+        # self._neighbours_list remains the same
+
+        return self.current_node
+
+
+
+    ##
+    #   @brief
+    def move_to_first_child(self):
+        # There it is not useful to use the is_a_leaf() method because
+        # we don't know to make a request in the DB. If there are children,
+        # they are already here. So just check len(children)
+        if len(self.current_node.children) >= 1:
+            for n in self.current_node.children:
+                n.add_children(1)
+            self._neighbours_list = self.current_node.children
+            self._current_node = self.current_node.children[0]
+
+        return self.current_node
 
 
 
     ##
     #   @brief
     def jump_to_1st_child_of_next_parent(self):
-        #
+        self.move_to_parent()
+        self.move_to_next_node()
+        # To be sure we are not unfortunately on a leaf:
+        # (this loop should end because we just came from a node that's not
+        # a leaf, in the worst case, we come back into it)
+        while len(self.current_node.children) == 0:
+            self.move_to_next_node()
+        return self.move_to_first_child()
+
 
 
     ##
     #   @brief
     def jump_to_1st_child_of_prev_parent(self):
-        #
+        self.move_to_parent()
+        self.move_to_prev_node()
+        # To be sure we are not unfortunately on a leaf:
+        # (this loop should end because we just came from a node that's not
+        # a leaf, in the worst case, we come back into it)
+        while len(self.current_node.children) == 0:
+            self.move_to_prev_node()
+        return self.move_to_first_child()
+
+
