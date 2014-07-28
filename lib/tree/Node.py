@@ -44,9 +44,9 @@ class Node(object):
     #   @param  parent : the parent Node
     #   @param  id : the id of the file, to get infos from the database
     #   @param  add_children : int that tells how deep we should add children
-    def __init__(self, parent, id, position, add_children):
+    def __init__(self, parent, full_path, position, add_children):
         self._parent = parent
-        self._id = id         # unique identifier for the file, in the database?
+        self._full_path = full_path  # will also be a unique identifier
         #self._id3_tags = ... # extract them from the database, as a dict
         self._position = position # this should be an int
 
@@ -112,8 +112,8 @@ class Node(object):
 
     ##
     #   @brief
-    def get_id(self):
-        return self._id
+    def get_full_path(self):
+        return self._full_path
 
 
 
@@ -126,7 +126,9 @@ class Node(object):
 
     parent = property(get_parent, doc="Parent Node")
     children = property(get_children, doc="Children Nodes, if any")
-    id = property(get_id, doc="The id is a unique identifier in the database")
+    full_path = property(get_full_path, doc="The full patht to the file or "\
+                                            + "directory. Will also be a unique"\
+                                            + " identifier.")
     position = property(get_position, doc="Position of the Node among " \
                                          + "its brothers")
 
