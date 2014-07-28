@@ -41,14 +41,60 @@ from abc import ABCMeta, abstractmethod
 #        current_node['Artist'], current_node['Album'] etc.
 class Node(object, metaclass=ABCMeta):
 
+
+
+    ##
+    #   @brief  Checks if current Node is actually a leaf
+    @abstractmethod
+    @staticmethod
+    def is_a_leaf(self):
+        # /!\ Take care, this should not only be:
+        # return len(self._children) == 0
+        # Because this should actually check, in the database or filesystem,
+        # if self has really children or not, according to the current view.
+        # This is a static method because it doesn't need the fields of an
+        # object, just determine from the path if it's a leaf indeed or not.
+        # Moreover it has to be used in __init__()
+        pass
+
+
+
+    ##
+    #   @brief  Gets the children list of a Node, as filenames or directory names.
+    #           Returns [] if the node has no children. Should be called only
+    #           on non-leaves nodes.
+    #   @return List
+    #   @param  full_path   The full path of directory to test
+    #   @todo   Maybe check full_path is a path to a directory.
+    @abstractmethod
+    @staticmethod
+    def get_children_list(full_path):
+        pass
+
+
+
+    ##
+    #   @brief
+    def add_children(self, depth):
+        if depth > 0 and not self.is_a_leaf(self.full_path):
+            for i, name in enumerate(self.get_children_list(self.full_path)):
+                self._children.append(NodeFileSystem(self,
+                                                     self.full_path + name,
+                                                     i,
+                                                     self._view,
+                                                     depth - 1
+                                                     ))
+
+
+
     ##
     #   @brief
     #   @param  parent : the parent Node
     #   @param  full_path : the full path of the file
     #   @param  position : the position among the neighbours' list
     #   @param  view : the view type (e.g. file system, album/artist etc.)
-    #   @param  add_children : int that tells how deep we should add children
-    def __init__(self, parent, full_path, position, view, add_children):
+    #   @param  depth : int that tells how deep we should further add children
+    def __init__(self, parent, full_path, position, view, depth):
         self._parent = parent
         self._full_path = full_path  # can also be used as unique identifier
         #self._tags = ... # extract them from the database, as a dict,
@@ -71,19 +117,18 @@ class Node(object, metaclass=ABCMeta):
         file_name = tail or ntpath.basename(head)
         file_name += end_as_dirname
 
+        # The content should be initialized here, without any problem a priori
         self._content = {'full_path' : full_path,
                          'file_name' : file_name
                          #'tags' : self._tags
                          }
 
+        # The children
         self._children = []
 
-        # This was an idea to allow using move_to_parent on the root Node,
-        # without detecting self._parent is None;
-        # but this implies some problems in Tree.move_to_parent()
-        # and in other cases... so better not do that
-        #if self._parent = None:
-        #    self._parent = self
+        if depth > 0:
+            self.add_children(depth - 1)
+
 
 
     ##
@@ -94,13 +139,6 @@ class Node(object, metaclass=ABCMeta):
         #elif key in self._tags:
         #    return self._content['tags'][key]
 
-
-
-    ##
-    #   @brief  Checks if current Node is actually a leaf
-    @abstractmethod
-    def is_a_leaf(self):
-        pass
 
 
     ##
@@ -138,8 +176,4 @@ class Node(object, metaclass=ABCMeta):
                                          + "its brothers")
 
 
-    ##
-    #   @brief
-    @abstractmethod
-    def add_children(self, depth):
-        pass
+

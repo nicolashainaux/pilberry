@@ -106,13 +106,14 @@ class Tree(object):
     #   @brief  Moves to the parent Node. Returns the new current Node.
     #   @return Node
     def move_to_parent(self):
-        if self.current_node.parent != None:
+        # self.current_node.parent should never be None because we forbid
+        # to access the root directory
+        # So, self.current_node.parent.parent != None
+        # is equivalent to 'self.parent is not root'
+        if self.current_node.parent.parent != None:
             self._current_node = self.current_node.parent
             self._current_depth -= 1
-            if self.current_node.parent != None:
-                self._neighbours_list = self.current_node.parent.children
-            else:
-                self._neighbours_list = [self]
+            self._neighbours_list = self.current_node.parent.children
 
         return self.current_node
 

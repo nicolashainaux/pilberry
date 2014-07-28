@@ -22,10 +22,11 @@
 
 
 # Python packages|modules imports
-
+import os
 
 # Pilberry packages|modules imports
 from . import Node
+from ..utils import natural_sort
 
 
 ##
@@ -33,47 +34,41 @@ from . import Node
 # @brief These nodes will be built from file system informations
 class NodeFileSystem(Node):
 
-    ##
-    #   @brief
-    #   @param  parent : the parent Node
-    #   @param  full_path : the full path of the file
-    #   @param  position : the position among the neighbours' list
-    #   @param  view : the view type (e.g. file system, album/artist etc.)
-    #   @param  add_children : int that tells how deep we should add children
-    def __init__(self, parent, full_path, position, view, add_children):
-        Node.__init__(self, parent, full_path, position, view, add_children)
-
-
 
     ##
-    #   @brief  Checks if current Node is actually a leaf
-    def is_a_leaf(self):
-        # /!\ Take care, this should not only be:
-        #return len(self._children) == 0
-        # This should actually check, in the database, if self has really
-        # children or not, according to the current view
+    #   @brief  Checks if current Node is really a leaf, according to the
+    #           chosen view.
+    #   @return Boolean
+    #   @param  full_path   The full path of the file or directory to test
+    #   @todo   Maybe find a way to treat an empty directory not as a leaf
+    #           but in order to do that, a special Node (emptyNode?) has to be
+    #           created and the rest of the code has to be adapted to be able
+    #           to deal with it.
+    @staticmethod
+    def is_a_leaf(full_path):
+        # /!\ Check the comment in Node.is_a_leaf() before changing this
+        # A non-empty directory will be treated as an inode (False)
+        # all other cases are leaves (True)
+        if os.path.is_dir(full_path) and len(os.listdir(full_path)) != 0:
+            return False
+        else:
+            return True
 
-        # /!\ MAYBE this would be better a (class?) method, because
-        # it is useful in many situations, including in __init__()
-
-
-
-
-    parent = property(get_parent, doc="Parent Node")
-    children = property(get_children, doc="Children Nodes, if any")
-    full_path = property(get_full_path, doc="The full patht to the file or "\
-                                            + "directory. Will also be a unique"\
-                                            + " identifier.")
-    position = property(get_position, doc="Position of the Node among " \
-                                         + "its brothers")
 
 
     ##
-    #   @brief
-    def add_children(self, depth):
-        if not self.is_a_leaf():
-            # define all what children would be, according to the chosen view
-            # and add them to self._children
-            # should be same algorithm as in __init__()
-            # depth is an int. if depth == 0, do nothing, if depth > 0,
-            # then call recursively add_children on each child, with depth - 1
+    #   @brief  Gets the children list of a Node, as filenames or directory names.
+    #           Returns [] if the node has no children. Should be called only
+    #           on non-leaves nodes.
+    #   @return List
+    #   @param  full_path   The full path of directory to test
+    #   @todo   Maybe check full_path is a path to a directory.
+    @staticmethod
+    def get_children_list(full_path):
+        return natural_sort(os.listdir(full_path))
+
+
+
+
+
+
