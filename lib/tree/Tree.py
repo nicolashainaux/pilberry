@@ -44,6 +44,7 @@ class Tree(object):
         # level directly under the root, and their children also (like the
         # level "Artists" + the level "Albums")
         self._nodes = Node(None, id, 0, 2)
+        self._current_depth = 0
         # We set current_node as the first node found in root/,
         # otherwise we'll have to enter root to see anything
         self._neighbours_list = self._nodes.children
@@ -56,10 +57,13 @@ class Tree(object):
     def get_current_node(self):
         return self._current_node
 
-
+    ##
+    #   @brief
+    def get_current_depth(self):
+        return self._current_depth
 
     current_node = property(get_current_node, doc="Current Node in the Tree")
-
+    current_depth = property(get_current_depth, doc="Current depth in the Tree")
 
 
     ##
@@ -68,6 +72,7 @@ class Tree(object):
     def move_to_parent(self):
         if self.current_node.parent != None:
             self._current_node = self.current_node.parent
+            self._current_depth -= 1
             if self.current_node.parent != None:
                 self._neighbours_list = self.current_node.parent.children
             else:
@@ -109,13 +114,14 @@ class Tree(object):
     #   @brief
     def move_to_first_child(self):
         # There it is not useful to use the is_a_leaf() method because
-        # we don't know to make a request in the DB. If there are children,
+        # we don't need to make a request in the DB. If there are children,
         # they are already here. So just check len(children)
         if len(self.current_node.children) >= 1:
             for n in self.current_node.children:
                 n.add_children(1)
             self._neighbours_list = self.current_node.children
             self._current_node = self.current_node.children[0]
+            self._current_depth += 1
 
         return self.current_node
 
