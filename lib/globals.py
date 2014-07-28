@@ -30,13 +30,13 @@ import configparser
 #NO = ['N', 'NO', 'No', 'False', 'FALSE', 0, "OFF", "Off", "off"]
 PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
 CONF_DIR = PILBERRY_ROOT + 'etc/'
-SOCKETS_CONF = CONF_DIR + 'sockets.conf'
-MODES_CONF = CONF_DIR + 'modes.conf'
-CMD_CONF = CONF_DIR + 'cmd.conf'
+SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
+MODES_CONF_FILE = CONF_DIR + 'modes.conf'
+CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
 
 # Read the modes' list from appropriate conf file
 MODES_CONFIG = configparser.ConfigParser()
-MODES_CONFIG.read(MODES_CONF)
+MODES_CONFIG.read(MODES_CONF_FILE)
 modes_list = []
 for s in MODES_CONFIG.sections():
     if MODES_CONFIG[s].getboolean('ENABLED'):
@@ -50,10 +50,10 @@ current_state = {}
 # Read the modes' list from appropriate conf file
 CMD_CONFIG = configparser.ConfigParser()
 CMD_CONFIG.optionxform = lambda option: option
-CMD_CONFIG.read(CMD_CONF)
+CMD_CONFIG.read(CMD_CONF_FILE)
 cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode]['TYPE']])
 
 # Get the port from sockets' conf file
-SOCKET_CONFIG = configparser.ConfigParser()
-SOCKET_CONFIG.read(SOCKETS_CONF)
-MODES_PORT = int(SOCKET_CONFIG['MODES']['PORT'])
+SOCKETS_CONFIG = configparser.ConfigParser()
+SOCKETS_CONFIG.read(SOCKETS_CONF_FILE)
+MODES_PORT = int(SOCKETS_CONFIG['MODES']['PORT'])

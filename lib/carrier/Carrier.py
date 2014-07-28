@@ -26,7 +26,7 @@ import configparser
 import pickle
 
 # Pilberry packages|modules imports
-from lib.globals import SOCKET_CONFIG
+from lib.globals import SOCKETS_CONFIG
 
 ##
 # @class Carrier
@@ -37,7 +37,6 @@ class Carrier(object):
     ##
     #   @brief This initializer builds the list of available sockets.
     def __init__(self):
-        self._sockets_available = SOCKET_CONFIG
         self._sockets_enabled = {}
 
     ##
@@ -45,16 +44,32 @@ class Carrier(object):
     #          then 'packs' and sends the data.
     def send(self, dest, data):
         if not dest in self._sockets_enabled.keys():
-            self._sockets_enabled[dest] = socket.socket(socket.AF_INET,
-                                                        socket.SOCK_STREAM)
+            if SOCKETS_CONFIG[dest]['TYPE'] == 'TCP_IP':
+                self._sockets_enabled[dest] = socket.socket(socket.AF_INET,
+                                                            socket.SOCK_STREAM)
+
+                ##
+                # @todo Check if the connection works
+                #       and handle the possible exception
+
+                self._sockets_enabled[dest].connect((\
+                                            str(SOCKETS_CONFIG[dest]['IP']),
+                                            int(SOCKETS_CONFIG[dest]['PORT'])))
+
 
             ##
-            # @todo Check if the connection works
-            #       and handle the possible exception
+            # @todo Maybe check if the type is 'UNIX' and not anything else (
+            #       would be wrong)
+            else:
+                self._sockets_enabled[dest] = socket.socket(socket.AF_UNIX,
+                                                            socket.SOCK_DGRAM)
 
-            self._sockets_enabled[dest].connect((\
-                                    str(self._sockets_available[dest]['IP']),
-                                    int(self._sockets_available[dest]['PORT'])))
+                ##
+                # @todo Check if the connection works
+                #       and handle the possible exception
+
+                self._sockets_enabled[dest].connect(\
+                                            str(SOCKETS_CONFIG[dest]['FILE']))
 
 
         self._sockets_enabled[dest].send(pickle.dumps(data))
