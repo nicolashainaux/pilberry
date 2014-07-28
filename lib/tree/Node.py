@@ -22,7 +22,9 @@
 
 
 # Python packages|modules imports
-
+import os.path
+import ntpath
+from abc import ABCMeta, abstractmethod
 
 # Pilberry packages|modules imports
 
@@ -30,48 +32,56 @@
 
 ##
 # @class Node
-# @brief This matches both the inner nodes and leaves of the tree.
+# @brief This matches both the inner nodes and the leaves of the tree.
 #        A Node contains also all kind of information that may be available,
-#        it gets it at its creation, from the database using the unique id,
+#        it gets it at its creation, from the file system or from the database,
 #        and lets it accessible as from a dictionnary.
 #        For instance, it should be possible to get, if current_node is a Node:
-#        current_node['file_name'], current_node['id3_tags'],
+#        current_node['file_name'], current_node['tags'],
 #        current_node['Artist'], current_node['Album'] etc.
-class Node(object):
+class Node(object, metaclass=ABCMeta):
 
     ##
     #   @brief
     #   @param  parent : the parent Node
-    #   @param  id : the id of the file, to get infos from the database
+    #   @param  full_path : the full path of the file
+    #   @param  position : the position among the neighbours' list
+    #   @param  view : the view type (e.g. file system, album/artist etc.)
     #   @param  add_children : int that tells how deep we should add children
-    def __init__(self, parent, full_path, position, add_children):
+    def __init__(self, parent, full_path, position, view, add_children):
         self._parent = parent
-        self._full_path = full_path  # will also be a unique identifier
-        #self._id3_tags = ... # extract them from the database, as a dict
+        self._full_path = full_path  # can also be used as unique identifier
+        #self._tags = ... # extract them from the database, as a dict,
+                              # or from the file, if we're using the file
+                              # system view
         self._position = position # this should be an int
+        self._view = view
 
-        self._display = ... # Create it from the infos and according to
+        #self._display = ... # Create it from the infos and according to
                             # the chosen view (defined in conf file)
 
-        self._content = {'file_name' : ...,  # get it from database
-                         'display' : self._display
-                         #'id3_tags' : self._id3_tags
+        # Now, determine the file name from full_path
+        # and add a "/" at the end if it's a dir name actually
+        end_as_dirname = ""
+
+        if os.path.isdir(full_path):
+            end_as_dirname = "/"
+
+        head, tail = ntpath.split(full_path)
+        file_name = tail or ntpath.basename(head)
+        file_name += end_as_dirname
+
+        self._content = {'full_path' : full_path,
+                         'file_name' : file_name
+                         #'tags' : self._tags
                          }
 
-        self._children = [] # and if the current node does have children in
-                            # this view (e.g. is not a leaf),
-                            # AND if we want to dive one step more
-                            # into the tree (add_children > 0 ),
-                            # then create them according to conf file (which
-                            # kind of view...). Take all info
-                            # from database and create each new i-th Node in
-                            # this list with Node(self, id[i], i, add_children-1).
-                            # Maybe find a way to share code with
-                            # the method add_children() for that?
-                            # It should be all the same...
+        self._children = []
 
-        # To allow using move_to_parent on the root Node,
-        # maybe use that; but modify the Tree.move_to_parent() accordingly
+        # This was an idea to allow using move_to_parent on the root Node,
+        # without detecting self._parent is None;
+        # but this implies some problems in Tree.move_to_parent()
+        # and in other cases... so better not do that
         #if self._parent = None:
         #    self._parent = self
 
@@ -81,21 +91,16 @@ class Node(object):
     def __getitem__(self, key):
         if key in self._content:
             return self._content[key]
-        #elif key in self._id3_tags:
-        #    return self._content['id3_tags'][key]
+        #elif key in self._tags:
+        #    return self._content['tags'][key]
 
 
 
     ##
     #   @brief  Checks if current Node is actually a leaf
+    @abstractmethod
     def is_a_leaf(self):
-        # /!\ Take care, this should not only be:
-        #return len(self._children) == 0
-        # This should actually check, in the database, if self has really
-        # children or not, according to the current view
-
-        # /!\ MAYBE this would be better a (class?) method, because
-        # it is useful in many situations, including in __init__()
+        pass
 
 
     ##
@@ -135,10 +140,6 @@ class Node(object):
 
     ##
     #   @brief
+    @abstractmethod
     def add_children(self, depth):
-        if not self.is_a_leaf():
-            # define all what children would be, according to the chosen view
-            # and add them to self._children
-            # should be same algorithm as in __init__()
-            # depth is an int. if depth == 0, do nothing, if depth > 0,
-            # then call recursively add_children on each child, with depth - 1
+        pass

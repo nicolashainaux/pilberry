@@ -25,7 +25,9 @@
 
 # Pilberry packages|modules imports
 from .Node import Node
-
+from .NodeFileSystem import NodeFileSystem
+# from .NodeDataBase import NodeDataBase
+from lib.globals import current_mode, MODES_CONFIG, USER_CONFIG
 
 ##
 # @class Tree
@@ -34,22 +36,48 @@ class Tree(object):
 
     ##
     #   @brief
-    #   @param  id : this will be the id of the root node, has to be taken
-    #                from the database
-    #                We could change it for just the root_path/, what
-    #                will be accessible from the conf file, and let
-    #                __init__() itself get the matching id from the database
-    def __init__(self, id):
+    #   @todo   When the NodeDataBase will get used, remember to uncomment the
+    #           matching lines
+    def __init__(self):
         # We'll first define the children until a depth of 2: e.g. the first
         # level directly under the root, and their children also (like the
         # level "Artists" + the level "Albums")
-        self._nodes = Node(None, id, 0, 2)
-        self._current_depth = 0
+        node_class = NodeFileSystem
+        self._view_type = 'FILE_SYSTEM'
+
+        if USER_CONFIG['VIEW']['ALL'] == '':
+            if USER_CONFIG['VIEW'][current_mode] == '':
+                if USER_CONFIG['VIEW']['DEFAULT'] != '':
+                    if USER_CONFIG['VIEW']['DEFAULT'] != 'FILE_SYSTEM':
+                        #node_class = NodeDataBase
+                        self._view_type = USER_CONFIG['VIEW']['DEFAULT']
+            elif USER_CONFIG['VIEW'][current_mode] != 'FILE_SYSTEM':
+                #node_class = NodeDataBase
+                self._view_type = USER_CONFIG['VIEW'][current_mode]
+
+        elif USER_CONFIG['VIEW']['ALL'] != 'FILE_SYSTEM':
+            #node_class = NodeDataBase
+            self._view_type = USER_CONFIG['VIEW']['ALL']
+
+
+        self._nodes = node_class(None,
+                                 MODES_CONFIG[current_mode]['ROOT_PATH'],
+                                 0,
+                                 self._view_type,
+                                 2)
+
         # We set current_node as the first node found in root/,
         # otherwise we'll have to enter root to see anything
         self._neighbours_list = self._nodes.children
+
+        ##
+        #   @todo   Check if there is one child at least!
         self._current_node = self._nodes.children[0]
 
+        ##
+        #   @todo   Maybe initialize it to 1, because we did not set the
+        #           view to / but to the first child of /
+        self._current_depth = 0
 
 
     ##
@@ -62,8 +90,16 @@ class Tree(object):
     def get_current_depth(self):
         return self._current_depth
 
+
+    ##
+    #   @brief
+    def get_view_type(self):
+        return self._view_type
+
+
     current_node = property(get_current_node, doc="Current Node in the Tree")
     current_depth = property(get_current_depth, doc="Current depth in the Tree")
+    view_type = property(view_type, doc="View type of the Tree")
 
 
     ##
