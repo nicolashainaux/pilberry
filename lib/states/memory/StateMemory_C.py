@@ -31,10 +31,7 @@ class State_C(State):
     def __init__(self):
         pass
 
-    def init(self):
-        pass
-
-    def quit(self):
+    def __del__(self):
         pass
 
     def handle_cmd_dir_up(self):
@@ -61,4 +58,6 @@ class State_C(State):
     def handle_cmd_chmod(self):
         print("handle_cmd_chmod from State_C")
 
+    def handle_cmd_settings(self):
+        print("handle_cmd_settings from State_C")
 
