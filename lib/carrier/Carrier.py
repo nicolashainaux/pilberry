@@ -21,6 +21,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Python packages|modules imports
+import os
 import socket
 import configparser
 import pickle
@@ -87,4 +88,8 @@ class Carrier(object):
     #          able to use the object in a with statement.
     def __exit__(self, type, value, traceback):
         for dest in self._sockets_enabled:
+            self._sockets_enabled[dest].shutdown(socket.SHUT_RDWR)
             self._sockets_enabled[dest].close()
+            if SOCKETS_CONFIG[dest]['TYPE'] == 'UNIX':
+                os.remove(str(SOCKETS_CONFIG[dest]['FILE']))
+
