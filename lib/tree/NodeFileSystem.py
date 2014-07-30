@@ -25,7 +25,7 @@
 import os
 
 # Pilberry packages|modules imports
-from . import Node
+from .Node import Node
 from lib.utils import natural_sort
 from lib.globals import USER_CONFIG
 

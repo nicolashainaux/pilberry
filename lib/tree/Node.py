@@ -45,8 +45,8 @@ class Node(object, metaclass=ABCMeta):
 
     ##
     #   @brief  Checks if current Node is actually a leaf
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def is_a_leaf(self):
         # /!\ Take care, this should not only be:
         # return len(self._children) == 0
@@ -66,8 +66,8 @@ class Node(object, metaclass=ABCMeta):
     #   @return List
     #   @param  full_path   The full path of directory to test
     #   @todo   Maybe check full_path is a path to a directory.
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def get_children_list(full_path):
         pass
 

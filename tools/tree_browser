@@ -31,6 +31,7 @@ import argparse
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, cmd_match_list
+from lib.tree import Tree
 
 # Get the socket file name from sockets' conf file
 SOCKET_FILE = str(SOCKETS_CONFIG['TEST_TREE_BROWSER']['FILE'])

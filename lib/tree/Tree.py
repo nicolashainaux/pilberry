@@ -99,7 +99,7 @@ class Tree(object):
 
     current_node = property(get_current_node, doc="Current Node in the Tree")
     current_depth = property(get_current_depth, doc="Current depth in the Tree")
-    view_type = property(view_type, doc="View type of the Tree")
+    view_type = property(get_view_type, doc="View type of the Tree")
 
 
     ##
