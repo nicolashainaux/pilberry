@@ -31,23 +31,23 @@ import argparse
 from lib.carrier.Carrier import Carrier
 
 parser = argparse.ArgumentParser(description='Sends a message to a dest process')
-parser.add_argument('dest process', metavar='dest', type=str, nargs='+',
+parser.add_argument('dest', metavar='DESTINATION', type=str, nargs='+',
                    help='the "adress" of the destination process')
 
 args = vars(parser.parse_args())
 
 with Carrier() as C:
     while True:
-        x = input(str(args['dest process'][0]) + "> ")
+        x = input(str(args['dest'][0]) + "> ")
         if "" == x:
-            C.send(args['dest process'][0], 'CMD_A1')
+            C.send(args['dest'][0], 'CMD_A1')
         elif "DONE" == x or "QUIT" == x:
             print("Shutting down.")
             if "QUIT" == x:
-                C.send(args['dest process'][0], x)
+                C.send(args['dest'][0], x)
             sys.exit()
         else:
-            C.send(args['dest process'][0], x)
+            C.send(args['dest'][0], x)
 
 
 
