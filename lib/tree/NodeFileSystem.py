@@ -26,7 +26,8 @@ import os
 
 # Pilberry packages|modules imports
 from . import Node
-from ..utils import natural_sort
+from lib.utils import natural_sort
+from lib.globals import USER_CONFIG
 
 
 ##
@@ -65,7 +66,12 @@ class NodeFileSystem(Node):
     #   @todo   Maybe check full_path is a path to a directory.
     @staticmethod
     def get_children_list(full_path):
-        return natural_sort(os.listdir(full_path))
+        if USER_CONFIG['GENERAL'].getboolean('SHOW_FILES_FIRST'):
+            return natural_sort(next(os.walk(full_path))[2]) \
+                   + natural_sort(next(os.walk(full_path))[1])
+        else:
+            return natural_sort(next(os.walk(full_path))[1]) \
+                   + natural_sort(next(os.walk(full_path))[2])
 
 
 
