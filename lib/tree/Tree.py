@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Python packages|modules imports
-
+import logging
 
 # Pilberry packages|modules imports
 from .Node import Node
@@ -38,10 +38,11 @@ class Tree(object):
     #   @brief
     #   @todo   When the NodeDataBase will get used, remember to uncomment the
     #           matching lines
-    def __init__(self):
+    def __init__(self, **options):
         # We'll first define the children until a depth of 2: e.g. the first
         # level directly under the root, and their children also (like the
         # level "Artists" + the level "Albums")
+
         node_class = NodeFileSystem
         self._view_type = 'FILE_SYSTEM'
 
@@ -59,20 +60,37 @@ class Tree(object):
             #node_class = NodeDataBase
             self._view_type = USER_CONFIG['VIEW']['ALL']
 
+        root_path = MODES_CONFIG[current_mode]['ROOT_PATH']
+        if 'root' in options:
+            root_path = options['root']
+
 
         self._nodes = node_class(None,
-                                 MODES_CONFIG[current_mode]['ROOT_PATH'],
+                                 root_path,
                                  0,
                                  self._view_type,
                                  2)
+
 
         # We set current_node as the first node found in root/,
         # otherwise we'll have to enter root to see anything
         self._neighbours_list = self._nodes.children
 
+        s = str(type(self._nodes))
+        logging.debug("root node's type is: "\
+                     + s[s.rfind('.')+1:-2] \
+                     + " its name is: " \
+                     + self._nodes['file_name'] \
+                     + " and it has: " \
+                     + str(len(self._nodes.children)) \
+                     + " children.")
+
         ##
         #   @todo   Check if there is one child at least!
         self._current_node = self._nodes.children[0]
+
+        logging.debug("initialized current_node at: " \
+                      + self._current_node['file_name'])
 
         ##
         #   @todo   Maybe initialize it to 1, because we did not set the
@@ -97,9 +115,20 @@ class Tree(object):
         return self._view_type
 
 
-    current_node = property(get_current_node, doc="Current Node in the Tree")
-    current_depth = property(get_current_depth, doc="Current depth in the Tree")
-    view_type = property(get_view_type, doc="View type of the Tree")
+    ##
+    #   @brief
+    def get_current_neighbours(self):
+        return self._neighbours_list
+
+
+    current_node = property(get_current_node,
+                            doc="Current Node in the Tree")
+    current_depth = property(get_current_depth,
+                             doc="Current depth in the Tree")
+    view_type = property(get_view_type,
+                         doc="View type of the Tree")
+    current_neighbours = property(get_current_neighbours,
+                          doc="All nodes at the same floor as current")
 
 
     ##
@@ -149,13 +178,15 @@ class Tree(object):
 
     ##
     #   @brief
-    def move_to_first_child(self):
+    def move_to_1st_child(self):
         # There it is not useful to use the is_a_leaf() method because
-        # we don't need to make a request in the DB. If there are children,
-        # they are already here. So just check len(children)
+        # we don't need to check the filesystem neither to make a request
+        # in the DB. If there are children, they are already here.
+        # So just check len(children)
         if len(self.current_node.children) >= 1:
             for n in self.current_node.children:
-                n.add_children(1)
+                if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
+                    n.add_children(1)
             self._neighbours_list = self.current_node.children
             self._current_node = self.current_node.children[0]
             self._current_depth += 1

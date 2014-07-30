@@ -50,7 +50,7 @@ class NodeFileSystem(Node):
         # /!\ Check the comment in Node.is_a_leaf() before changing this
         # A non-empty directory will be treated as an inode (False)
         # all other cases are leaves (True)
-        if os.path.is_dir(full_path) and len(os.listdir(full_path)) != 0:
+        if os.path.isdir(full_path) and len(os.listdir(full_path)) != 0:
             return False
         else:
             return True

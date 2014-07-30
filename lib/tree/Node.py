@@ -25,6 +25,7 @@
 import os.path
 import ntpath
 from abc import ABCMeta, abstractmethod
+import logging
 
 # Pilberry packages|modules imports
 
@@ -68,22 +69,65 @@ class Node(object, metaclass=ABCMeta):
     #   @todo   Maybe check full_path is a path to a directory.
     @staticmethod
     @abstractmethod
-    def get_children_list(full_path):
+    def get_children_list(self, full_path):
         pass
+        #getattr(self, self.get_children_list(full_path))()
 
 
 
     ##
     #   @brief
     def add_children(self, depth):
-        if depth > 0 and not self.is_a_leaf(self.full_path):
+        logging.debug("Node: " \
+                      + self['file_name'] \
+                      + " checks if it can add children. Given depth is: " \
+                      + str(depth))
+        if depth > 0 \
+            and not self.is_a_leaf(self.full_path) \
+            and len(self._children) == 0:
+        #___
+            logging.debug("Node: " \
+                          + self['file_name'] \
+                          + " will add children")
             for i, name in enumerate(self.get_children_list(self.full_path)):
-                self._children.append(NodeFileSystem(self,
-                                                     self.full_path + name,
-                                                     i,
-                                                     self._view,
-                                                     depth - 1
-                                                     ))
+                ##
+                #   @todo The following line is a hack to avoid encoding errors,
+                #         it would be better to find a way to avoid doing this
+                #         encoding/decoding on each file. Problem is, when more
+                #         than one encoding error shows up, it does not seem
+                #         possible to catch all raised exceptions.
+                #         As it is now, directories with encoding errors in their
+                #         name will be treated as if they were empty.
+                name = name.encode('utf-8', 'replace').decode()
+
+            #    try:
+            #        print("At position " + str(i) + " I've found " + name)
+            #    except UnicodeEncodeError:
+            #        safe_name = "ENCODING ERROR on " + name.encode('ascii',
+            #                                                       'replace')
+
+                n = object.__new__(type(self))
+                n.__init__(self,
+                           self.full_path + name,
+                           i,
+                           self._view,
+                           depth - 1
+                           )
+
+                if depth > 1:
+                    n.add_children(depth - 1)
+
+                self._children.append(n)
+                logging.debug("Node: " + self['file_name'] + \
+                              " has now " \
+                              + str(len(self._children)) \
+                              + " children. ")
+
+        elif depth > 1 \
+            and not self.is_a_leaf(self.full_path):
+        #___
+            for n in self._children:
+                n.add_children(depth - 1)
 
 
 
@@ -96,6 +140,15 @@ class Node(object, metaclass=ABCMeta):
     #   @param  depth : int that tells how deep we should further add children
     def __init__(self, parent, full_path, position, view, depth):
         self._parent = parent
+
+        end_as_dirname = ""
+
+        if os.path.isdir(full_path):
+            end_as_dirname = "/"
+            if full_path[-1:] != "/":
+                full_path += end_as_dirname
+
+
         self._full_path = full_path  # can also be used as unique identifier
         #self._tags = ... # extract them from the database, as a dict,
                               # or from the file, if we're using the file
@@ -108,14 +161,18 @@ class Node(object, metaclass=ABCMeta):
 
         # Now, determine the file name from full_path
         # and add a "/" at the end if it's a dir name actually
-        end_as_dirname = ""
-
-        if os.path.isdir(full_path):
-            end_as_dirname = "/"
-
         head, tail = ntpath.split(full_path)
         file_name = tail or ntpath.basename(head)
         file_name += end_as_dirname
+
+        temp = "None"
+        if self.parent != None:
+            temp = self.parent['file_name']
+
+        s = str(type(self))
+        logging.debug("creating a new " + s[s.rfind('.')+1:-2] \
+                      + "; its parent is: " +  temp \
+                      + "; its name: " + file_name)
 
         # The content should be initialized here, without any problem a priori
         self._content = {'full_path' : full_path,
@@ -127,7 +184,7 @@ class Node(object, metaclass=ABCMeta):
         self._children = []
 
         if depth > 0:
-            self.add_children(depth - 1)
+            self.add_children(depth)
 
 
 
