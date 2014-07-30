@@ -41,5 +41,10 @@ server.bind(SOCKET_FILE)
 
 print("Waiting for instructions...")
 while True:
-    cmd = cmd_match_list[pickle.loads(server.recv(1024))]
-    print(cmd)
+    raw_cmd = pickle.loads(server.recv(1024))
+    if raw_cmd == 'QUIT':
+        print("Shutting down server")
+        sys.exit()
+    else:
+        cmd = cmd_match_list[raw_cmd]
+        print(cmd)
