@@ -31,23 +31,32 @@ class State_A(State):
     def __init__(self):
         pass
 
-    def init(self):
-        pass
-
-    def quit(self):
+    def __del__(self):
         pass
 
     def handle_cmd_dir_up(self):
         print("handle_cmd_dir_up from State_A")
+        # Go up in the tree (new dir/artist/album)
+        #   (if current is the first, go to last)
+        # Display the new current item (dir/artist/album)
 
     def handle_cmd_dir_down(self):
         print("handle_cmd_dir_down from State_A")
+        # Go down in the tree (new dir/artist/album)
+        #   (if current is last, go to first)
+        # Display the new current item (dir/artist/album)
 
     def handle_cmd_play(self):
         print("handle_cmd_play from State_A")
+        # Go to the next item
+        #   (if last, go to first)
+        # Display the new current item (dir/artist/album)
 
     def handle_cmd_prev(self):
         print("handle_cmd_prev from State_A")
+        # Go down in the tree (new dir/artist/album)
+        #   (if current is last, go to first)
+        # Display the new current item (dir/artist/album)
 
     def handle_cmd_next(self):
         print("handle_cmd_next from State_A")
@@ -61,4 +70,6 @@ class State_A(State):
     def handle_cmd_chmod(self):
         print("handle_cmd_chmod from State_A")
 
+    def handle_cmd_settings(self):
+        print("handle_cmd_settings from State_A")
 
