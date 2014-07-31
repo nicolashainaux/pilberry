@@ -24,14 +24,21 @@
 # Main script that will start all other pilberry components
 
 # Python packages|modules imports
-
+import subprocess
+import time
 
 # Pilberry packages|modules imports
 
 
 def __main__():
-    pass
+    subprocess.Popen(['cmus'])
+
+    ##
+    #   @todo   Check if the timing below is enough/not too much
+
+    # To ensure cmus is completely open before any cmus-remote command is sent:
+    time.sleep(1)
 
 
 if __name__ == '__main__':
-    main()
+    __main__()
