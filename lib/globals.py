@@ -66,3 +66,7 @@ MODES_PORT = int(SOCKETS_CONFIG['MODES']['PORT'])
 USER_CONFIG = configparser.ConfigParser()
 USER_CONFIG.optionxform = lambda option: option
 USER_CONFIG.read(USER_CONF_FILE)
+
+MUSIC_FILE_EXTENSIONS = ['.ogg', '.mp3', '.flac', '.wma', '.m4a',
+                         '.mpc', '.mpp', '.wav', '.wv', '.ape',
+                         '.aac', '.mp4', '.mod', '.s3m']

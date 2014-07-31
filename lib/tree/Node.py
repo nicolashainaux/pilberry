@@ -28,7 +28,7 @@ from abc import ABCMeta, abstractmethod
 import logging
 
 # Pilberry packages|modules imports
-
+from globals import MUSIC_FILE_EXTENSIONS
 
 
 ##
@@ -106,22 +106,25 @@ class Node(object, metaclass=ABCMeta):
             #        safe_name = "ENCODING ERROR on " + name.encode('ascii',
             #                                                       'replace')
 
-                n = object.__new__(type(self))
-                n.__init__(self,
-                           self.full_path + name,
-                           i,
-                           self._view,
-                           depth - 1
-                           )
+                file_name, extension = os.path.splitext(name)
 
-                if depth > 1:
-                    n.add_children(depth - 1)
+                if extension in MUSIC_FILE_EXTENSIONS:
+                    n = object.__new__(type(self))
+                    n.__init__(self,
+                               self.full_path + name,
+                               i,
+                               self._view,
+                               depth - 1
+                               )
 
-                self._children.append(n)
-                logging.debug("Node: " + self['file_name'] + \
-                              " has now " \
-                              + str(len(self._children)) \
-                              + " children. ")
+                    if depth > 1:
+                        n.add_children(depth - 1)
+
+                    self._children.append(n)
+                    logging.debug("Node: " + self['file_name'] + \
+                                  " has now " \
+                                  + str(len(self._children)) \
+                                  + " children. ")
 
         elif depth > 1 \
             and not self.is_a_leaf(self.full_path):
