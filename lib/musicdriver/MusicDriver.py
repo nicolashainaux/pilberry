@@ -24,11 +24,13 @@
 import subprocess
 
 # Pilberry packages|modules imports
+from lib.globals import current_tree
 
 ##
 # @class MusicDriver
 # @brief The MusicDriver will drive the music player
 class MusicDriver(object):
+
 
     ##
     #   @brief
@@ -39,11 +41,29 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def play_songs(self, full_paths_list):
-        for s in full_paths_list:
-            self._send(['-q', s])
+    #def play_songs(self, full_paths_list):
+    #    for s in full_paths_list:
+    #        self._send(['-q', s])
+    #
+    #    self._send(['-p'])
 
-        self._send(['-p'])
+    ##
+    #   @brief
+    def start_playing(self):
+
+
+
+    ##
+    #   @brief
+    def stop(self):
+        self._send(['-s'])
+
+
+
+    ##
+    #   @brief
+    def pause(self):
+        self._send(['-u'])
 
 
 
