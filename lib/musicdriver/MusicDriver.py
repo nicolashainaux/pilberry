@@ -21,6 +21,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Python packages|modules imports
+import subprocess
 
 # Pilberry packages|modules imports
 
@@ -32,7 +33,26 @@ class MusicDriver(object):
     ##
     #   @brief
     def __init__(self):
-        pass
+        self._songs_queue = ['']
+
+
+
+    ##
+    #   @brief
+    def play_songs(self, full_paths_list):
+        for s in full_paths_list:
+            self._send(['-q', s])
+
+        self._send(['-p'])
+
+
+
+    ##
+    #   @brief  Sends the given command to cmus, via cmus-remote
+    #   @param  cmd_list a list of chains
+    def _send(self, cmd_list):
+        subprocess.Popen(['cmus-remote'] + cmd_list)
+
 
 
     ##
