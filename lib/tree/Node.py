@@ -28,7 +28,7 @@ from abc import ABCMeta, abstractmethod
 import logging
 
 # Pilberry packages|modules imports
-from globals import MUSIC_FILE_EXTENSIONS
+from lib.globals import MUSIC_FILE_EXTENSIONS
 
 
 ##
@@ -108,7 +108,9 @@ class Node(object, metaclass=ABCMeta):
 
                 file_name, extension = os.path.splitext(name)
 
-                if extension in MUSIC_FILE_EXTENSIONS:
+                if not self.is_a_leaf(self.full_path + name) \
+                    or extension in MUSIC_FILE_EXTENSIONS:
+                #___
                     n = object.__new__(type(self))
                     n.__init__(self,
                                self.full_path + name,
