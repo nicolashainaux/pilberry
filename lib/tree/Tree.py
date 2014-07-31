@@ -120,6 +120,21 @@ class Tree(object):
     def get_current_neighbours(self):
         return self._neighbours_list
 
+    ##
+    #   @brief Returns the list of self + all neighbours after me
+    def get_current_neighbours_after(self):
+        return self._neighbours_list[\
+                          self.current_node.position:len(self._neighbours_list)]
+
+
+
+    ##
+    #   @brief Returns the list of neighbours before me (but not me)
+    def get_current_neighbours_before(self):
+        return self._neighbours_list[0:self.current_node.position]
+
+
+
 
     current_node = property(get_current_node,
                             doc="Current Node in the Tree")
