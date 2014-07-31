@@ -144,6 +144,12 @@ class Tree(object):
                          doc="View type of the Tree")
     current_neighbours = property(get_current_neighbours,
                           doc="All nodes at the same floor as current")
+    current_neighbours_after = property(get_current_neighbours_after,
+                          doc="All nodes at the same floor as current, " \
+                              "after current, including current")
+    current_neighbours_before = property(get_current_neighbours_before,
+                          doc="All nodes at the same floor as current, " \
+                              "before current, but not current")
 
 
     ##
