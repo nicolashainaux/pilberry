@@ -49,8 +49,17 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def start_playing(self):
+    def add_playlist(self, full_path):
+        self._send(['-C', '"add -p ' + full_path + '"'])
 
+
+    ##
+    #   @brief
+    def start_playing(self):
+        for n in current_tree.current_neighbours_after:
+            self.add_playlist(n.full_path)
+
+        self._send(['-p'])
 
 
     ##
@@ -62,7 +71,7 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def pause(self):
+    def toggle_pause(self):
         self._send(['-u'])
 
 
@@ -88,5 +97,7 @@ class MusicDriver(object):
     #          and an __exit__() methods are required to be able to use the
     #          object in a with statement.
     def __exit__(self, type, value, traceback):
+        ##
+        #   @todo   Send the quit signal to cmus
         pass
 
