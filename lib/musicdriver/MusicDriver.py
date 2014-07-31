@@ -22,9 +22,11 @@
 
 # Python packages|modules imports
 import subprocess
+import logging
 
 # Pilberry packages|modules imports
-from lib.globals import current_tree
+import lib.globals as globals
+
 
 ##
 # @class MusicDriver
@@ -50,15 +52,28 @@ class MusicDriver(object):
     ##
     #   @brief
     def add_playlist(self, full_path):
-        self._send(['-C', '"add -p ' + full_path + '"'])
+        self._send(['-C', 'add -q ' + full_path])
+
+
+    ##
+    #   @brief
+    def clear_queue(self):
+        self._send(['-c', '-q'])
+
+    ##
+    #   @brief
+    def skip_to_next_song(self):
+        self._send(['-C', 'player-next'])
 
 
     ##
     #   @brief
     def start_playing(self):
-        for n in current_tree.current_neighbours_after:
+        self.clear_queue()
+        for n in globals.current_tree.current_neighbours_after:
             self.add_playlist(n.full_path)
 
+        self.skip_to_next_song()
         self._send(['-p'])
 
 
@@ -80,6 +95,7 @@ class MusicDriver(object):
     #   @brief  Sends the given command to cmus, via cmus-remote
     #   @param  cmd_list a list of chains
     def _send(self, cmd_list):
+        logging.debug('sending ' + str(cmd_list) + ' via cmus-remote')
         subprocess.Popen(['cmus-remote'] + cmd_list)
 
 
