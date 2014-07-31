@@ -47,6 +47,9 @@ for s in MODES_CONFIG.sections():
 #   @todo   At startup, define the current_mode as last used mode
 current_mode = modes_list[0]
 current_state = {}
+##
+#   @todo   At startup, get the tree matching the current mode and state
+current_tree = None
 
 # Read the modes' list from appropriate conf file
 CMD_CONFIG = configparser.ConfigParser()
