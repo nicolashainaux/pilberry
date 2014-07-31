@@ -20,3 +20,16 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+# Python packages|modules imports
+import re
+
+# Pilberry packages|modules imports
+
+
+##
+#   @brief  Natural sort of a list; e.g. ['file2', 'file1', 'file10'] becomes
+#           ['file1', 'file2', 'file10'] and NOT ['file1', 'file10', 'file2']
+def natural_sort(l):
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    return sorted(l, key = alphanum_key)

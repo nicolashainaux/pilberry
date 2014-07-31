@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# Simple server script that waits for command, to test browsing a file system
+
+# Python packages|modules imports
+import time
+import pickle
+import configparser
+import socket
+import sys, os
+import argparse
+import logging
+
+# Pilberry packages|modules imports
+from lib.globals import SOCKETS_CONFIG, cmd_match_list
+from lib.tree.Tree import Tree
+
+logging.basicConfig(filename='tree_browser.log',
+                    filemode='w',
+                    level=logging.DEBUG,
+                    format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
+                    datefmt='%Y/%m/%d %H:%M:%S')
+
+# Get the socket file name from sockets' conf file
+SOCKET_FILE = str(SOCKETS_CONFIG['TEST_TREE_BROWSER']['FILE'])
+
+parser = argparse.ArgumentParser(description='Script to test driving a tree')
+parser.add_argument('root', metavar='ROOT_PATH', type=str, nargs='+',
+                   help='the "adress" of the destination process')
+
+tree_root = vars(parser.parse_args())['root'][0]
+
+if not os.path.isdir(tree_root):
+    print(tree_root + " is not a valid directory. Exiting")
+    sys.exit()
+
+t = Tree(root='/data/music/')
+
+print("Using socket file: " + SOCKET_FILE)
+server = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+server.bind(SOCKET_FILE)
+
+while True:
+    print("Parent node is: " \
+          + t.current_node.parent['full_path'])
+    print("Current node is " \
+          + t.current_node['file_name']\
+          + " and has " \
+          + str(len(t.current_node.children)) \
+          + " children.")
+    result = ""
+    for i in range(len(t.current_neighbours)):
+        open_bracket = "["
+        close_bracket = "]"
+        if i == t.current_node.position:
+            open_bracket = "<<"
+            close_bracket = ">>"
+
+        result += open_bracket \
+               + t.current_neighbours[i]['file_name'] \
+               + close_bracket \
+               + " "
+
+    print(result)
+
+    print("Waiting for next command...\n")
+    raw_cmd = pickle.loads(server.recv(1024))
+    if raw_cmd == 'QUIT':
+        print("Shutting down server")
+        sys.exit()
+    else:
+        try:
+            cmd = cmd_match_list[raw_cmd]
+        except KeyError:
+            print("Received: " + raw_cmd + ". Unknown command, no action")
+
+        else:
+            print("Received: " + cmd)
+            if cmd == "CMD_SELECT":
+                t.move_to_1st_child()
+
+            elif cmd == "CMD_MOVE_TO_PREV_NODE":
+                t.move_to_prev_node()
+
+            elif cmd == "CMD_MOVE_TO_NEXT_NODE":
+                t.move_to_next_node()
+
+            elif cmd == "CMD_MOVE_TO_PARENT":
+                t.move_to_parent()
+
+            elif cmd == "CMD_MOVE_TO_1ST_CHILD":
+                t.move_to_1st_child()
+
+            else:
+                print("This command has no action on browsing the tree")

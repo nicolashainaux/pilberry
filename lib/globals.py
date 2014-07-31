@@ -33,6 +33,7 @@ CONF_DIR = PILBERRY_ROOT + 'etc/'
 SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
+USER_CONF_FILE = CONF_DIR + 'user.conf'
 
 # Read the modes' list from appropriate conf file
 MODES_CONFIG = configparser.ConfigParser()
@@ -57,3 +58,8 @@ cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode]['TYPE']])
 SOCKETS_CONFIG = configparser.ConfigParser()
 SOCKETS_CONFIG.read(SOCKETS_CONF_FILE)
 MODES_PORT = int(SOCKETS_CONFIG['MODES']['PORT'])
+
+# Read the modes' list from appropriate conf file
+USER_CONFIG = configparser.ConfigParser()
+USER_CONFIG.optionxform = lambda option: option
+USER_CONFIG.read(USER_CONF_FILE)
