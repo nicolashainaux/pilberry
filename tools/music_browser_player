@@ -27,9 +27,10 @@
 import time
 import pickle
 import configparser
-import socket
+#import socket
 import sys, os
 import argparse
+import RPIO
 import logging
 
 # Pilberry packages|modules imports
@@ -38,14 +39,16 @@ from lib.tree.Tree import Tree
 from lib.musicdriver.MusicDriver import MusicDriver
 import lib.globals as globals
 
-logging.basicConfig(filename='mbp.log',
+logging.basicConfig(filename='../log/mbp.log',
                     filemode='w',
                     level=logging.DEBUG,
                     format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
                     datefmt='%Y/%m/%d %H:%M:%S')
 
 # Get the socket file name from sockets' conf file
-SOCKET_FILE = str(SOCKETS_CONFIG['TEST_MBP']['FILE'])
+SOCKETS_PORTS = [int(SOCKETS_CONFIG['TEST_MBP']['PORT']),
+                 int(SOCKETS_CONFIG['TEST_MBP2']['PORT'])
+                 ]
 
 parser = argparse.ArgumentParser(description='Script to test driving a tree')
 parser.add_argument('root', metavar='ROOT_PATH', type=str, nargs='+',
@@ -57,39 +60,39 @@ if not os.path.isdir(tree_root):
     print(tree_root + " is not a valid directory. Exiting")
     sys.exit()
 
-
-globals.current_tree = Tree(root='/data/music/')
+globals.current_tree = Tree(root=tree_root)
 md = MusicDriver()
 
-print("Using socket file: " + SOCKET_FILE)
-server = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-server.bind(SOCKET_FILE)
 
-while True:
-    print("Parent node is: " \
-          + globals.current_tree.current_node.parent['full_path'])
-    print("Current node is " \
-          + globals.current_tree.current_node['file_name']\
-          + " and has " \
-          + str(len(globals.current_tree.current_node.children)) \
-          + " children.")
-    result = ""
-    for i in range(len(globals.current_tree.current_neighbours)):
-        open_bracket = "["
-        close_bracket = "]"
-        if i == globals.current_tree.current_node.position:
-            open_bracket = "<<"
-            close_bracket = ">>"
+#print("Using socket file: " + SOCKET_FILE)
+#server = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+#server.bind(SOCKET_FILE)
 
-        result += open_bracket \
-               + globals.current_tree.current_neighbours[i]['file_name'] \
-               + close_bracket \
-               + " "
+print("Parent node is: " \
+      + globals.current_tree.current_node.parent['full_path'])
+print("Current node is " \
+      + globals.current_tree.current_node['file_name']\
+      + " and has " \
+      + str(len(globals.current_tree.current_node.children)) \
+      + " children.")
+result = ""
+for i in range(len(globals.current_tree.current_neighbours)):
+    open_bracket = "["
+    close_bracket = "]"
+    if i == globals.current_tree.current_node.position:
+        open_bracket = "<<"
+        close_bracket = ">>"
 
-    print(result)
+    result += open_bracket \
+           + globals.current_tree.current_neighbours[i]['file_name'] \
+           + close_bracket \
+           + " "
 
-    print("Waiting for next command...\n")
-    raw_cmd = pickle.loads(server.recv(1024))
+print(result)
+
+
+def socket_callback(socket, data):
+    raw_cmd = pickle.loads(data)
     if raw_cmd == 'QUIT':
         print("Shutting down server")
         sys.exit()
@@ -103,7 +106,7 @@ while True:
             print("Received: " + cmd)
             if cmd == "CMD_SELECT":
                 globals.current_tree.move_to_1st_child()
-                md.stop()
+                #md.stop()
                 md.start_playing()
 
             elif cmd == "CMD_MOVE_TO_PREV_NODE":
@@ -126,3 +129,47 @@ while True:
 
             else:
                 print("This command has no action on browsing the tree")
+
+    print("Parent node is now: " \
+          + globals.current_tree.current_node.parent['full_path'])
+    print("Current node is now: " \
+          + globals.current_tree.current_node['file_name']\
+          + " and has " \
+          + str(len(globals.current_tree.current_node.children)) \
+          + " children.")
+    result = ""
+    for i in range(len(globals.current_tree.current_neighbours)):
+        open_bracket = "["
+        close_bracket = "]"
+        if i == globals.current_tree.current_node.position:
+            open_bracket = "<<"
+            close_bracket = ">>"
+
+        result += open_bracket \
+               + globals.current_tree.current_neighbours[i]['file_name'] \
+               + close_bracket \
+               + " "
+
+    print(result)
+    print("Waiting for next command...\n")
+
+
+def socket_callback2(socket, data):
+    notification = pickle.loads(data)
+    if notification['status'] in globals.CMUS_NOTIFICATIONS:
+        print("Received status notification: " + notification['status'])
+        globals.cmus_status = notification['status']
+
+    else:
+        print("Received UNKNOWN status notification: " + notification['status'])
+
+    print("On full path: " + notification['full_path'])
+
+
+RPIO.add_tcp_callback(SOCKETS_PORTS[0], socket_callback)
+RPIO.add_tcp_callback(SOCKETS_PORTS[1], socket_callback2)
+
+print("Waiting for TCP interrupts...\n")
+
+# Blocking main epoll loop
+RPIO.wait_for_interrupts()

@@ -75,6 +75,7 @@ class MusicDriver(object):
             self.add_playlist(n.full_path)
 
         self.skip_to_next_song()
+
         self._send(['-p'])
 
 

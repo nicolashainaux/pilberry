@@ -34,6 +34,7 @@ SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
 USER_CONF_FILE = CONF_DIR + 'user.conf'
+AUDIO_FEEDBACK_SCRIPT = PILBERRY_ROOT + 'pilberry_audio_feedback'
 
 # Read the modes' list from appropriate conf file
 MODES_CONFIG = configparser.ConfigParser()
@@ -70,3 +71,9 @@ USER_CONFIG.read(USER_CONF_FILE)
 MUSIC_FILE_EXTENSIONS = ['.ogg', '.mp3', '.flac', '.wma', '.m4a',
                          '.mpc', '.mpp', '.wav', '.wv', '.ape',
                          '.aac', '.mp4', '.mod', '.s3m']
+
+CMUS_NOTIFICATIONS = ['stopped',
+                      'playing',
+                      'paused']
+
+cmus_status = 'stopped'

@@ -29,6 +29,7 @@ import time
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG
+from lib.globals import AUDIO_FEEDBACK_SCRIPT
 
 def __main__():
     subprocess.Popen(['cmus', '--listen', SOCKETS_CONFIG['CMUS']['FILE']])
@@ -37,7 +38,13 @@ def __main__():
     #   @todo   Check if the timing below is enough/not too much
 
     # To ensure cmus is completely open before any cmus-remote command is sent:
-    time.sleep(1)
+    time.sleep(2)
+
+    subprocess.Popen(['cmus-remote',
+                      '--server',
+                      SOCKETS_CONFIG['CMUS']['FILE'],
+                      '-C',
+                      'set status_display_program=' + AUDIO_FEEDBACK_SCRIPT])
 
 
 
