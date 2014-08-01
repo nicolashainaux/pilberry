@@ -36,7 +36,7 @@ import logging
 from lib.globals import SOCKETS_CONFIG, cmd_match_list
 from lib.tree.Tree import Tree
 
-logging.basicConfig(filename='tree_browser.log',
+logging.basicConfig(filename='../log/tree_browser.log',
                     filemode='w',
                     level=logging.DEBUG,
                     format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
