@@ -35,7 +35,8 @@ logging.basicConfig(filename='./log/audio_feedback.log',
                     format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
                     datefmt='%Y/%m/%d %H:%M:%S')
 
-logging.debug('just started')
+logging.debug('---------------------------------'\
+              + '--------------------------------------------------')
 
 with Carrier() as C:
     # Taken from
