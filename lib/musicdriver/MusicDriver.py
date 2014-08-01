@@ -26,6 +26,7 @@ import logging
 
 # Pilberry packages|modules imports
 import lib.globals as globals
+from lib.globals import SOCKETS_CONFIG
 
 
 ##
@@ -96,7 +97,11 @@ class MusicDriver(object):
     #   @param  cmd_list a list of chains
     def _send(self, cmd_list):
         logging.debug('sending ' + str(cmd_list) + ' via cmus-remote')
-        subprocess.Popen(['cmus-remote'] + cmd_list)
+        subprocess.Popen(['cmus-remote',
+                          '--server',
+                          SOCKETS_CONFIG['CMUS']['FILE']
+                         ]
+                         + cmd_list)
 
 
 

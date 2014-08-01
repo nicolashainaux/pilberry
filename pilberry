@@ -28,10 +28,10 @@ import subprocess
 import time
 
 # Pilberry packages|modules imports
-
+from lib.globals import SOCKETS_CONFIG
 
 def __main__():
-    subprocess.Popen(['cmus'])
+    subprocess.Popen(['cmus', '--listen', SOCKETS_CONFIG['CMUS']['FILE']])
 
     ##
     #   @todo   Check if the timing below is enough/not too much
