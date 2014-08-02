@@ -115,7 +115,10 @@ class Node(object, metaclass=ABCMeta):
                     n.__init__(self,
                                self.full_path + name,
                                i,
+                               self._children[0:i],
+                               [],
                                self._view,
+                               self.depth + 1,
                                deeper - 1
                                )
 
@@ -127,6 +130,12 @@ class Node(object, metaclass=ABCMeta):
                                   " has now " \
                                   + str(len(self._children)) \
                                   + " children. ")
+
+            # Now, add the neighbours after!
+            for i in range(len(self._children)):
+                self._children[i]._neighbours_after = \
+                                        self._children[i+1:len(self._children)]
+
 
         elif deeper > 1 \
             and not self.is_a_leaf(self.full_path):
@@ -143,7 +152,10 @@ class Node(object, metaclass=ABCMeta):
     #   @param  position : the position among the neighbours' list
     #   @param  view : the view type (e.g. file system, album/artist etc.)
     #   @param  deeper : int that tells how deep we should further add children
-    def __init__(self, parent, full_path, position, view, depth, deeper):
+    def __init__(self, parent, full_path, position,
+                       neighbours_before, neighbours_after,
+                       view, depth, deeper):
+
         self._parent = parent
 
         end_as_dirname = ""
@@ -185,8 +197,10 @@ class Node(object, metaclass=ABCMeta):
                          #'tags' : self._tags
                          }
 
-        # The children
+        # The children and neighbours
         self._children = []
+        self._neighbours_before = neighbours_before
+        self._neighbours_after = neighbours_after
 
         self._depth = depth
 
@@ -219,9 +233,26 @@ class Node(object, metaclass=ABCMeta):
 
     ##
     #   @brief
+    def get_neighbours_before(self):
+        return self._neighbours_before
+
+
+    ##
+    #   @brief
+    def get_neighbours_after(self):
+        return self._neighbours_after
+
+
+    ##
+    #   @brief
+    def get_neighbours(self):
+        return self._neighbours_before + [self] + self._neighbours_after
+
+
+    ##
+    #   @brief
     def get_full_path(self):
         return self._full_path
-
 
 
     ##
@@ -238,12 +269,25 @@ class Node(object, metaclass=ABCMeta):
 
     parent = property(get_parent, doc="Parent Node")
     children = property(get_children, doc="Children Nodes, if any")
+    neighbours_before = property(get_neighbours_before,
+                                 doc="Neighbours of the Node, before it")
+    neighbours_after = property(get_neighbours_after,
+                                doc="Neighbours of the Node, after it")
+    neighbours = property(get_neighbours,
+                          doc="Neighbours of the Node, including it")
+
     full_path = property(get_full_path, doc="The full patht to the file or "\
                                             + "directory. Will also be a unique"\
                                             + " identifier.")
     position = property(get_position, doc="Position of the Node among " \
                                          + "its brothers")
     depth = property(get_depth, doc="Depth of the Node")
+
+
+    ##
+    #   @brief
+    def set_depth(self, val):
+        self._depth = val
 
 
 

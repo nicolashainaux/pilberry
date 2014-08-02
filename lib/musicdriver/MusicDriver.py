@@ -65,17 +65,19 @@ class MusicDriver(object):
     #   @brief
     def start_playing(self):
         self.clear_queue()
-        for n in globals.current_tree.hneighbours_after:
+        for n in [globals.current_tree.head] \
+            + globals.current_tree.head.neighbours_after:
+        #___
             self.queue(n.full_path)
 
         self.skip_to_next_song()
         logging.debug("sending order to PLAY!")
 
-        subprocess.call(['echo ' \
-                         + str(time.time() + 7) \
-                         + ' > ' \
-                         + AUDIO_FEEDBACK_LOCK_FILE],
-                        shell=True)
+        #subprocess.call(['echo ' \
+        #                 + str(time.time() + 7) \
+        #                 + ' > ' \
+        #                 + AUDIO_FEEDBACK_LOCK_FILE],
+        #                shell=True)
 
         self._send(['-p'])
 

@@ -74,16 +74,18 @@ def report():
           + " and has " \
           + str(len(t.head.children)) \
           + " children.")
+    print("global.exploring: " + str(globals.exploring) \
+          + "          global.cmus_status: "+ str(globals.cmus_status))
     result = ""
-    for i in range(len(t.xneighbours)):
+    for i in range(len(t.xnode.neighbours)):
         open_bracket = "["
         close_bracket = "]"
-        if i == t.xnode.position:
+        if t.xnode.neighbours[i]['file_name'] == t.xnode['file_name']:
             open_bracket = "<<"
             close_bracket = ">>"
 
         result += open_bracket \
-               + t.xneighbours[i]['file_name'] \
+               + t.xnode.neighbours[i]['file_name'] \
                + close_bracket \
                + " "
 
@@ -125,13 +127,12 @@ def cmus_callback(socket, data):
                 # Let's try to find the node matching current song
                 # First, check if it's one of the song of the same 'directory'
                 found = False
-                for n in t.hneighbours:
+                for n in t.head.neighbours:
                     if n['full_path'] == notification['full_path']:
                         t.set_head(n)
                         found = True
                 if found:
                     logging.debug("found the node matching current song")
-                    report()
                     print("Updated head Node, waiting for next command...\n")
                 ##
                 #   @todo   If the next node at right is not the good one, then
@@ -145,6 +146,8 @@ def cmus_callback(socket, data):
         print("Received UNKNOWN status notification: " + notification['status'])
 
     print("On full path: " + notification['full_path'])
+
+    report()
 
 
 RPIO.add_tcp_callback(SOCKETS_PORTS[0], cmd_callback)

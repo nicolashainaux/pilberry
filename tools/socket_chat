@@ -30,6 +30,16 @@ import argparse
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
 
+SHORTCUTS = {'select' : 'CMD_A1',
+             'play' : 'CMD_A1',
+             'esc' : 'CMD_A2',
+             'prev' : 'CMD_B1',
+             'next' : 'CMD_C1',
+             'up' : 'CMD_D1',
+             'down' : 'CMD_E1',
+             'stop' : 'CMD_E2'
+             }
+
 parser = argparse.ArgumentParser(description='Sends a message to a dest process')
 parser.add_argument('dest', metavar='DESTINATION', type=str, nargs='+',
                    help='the "adress" of the destination process')
@@ -39,9 +49,11 @@ args = vars(parser.parse_args())
 with Carrier() as C:
     while True:
         x = input(str(args['dest'][0]) + "> ")
-        if "" == x:
-            C.send(args['dest'][0], 'CMD_A1')
-        elif "DONE" == x or "QUIT" == x:
+        if x in SHORTCUTS.keys():
+            x = SHORTCUTS[x]
+        #if "" == x:
+        #    C.send(args['dest'][0], 'CMD_A1')
+        if "DONE" == x or "QUIT" == x:
             print("Shutting down.")
             if "QUIT" == x:
                 C.send(args['dest'][0], x)

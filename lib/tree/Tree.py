@@ -71,6 +71,7 @@ class Tree(object):
         self._nodes = node_class(None,
                                  root_path,
                                  0,
+                                 [], [],
                                  self._view_type,
                                  0,
                                  2)
@@ -128,29 +129,6 @@ class Tree(object):
     def get_view_type(self):
         return self._view_type
 
-    ##
-    #   @brief
-    def get_hneighbours(self):
-        return self._hneighbours
-
-    ##
-    #   @brief
-    def get_xneighbours(self):
-        return self._xneighbours
-
-    ##
-    #   @brief Returns a list of all neighbours after head, including head
-    def get_hneighbours_after(self):
-        return self.hneighbours[self.head.position:len(self.hneighbours)]
-
-    ##
-    #   @brief Returns the list of neighbours before head (but not head)
-    def get_hneighbours_before(self):
-        return self.hneighbours[0:self.head.position]
-
-
-
-
     md = property(get_md,
                   doc="The Tree's MusicDriver")
     head = property(get_head,
@@ -159,18 +137,6 @@ class Tree(object):
                      doc="XNode is the 'explorer node' of the Tree")
     view_type = property(get_view_type,
                          doc="View type of the Tree")
-    hneighbours = property(get_hneighbours,
-                           doc="All nodes at the same floor as current")
-    xneighbours = property(get_xneighbours,
-                           doc="All nodes at the same floor as current x")
-    hneighbours_after = property(get_hneighbours_after,
-                          doc="All nodes at the same floor as current, " \
-                              "after current, including current")
-    hneighbours_before = property(get_hneighbours_before,
-                          doc="All nodes at the same floor as current, " \
-                              "before current, but not current")
-
-
     ##
     #   @brief
     def set_head(self, n):
@@ -196,8 +162,6 @@ class Tree(object):
         # is equivalent to 'self.xnode.parent is not root'
         if self.xnode.parent.parent != None:
             self.set_xnode(self.xnode.parent)
-            self.xnode.set_depth(xnode.depth - 1)
-            self._xneighbours = self.xnode.parent.children
 
         globals.exploring = True
 
@@ -207,9 +171,8 @@ class Tree(object):
     def move_to_next_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.xnode.position + 1) % len(self.xneighbours)
-        self.set_xnode(self.xneighbours[new_position])
-        # self._xneighbours remains the same
+        new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
+        self.set_xnode(self.xnode.neighbours[new_position])
 
         # Now, if we're at playing and not exploring, we have to change
         # head's position too and start playing
@@ -227,9 +190,8 @@ class Tree(object):
     def move_to_prev_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.xnode.position - 1) % len(self.xneighbours)
-        self.set_xnode(self.xneighbours[new_position])
-        # self._xneighbours remains the same
+        new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
+        self.set_xnode(self.xnode.neighbours[new_position])
 
         # Now, if we're at playing and not exploring, we have to change
         # head's position too and start playing
@@ -254,16 +216,14 @@ class Tree(object):
                 for n in self.xnode.children:
                     if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
                         n.add_children(1)
-                self._xneighbours = self.xnode.children
                 self.set_xnode(self.xnode.children[0])
-                self.xnode.set_depth(xnode.depth + 1)
 
 
     ##
     #   @brief
     def select(self):
         if len(self.xnode.children) >= 1:
-            self.move_to_first_child()
+            self.move_to_1st_child()
         else:
             if not globals.exploring:
                 self.md.toggle_pause()
@@ -289,6 +249,7 @@ class Tree(object):
             pass
         elif globals.exploring:
             self.set_xnode(self.head)
+            globals.exploring = False
         else:
             self.md.toggle_pause()
             globals.exploring = True
