@@ -98,7 +98,7 @@ def socket_callback(socket, data):
         sys.exit()
     else:
         try:
-            cmd = cmd_match_list[raw_cmd]
+            cmd = cmd_match_list[raw_cmd[0:6]]
         except KeyError:
             print("Received: " + raw_cmd + ". Unknown command, no action")
 
@@ -106,19 +106,35 @@ def socket_callback(socket, data):
             print("Received: " + cmd)
             if cmd == "CMD_SELECT":
                 globals.current_tree.move_to_1st_child()
-                #md.stop()
                 md.start_playing()
 
             elif cmd == "CMD_MOVE_TO_PREV_NODE":
-                #md.stop()
-                globals.current_tree.move_to_prev_node()
+                if len(raw_cmd) >= 8 and raw_cmd[6] == 'x':
+                    globals.current_tree.\
+                         move_to_prev_node(nb_step=int(raw_cmd[7:len(raw_cmd)]))
+                else:
+                    globals.current_tree.move_to_prev_node(nb_step=1)
+
+                if len(globals.current_tree.current_node.children) == 0 \
+                    and globals.cmus_status == "playing":
+                #___
+                        md.stop()
+                        md.start_playing()
 
             elif cmd == "CMD_MOVE_TO_NEXT_NODE":
-                #md.stop()
-                globals.current_tree.move_to_next_node()
+                if len(raw_cmd) >= 8 and raw_cmd[6] == 'x':
+                    globals.current_tree.\
+                         move_to_next_node(nb_step=int(raw_cmd[7:len(raw_cmd)]))
+                else:
+                    globals.current_tree.move_to_next_node(nb_step=1)
+
+                if len(globals.current_tree.current_node.children) == 0 \
+                    and globals.cmus_status == "playing":
+                #___
+                        md.stop()
+                        md.start_playing()
 
             elif cmd == "CMD_MOVE_TO_PARENT":
-                #md.stop()
                 globals.current_tree.move_to_parent()
 
             elif cmd == "CMD_MOVE_TO_1ST_CHILD":
@@ -159,6 +175,53 @@ def socket_callback2(socket, data):
     if notification['status'] in globals.CMUS_NOTIFICATIONS:
         print("Received status notification: " + notification['status'])
         globals.cmus_status = notification['status']
+        if 'playing' == globals.cmus_status:
+            if globals.current_tree\
+                    .current_node['full_path'] != notification['full_path']:
+            #___
+                logging.debug("noticed that current node doesn't match " \
+                              + "current song")
+                # Current song doesn't match current node
+                # Let's try to find the node matches the current song
+                # First, check if it's one of the song of the same 'directory'
+                found = False
+                for n in globals.current_tree.current_neighbours:
+                    if n['full_path'] == notification['full_path']:
+                        globals.current_tree.set_current_node(n)
+                        found = True
+                if found:
+                    logging.debug("found the node matching current song")
+                    print("Parent node is now: " \
+                     + globals.current_tree.current_node.parent['full_path'])
+                    print("Current node is now: " \
+                      + globals.current_tree.current_node['file_name']\
+                      + " and has " \
+                      + str(len(globals.current_tree.current_node.children))\
+                      + " children.")
+                    result = ""
+                    for i in range(len(globals.current_tree.\
+                                                        current_neighbours)):
+                        open_bracket = "["
+                        close_bracket = "]"
+                        if i == globals.current_tree.current_node.position:
+                            open_bracket = "<<"
+                            close_bracket = ">>"
+
+                        result += open_bracket \
+                               + globals.current_tree.\
+                                        current_neighbours[i]['file_name'] \
+                               + close_bracket \
+                               + " "
+
+                    print(result)
+                    print("Updated current Node, waiting for next command...\n")
+                ##
+                #   @todo   If the next node at right is not the good one, then
+                #           look for the good one! In the best case, a data-
+                #           base is available and we can find it thanks to its
+                #           full path. If no database is available, then a
+                #           search algorithm has to be found...
+
 
     else:
         print("Received UNKNOWN status notification: " + notification['status'])

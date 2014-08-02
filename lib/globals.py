@@ -34,7 +34,11 @@ SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
 USER_CONF_FILE = CONF_DIR + 'user.conf'
+
 AUDIO_FEEDBACK_SCRIPT = PILBERRY_ROOT + 'pilberry_audio_feedback'
+
+LOCKS_DIR = PILBERRY_ROOT + 'locks/'
+AUDIO_FEEDBACK_LOCK_FILE = LOCKS_DIR + 'audio_feedback'
 
 # Read the modes' list from appropriate conf file
 MODES_CONFIG = configparser.ConfigParser()
@@ -77,3 +81,4 @@ CMUS_NOTIFICATIONS = ['stopped',
                       'paused']
 
 cmus_status = 'stopped'
+exploring = False

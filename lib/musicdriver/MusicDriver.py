@@ -22,11 +22,12 @@
 
 # Python packages|modules imports
 import subprocess
+import time
 import logging
 
 # Pilberry packages|modules imports
 import lib.globals as globals
-from lib.globals import SOCKETS_CONFIG
+from lib.globals import SOCKETS_CONFIG, AUDIO_FEEDBACK_LOCK_FILE
 
 
 ##
@@ -75,6 +76,13 @@ class MusicDriver(object):
             self.add_playlist(n.full_path)
 
         self.skip_to_next_song()
+        logging.debug("sending order to PLAY!")
+
+        subprocess.call(['echo ' \
+                         + str(time.time() + 7) \
+                         + ' > ' \
+                         + AUDIO_FEEDBACK_LOCK_FILE],
+                        shell=True)
 
         self._send(['-p'])
 

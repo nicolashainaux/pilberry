@@ -24,11 +24,14 @@
 # This script is run by cmus to give status informations
 
 # Python packages|modules imports
-import sys
+import sys, os
+import time
 import logging
 
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
+from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
+
 
 logging.basicConfig(filename='./log/audio_feedback.log',
                     level=logging.DEBUG,
@@ -37,6 +40,19 @@ logging.basicConfig(filename='./log/audio_feedback.log',
 
 logging.debug('---------------------------------'\
               + '--------------------------------------------------')
+
+logging.debug('AUDIO_FEEDBACK_LOCK_FILE: ' + AUDIO_FEEDBACK_LOCK_FILE)
+AF_FILE_READ = open(AUDIO_FEEDBACK_LOCK_FILE, mode = 'r')
+
+now = time.time()
+lock_time = float(AF_FILE_READ.readlines()[0])
+
+logging.debug('time.time()  -> ' + str(now))
+logging.debug('locktime     -> ' + str(lock_time))
+
+if time.time() < lock_time:
+    logging.debug('audio feedback is locked, no action')
+    sys.exit()
 
 with Carrier() as C:
     # Taken from

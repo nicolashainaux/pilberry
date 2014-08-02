@@ -75,6 +75,7 @@ class Tree(object):
         # We set current_node as the first node found in root/,
         # otherwise we'll have to enter root to see anything
         self._neighbours_list = self._nodes.children
+        self._xneighbours_list = self._nodes.children
 
         s = str(type(self._nodes))
         logging.debug("root node's type is: "\
@@ -88,6 +89,7 @@ class Tree(object):
         ##
         #   @todo   Check if there is one child at least!
         self._current_node = self._nodes.children[0]
+        self._current_xnode = self._nodes.children[0]
 
         logging.debug("initialized current_node at: " \
                       + self._current_node['file_name'])
@@ -96,6 +98,7 @@ class Tree(object):
         #   @todo   Maybe initialize it to 1, because we did not set the
         #           view to / but to the first child of /
         self._current_depth = 0
+        self._current_xdepth = 0
 
 
     ##
@@ -105,8 +108,19 @@ class Tree(object):
 
     ##
     #   @brief
+    def get_current_xnode(self):
+        return self._current_xnode
+
+    ##
+    #   @brief
     def get_current_depth(self):
         return self._current_depth
+
+
+    ##
+    #   @brief
+    def get_current_xdepth(self):
+        return self._current_xdepth
 
 
     ##
@@ -119,6 +133,11 @@ class Tree(object):
     #   @brief
     def get_current_neighbours(self):
         return self._neighbours_list
+
+    ##
+    #   @brief
+    def get_current_xneighbours(self):
+        return self._xneighbours_list
 
     ##
     #   @brief Returns the list of self + all neighbours after me
@@ -138,12 +157,18 @@ class Tree(object):
 
     current_node = property(get_current_node,
                             doc="Current Node in the Tree")
+    current_xnode = property(get_current_xnode,
+                            doc="Current XNode in the Tree")
     current_depth = property(get_current_depth,
                              doc="Current depth in the Tree")
+    current_xdepth = property(get_current_xdepth,
+                             doc="Current xdepth in the Tree")
     view_type = property(get_view_type,
                          doc="View type of the Tree")
     current_neighbours = property(get_current_neighbours,
                           doc="All nodes at the same floor as current")
+    current_xneighbours = property(get_current_xneighbours,
+                          doc="All nodes at the same floor as current x")
     current_neighbours_after = property(get_current_neighbours_after,
                           doc="All nodes at the same floor as current, " \
                               "after current, including current")
@@ -151,6 +176,16 @@ class Tree(object):
                           doc="All nodes at the same floor as current, " \
                               "before current, but not current")
 
+
+    ##
+    #   @brief
+    def set_current_node(self, n):
+        self._current_node = n
+
+    ##
+    #   @brief
+    def set_current_xnode(self):
+        return self._current_node
 
     ##
     #   @brief  Moves to the parent Node. Returns the new current Node.
@@ -170,11 +205,28 @@ class Tree(object):
 
 
     ##
+    #   @brief  Moves xNode to its parent Node. Returns the new current xNode.
+    #   @return Node
+    def movex_to_parent(self):
+        # self.current_xnode.parent should never be None because we forbid
+        # to access the root directory
+        # So, self.current_xnode.parent.parent != None
+        # is equivalent to 'self.parent is not root'
+        if self.current_xnode.parent.parent != None:
+            self._current_xnode = self.current_xnode.parent
+            self._current_xdepth -= 1
+            self._xneighbours_list = self.current_xnode.parent.children
+
+        return self.current_xnode
+
+
+
+    ##
     #   @brief
-    def move_to_next_node(self):
+    def move_to_next_node(self, nb_step=1):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.current_node.position + 1) \
+        new_position = (self.current_node.position + nb_step) \
                                                     % len(self._neighbours_list)
         self._current_node = self._neighbours_list[new_position]
         # self._neighbours_list remains the same
@@ -185,15 +237,43 @@ class Tree(object):
 
     ##
     #   @brief
-    def move_to_prev_node(self):
+    def movex_to_next_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.current_node.position - 1) \
+        new_position = (self.current_xnode.position + 1) \
+                                                    % len(self._xneighbours_list)
+        self._current_xnode = self._xneighbours_list[new_position]
+        # self._neighbours_list remains the same
+
+        return self.current_node
+
+
+
+    ##
+    #   @brief
+    def move_to_prev_node(self, nb_step):
+        # We compute the new position with a modulo to go to first position if
+        # we were at end and vice-versa
+        new_position = (self.current_node.position - nb_step) \
                                                     % len(self._neighbours_list)
         self._current_node = self._neighbours_list[new_position]
         # self._neighbours_list remains the same
 
         return self.current_node
+
+
+
+    ##
+    #   @brief
+    def movex_to_prev_node(self):
+        # We compute the new position with a modulo to go to first position if
+        # we were at end and vice-versa
+        new_position = (self.current_xnode.position - 1) \
+                                                    % len(self._xneighbours_list)
+        self._current_xnode = self._xneighbours_list[new_position]
+        # self._neighbours_list remains the same
+
+        return self.current_xnode
 
 
 
@@ -211,6 +291,10 @@ class Tree(object):
             self._neighbours_list = self.current_node.children
             self._current_node = self.current_node.children[0]
             self._current_depth += 1
+            self._xneighbours_list = self._neighbours_list
+            self._current_xnode = self.current_node
+            self._current_xdepth += 1
+
 
         return self.current_node
 
