@@ -105,10 +105,11 @@ def cmd_callback(socket, data):
         try:
             cmd = cmd_match_list[raw_cmd]
         except KeyError:
-            print("Received: " + raw_cmd + ". Unknown command, no action")
+            print("Received: \033[92m" + raw_cmd \
+                            + ". Unknown command, no action\033[0m")
 
         else:
-            print("Received: " + cmd)
+            print("Received: \033[92m" + cmd + "\033[0m")
             t.handle(cmd)
 
             report()
@@ -117,7 +118,9 @@ def cmd_callback(socket, data):
 def cmus_callback(socket, data):
     notification = pickle.loads(data)
     if notification['status'] in globals.CMUS_NOTIFICATIONS:
-        print("Received status notification: " + notification['status'])
+        print("Received status notification: \033[31m" \
+                + notification['status']
+                + '\033[0m')
         globals.cmus_status = notification['status']
         if 'playing' == globals.cmus_status:
             if t.head['full_path'] != notification['full_path']:
@@ -134,9 +137,11 @@ def cmus_callback(socket, data):
                 if found:
                     logging.debug("found the node matching current song")
                     print("Updated head Node, waiting for next command...\n")
+                    if not globals.exploring:
+                        t.set_xnode(t.head)
                 ##
-                #   @todo   If the next node at right is not the good one, then
-                #           look for the good one! In the best case, a data-
+                #   @todo   If the right node is not among the neighbours, it has
+                #           to be found elsewhere. In the best case, a data-
                 #           base is available and we can find it thanks to its
                 #           full path. If no database is available, then a
                 #           search algorithm has to be found...
