@@ -72,10 +72,10 @@ class Tree(object):
                                  2)
 
 
-        # We set read_head as the first node found in root/,
+        # We set head as the first node found in root/,
         # otherwise we'll have to enter root to see anything
-        self._neighbours_list = self._nodes.children
-        self._xneighbours_list = self._nodes.children
+        self._xneighbours = self._nodes.children
+        self._hneighbours = self._nodes.children
 
         s = str(type(self._nodes))
         logging.debug("root node's type is: "\
@@ -88,23 +88,23 @@ class Tree(object):
 
         ##
         #   @todo   Check if there is one child at least!
-        self._read_head = self._nodes.children[0]
         self._xnode = self._nodes.children[0]
+        self._head = self._nodes.children[0]
 
-        logging.debug("initialized read_head at: " \
-                      + self._read_head['file_name'])
+        logging.debug("initialized xnode at: " + self._xnode['file_name'])
+
 
         ##
         #   @todo   Maybe initialize it to 1, because we did not set the
         #           view to / but to the first child of /
-        self._read_head_depth = 0
         self._xdepth = 0
+        self._hdepth = 0
 
 
     ##
     #   @brief
-    def get_read_head(self):
-        return self._read_head
+    def get_head(self):
+        return self._head
 
     ##
     #   @brief
@@ -113,111 +113,86 @@ class Tree(object):
 
     ##
     #   @brief
-    def get_read_head_depth(self):
-        return self._read_head_depth
-
+    def get_hdepth(self):
+        return self._hdepth
 
     ##
     #   @brief
     def get_xdepth(self):
         return self._xdepth
 
-
     ##
     #   @brief
     def get_view_type(self):
         return self._view_type
 
-
     ##
     #   @brief
-    def get_rh_neighbours(self):
-        return self._neighbours_list
+    def get_hneighbours(self):
+        return self._hneighbours
 
     ##
     #   @brief
     def get_xneighbours(self):
-        return self._xneighbours_list
+        return self._xneighbours
 
     ##
-    #   @brief Returns the list of self + all neighbours after me
-    def get_rh_neighbours_after(self):
-        return self._neighbours_list[\
-                          self.read_head.position:len(self._neighbours_list)]
-
-
+    #   @brief Returns a list of all neighbours after head, including head
+    def get_hneighbours_after(self):
+        return self.hneighbours[self.head.position:len(self.hneighbours)]
 
     ##
-    #   @brief Returns the list of neighbours before me (but not me)
-    def get_rh_neighbours_before(self):
-        return self._neighbours_list[0:self.read_head.position]
+    #   @brief Returns the list of neighbours before head (but not head)
+    def get_hneighbours_before(self):
+        return self.hneighbours[0:self.head.position]
 
 
 
 
-    read_head = property(get_read_head,
-                         doc="Read Head position (node of the Tree)")
+    head = property(get_head,
+                    doc="Read Head position (node of the Tree)")
     xnode = property(get_xnode,
                      doc="XNode is the 'explorer node' of the Tree")
-    read_head_depth = property(get_read_head_depth,
-                             doc="Current depth in the Tree")
+    hdepth = property(get_hdepth,
+                      doc="Current depth in the Tree")
     xdepth = property(get_xdepth,
                       doc="Current xdepth in the Tree")
     view_type = property(get_view_type,
                          doc="View type of the Tree")
-    rh_neighbours = property(get_rh_neighbours,
-                          doc="All nodes at the same floor as current")
+    hneighbours = property(get_hneighbours,
+                           doc="All nodes at the same floor as current")
     xneighbours = property(get_xneighbours,
-                          doc="All nodes at the same floor as current x")
-    rh_neighbours_after = property(get_rh_neighbours_after,
+                           doc="All nodes at the same floor as current x")
+    hneighbours_after = property(get_hneighbours_after,
                           doc="All nodes at the same floor as current, " \
                               "after current, including current")
-    rh_neighbours_before = property(get_rh_neighbours_before,
+    hneighbours_before = property(get_hneighbours_before,
                           doc="All nodes at the same floor as current, " \
                               "before current, but not current")
 
 
     ##
     #   @brief
-    def set_read_head(self, n):
-        self._read_head = n
+    def set_head(self, n):
+        self._head = n
 
     ##
     #   @brief
-    def set_xnode(self):
-        return self._read_head
+    def set_xnode(self, n):
+        self._xnode = n
 
     ##
     #   @brief  Moves to the parent Node. Returns the new current Node.
     #   @return Node
     def move_to_parent(self):
-        # self.read_head.parent should never be None because we forbid
-        # to access the root directory
-        # So, self.read_head.parent.parent != None
-        # is equivalent to 'self.parent is not root'
-        if self.read_head.parent.parent != None:
-            self._read_head = self.read_head.parent
-            self._read_head_depth -= 1
-            self._neighbours_list = self.read_head.parent.children
-
-        return self.read_head
-
-
-
-    ##
-    #   @brief  Moves xNode to its parent Node. Returns the new current xNode.
-    #   @return Node
-    def movex_to_parent(self):
         # self.xnode.parent should never be None because we forbid
         # to access the root directory
         # So, self.xnode.parent.parent != None
-        # is equivalent to 'self.parent is not root'
+        # is equivalent to 'self.xnode.parent is not root'
         if self.xnode.parent.parent != None:
-            self._xnode = self.xnode.parent
+            self.set_xnode(self.xnode.parent)
             self._xdepth -= 1
-            self._xneighbours_list = self.xnode.parent.children
-
-        return self.xnode
+            self._xneighbours = self.xnode.parent.children
 
 
 
@@ -226,27 +201,9 @@ class Tree(object):
     def move_to_next_node(self, nb_step=1):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.read_head.position + nb_step) \
-                                                    % len(self._neighbours_list)
-        self._read_head = self._neighbours_list[new_position]
-        # self._neighbours_list remains the same
-
-        return self.read_head
-
-
-
-    ##
-    #   @brief
-    def movex_to_next_node(self):
-        # We compute the new position with a modulo to go to first position if
-        # we were at end and vice-versa
-        new_position = (self.xnode.position + 1) \
-                                                    % len(self._xneighbours_list)
-        self._xnode = self._xneighbours_list[new_position]
-        # self._neighbours_list remains the same
-
-        return self.read_head
-
+        new_position = (self.xnode.position + nb_step) % len(self.xneighbours)
+        self.set_xnode(self.xneighbours[new_position])
+        # self._xneighbours remains the same
 
 
     ##
@@ -254,26 +211,9 @@ class Tree(object):
     def move_to_prev_node(self, nb_step=1):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.read_head.position - nb_step) \
-                                                    % len(self._neighbours_list)
-        self._read_head = self._neighbours_list[new_position]
-        # self._neighbours_list remains the same
-
-        return self.read_head
-
-
-
-    ##
-    #   @brief
-    def movex_to_prev_node(self):
-        # We compute the new position with a modulo to go to first position if
-        # we were at end and vice-versa
-        new_position = (self.xnode.position - 1) \
-                                                    % len(self._xneighbours_list)
-        self._xnode = self._xneighbours_list[new_position]
-        # self._neighbours_list remains the same
-
-        return self.xnode
+        new_position = (self.xndoe.position - nb_step) % len(self.xneighbours)
+        self.set_xnode(self.xneighbours[new_position])
+        # self._xneighbours remains the same
 
 
 
@@ -284,46 +224,13 @@ class Tree(object):
         # we don't need to check the filesystem neither to make a request
         # in the DB. If there are children, they are already here.
         # So just check len(children)
-        if len(self.read_head.children) >= 1:
-            for n in self.read_head.children:
+        if len(self.xnode.children) >= 1:
+            for n in self.xnode.children:
                 if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
                     n.add_children(1)
-            self._neighbours_list = self.read_head.children
-            self._read_head = self.read_head.children[0]
-            self._read_head_depth += 1
-            self._xneighbours_list = self._neighbours_list
-            self._xnode = self.read_head
+            self._xneighbours = self.xnode.children
+            self.set_xnode(self.xnode.children[0])
             self._xdepth += 1
 
-
-        return self.read_head
-
-
-
-    ##
-    #   @brief
-    def jump_to_1st_child_of_next_parent(self):
-        self.move_to_parent()
-        self.move_to_next_node()
-        # To be sure we are not unfortunately on a leaf:
-        # (this loop should end because we just came from a node that's not
-        # a leaf, in the worst case, we come back into it)
-        while len(self.read_head.children) == 0:
-            self.move_to_next_node()
-        return self.move_to_first_child()
-
-
-
-    ##
-    #   @brief
-    def jump_to_1st_child_of_prev_parent(self):
-        self.move_to_parent()
-        self.move_to_prev_node()
-        # To be sure we are not unfortunately on a leaf:
-        # (this loop should end because we just came from a node that's not
-        # a leaf, in the worst case, we come back into it)
-        while len(self.read_head.children) == 0:
-            self.move_to_prev_node()
-        return self.move_to_first_child()
 
 
