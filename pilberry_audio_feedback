@@ -88,4 +88,4 @@ with Carrier() as C:
 
     logging.debug('sending notification: ' + str(notification))
 
-    C.send('TEST_MBP2', notification)
+    C.send('TREE_BROWSER2', notification)

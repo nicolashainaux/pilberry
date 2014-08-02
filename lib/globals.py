@@ -81,4 +81,4 @@ CMUS_NOTIFICATIONS = ['stopped',
                       'paused']
 
 cmus_status = 'stopped'
-exploring = False
+exploring = True

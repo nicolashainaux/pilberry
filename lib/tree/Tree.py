@@ -28,11 +28,14 @@ from .Node import Node
 from .NodeFileSystem import NodeFileSystem
 # from .NodeDataBase import NodeDataBase
 from lib.globals import current_mode, MODES_CONFIG, USER_CONFIG
+import lib.globals as globals
+from lib.musicdriver.MusicDriver import MusicDriver
 
 ##
 # @class Tree
 # @brief
 class Tree(object):
+
 
     ##
     #   @brief
@@ -69,13 +72,9 @@ class Tree(object):
                                  root_path,
                                  0,
                                  self._view_type,
+                                 0,
                                  2)
 
-
-        # We set head as the first node found in root/,
-        # otherwise we'll have to enter root to see anything
-        self._xneighbours = self._nodes.children
-        self._hneighbours = self._nodes.children
 
         s = str(type(self._nodes))
         logging.debug("root node's type is: "\
@@ -94,12 +93,25 @@ class Tree(object):
         logging.debug("initialized xnode at: " + self._xnode['file_name'])
 
 
-        ##
-        #   @todo   Maybe initialize it to 1, because we did not set the
-        #           view to / but to the first child of /
-        self._xdepth = 0
-        self._hdepth = 0
+        self._md = MusicDriver()
 
+        self.HANDLE = {'CMD_MOVE_TO_PARENT' : self.move_to_parent,
+                       'CMD_MOVE_TO_1ST_CHILD' : self.move_to_1st_child,
+                       'CMD_SELECT' : self.select,
+                       'CMD_MOVE_TO_PREV_NODE' : self.move_to_prev_node,
+                       'CMD_MOVE_TO_NEXT_NODE' : self.move_to_next_node,
+                       'CMD_ESC' : self.esc,
+                       'CMD_STOP' : self.stop
+                      }
+
+
+
+
+
+    ##
+    #   @brief
+    def get_md(self):
+        return self._md
 
     ##
     #   @brief
@@ -110,16 +122,6 @@ class Tree(object):
     #   @brief
     def get_xnode(self):
         return self._xnode
-
-    ##
-    #   @brief
-    def get_hdepth(self):
-        return self._hdepth
-
-    ##
-    #   @brief
-    def get_xdepth(self):
-        return self._xdepth
 
     ##
     #   @brief
@@ -149,14 +151,12 @@ class Tree(object):
 
 
 
+    md = property(get_md,
+                  doc="The Tree's MusicDriver")
     head = property(get_head,
                     doc="Read Head position (node of the Tree)")
     xnode = property(get_xnode,
                      doc="XNode is the 'explorer node' of the Tree")
-    hdepth = property(get_hdepth,
-                      doc="Current depth in the Tree")
-    xdepth = property(get_xdepth,
-                      doc="Current xdepth in the Tree")
     view_type = property(get_view_type,
                          doc="View type of the Tree")
     hneighbours = property(get_hneighbours,
@@ -174,12 +174,17 @@ class Tree(object):
     ##
     #   @brief
     def set_head(self, n):
+        logging.debug("setting head at: " + n['file_name'])
         self._head = n
+
+
 
     ##
     #   @brief
     def set_xnode(self, n):
+        logging.debug("setting xnode at: " + n['file_name'])
         self._xnode = n
+
 
     ##
     #   @brief  Moves to the parent Node. Returns the new current Node.
@@ -191,46 +196,121 @@ class Tree(object):
         # is equivalent to 'self.xnode.parent is not root'
         if self.xnode.parent.parent != None:
             self.set_xnode(self.xnode.parent)
-            self._xdepth -= 1
+            self.xnode.set_depth(xnode.depth - 1)
             self._xneighbours = self.xnode.parent.children
 
+        globals.exploring = True
 
 
     ##
     #   @brief
-    def move_to_next_node(self, nb_step=1):
+    def move_to_next_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.xnode.position + nb_step) % len(self.xneighbours)
+        new_position = (self.xnode.position + 1) % len(self.xneighbours)
         self.set_xnode(self.xneighbours[new_position])
         # self._xneighbours remains the same
+
+        # Now, if we're at playing and not exploring, we have to change
+        # head's position too and start playing
+        if not globals.exploring:
+            if len(self.xnode.children) == 0:
+                self.set_head(self.xnode)
+                self.md.stop()
+                self.md.start_playing()
+            else:
+                globals.exploring = True
 
 
     ##
     #   @brief
-    def move_to_prev_node(self, nb_step=1):
+    def move_to_prev_node(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        new_position = (self.xndoe.position - nb_step) % len(self.xneighbours)
+        new_position = (self.xnode.position - 1) % len(self.xneighbours)
         self.set_xnode(self.xneighbours[new_position])
         # self._xneighbours remains the same
 
+        # Now, if we're at playing and not exploring, we have to change
+        # head's position too and start playing
+        if not globals.exploring:
+            if len(self.xnode.children) == 0:
+                self.set_head(self.xnode)
+                self.md.stop()
+                self.md.start_playing()
+            else:
+                globals.exploring = True
 
 
     ##
     #   @brief
     def move_to_1st_child(self):
-        # There it is not useful to use the is_a_leaf() method because
-        # we don't need to check the filesystem neither to make a request
-        # in the DB. If there are children, they are already here.
+        # There it is not useful to use the is_a_leaf() method on self.xnode
+        # because we don't need to check the filesystem neither to make a
+        # request in the DB. If there are children, they are already here.
         # So just check len(children)
-        if len(self.xnode.children) >= 1:
-            for n in self.xnode.children:
-                if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
-                    n.add_children(1)
-            self._xneighbours = self.xnode.children
-            self.set_xnode(self.xnode.children[0])
-            self._xdepth += 1
+        if globals.exploring:
+            if len(self.xnode.children) >= 1:
+                for n in self.xnode.children:
+                    if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
+                        n.add_children(1)
+                self._xneighbours = self.xnode.children
+                self.set_xnode(self.xnode.children[0])
+                self.xnode.set_depth(xnode.depth + 1)
 
+
+    ##
+    #   @brief
+    def select(self):
+        if len(self.xnode.children) >= 1:
+            self.move_to_first_child()
+        else:
+            if not globals.exploring:
+                self.md.toggle_pause()
+                globals.exploring = True
+
+            elif globals.cmus_status != 'playing':
+                self.set_head(self.xnode)
+                self.md.start_playing()
+                globals.exploring = False
+
+            elif self.xnode == self.head:
+                pass
+            else:
+                self.set_head(self.xnode)
+                self.md.start_playing()
+                globals.exploring = False
+
+
+    ##
+    #   @brief
+    def esc(self):
+        if globals.cmus_status != 'playing':
+            pass
+        elif globals.exploring:
+            self.set_xnode(self.head)
+        else:
+            self.md.toggle_pause()
+            globals.exploring = True
+
+
+    ##
+    #   @brief
+    def stop(self):
+        if globals.cmus_status != 'playing':
+            pass
+        elif globals.exploring:
+            self.md.stop()
+            globals.exploring = True
+            self.set_xnode(self.head)
+        else:
+            self.md.stop()
+            globals.exploring = True
+
+
+    ##
+    #   @brief
+    def handle(self, cmd):
+        self.HANDLE[cmd]()
 
 

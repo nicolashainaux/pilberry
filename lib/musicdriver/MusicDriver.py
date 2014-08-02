@@ -42,24 +42,17 @@ class MusicDriver(object):
         self._songs_queue = ['']
 
 
-
     ##
     #   @brief
-    #def play_songs(self, full_paths_list):
-    #    for s in full_paths_list:
-    #        self._send(['-q', s])
-    #
-    #    self._send(['-p'])
-
-    ##
-    #   @brief
-    def add_playlist(self, full_path):
+    def queue(self, full_path):
+        logging.debug('queuing: ' + full_path)
         self._send(['-C', 'add -q ' + full_path])
 
 
     ##
     #   @brief
     def clear_queue(self):
+        logging.debug('queue is being cleared')
         self._send(['-c', '-q'])
 
     ##
@@ -72,8 +65,8 @@ class MusicDriver(object):
     #   @brief
     def start_playing(self):
         self.clear_queue()
-        for n in globals.current_tree.current_neighbours_after:
-            self.add_playlist(n.full_path)
+        for n in globals.current_tree.hneighbours_after:
+            self.queue(n.full_path)
 
         self.skip_to_next_song()
         logging.debug("sending order to PLAY!")

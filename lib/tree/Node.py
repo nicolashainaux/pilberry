@@ -77,12 +77,12 @@ class Node(object, metaclass=ABCMeta):
 
     ##
     #   @brief
-    def add_children(self, depth):
+    def add_children(self, deeper):
         logging.debug("Node: " \
                       + self['file_name'] \
-                      + " checks if it can add children. Given depth is: " \
-                      + str(depth))
-        if depth > 0 \
+                      + " checks if it can add children. Given deeper is: " \
+                      + str(deeper))
+        if deeper > 0 \
             and not self.is_a_leaf(self.full_path) \
             and len(self._children) == 0:
         #___
@@ -116,11 +116,11 @@ class Node(object, metaclass=ABCMeta):
                                self.full_path + name,
                                i,
                                self._view,
-                               depth - 1
+                               deeper - 1
                                )
 
-                    if depth > 1:
-                        n.add_children(depth - 1)
+                    if deeper > 1:
+                        n.add_children(deeper - 1)
 
                     self._children.append(n)
                     logging.debug("Node: " + self['file_name'] + \
@@ -128,11 +128,11 @@ class Node(object, metaclass=ABCMeta):
                                   + str(len(self._children)) \
                                   + " children. ")
 
-        elif depth > 1 \
+        elif deeper > 1 \
             and not self.is_a_leaf(self.full_path):
         #___
             for n in self._children:
-                n.add_children(depth - 1)
+                n.add_children(deeper - 1)
 
 
 
@@ -142,8 +142,8 @@ class Node(object, metaclass=ABCMeta):
     #   @param  full_path : the full path of the file
     #   @param  position : the position among the neighbours' list
     #   @param  view : the view type (e.g. file system, album/artist etc.)
-    #   @param  depth : int that tells how deep we should further add children
-    def __init__(self, parent, full_path, position, view, depth):
+    #   @param  deeper : int that tells how deep we should further add children
+    def __init__(self, parent, full_path, position, view, depth, deeper):
         self._parent = parent
 
         end_as_dirname = ""
@@ -188,8 +188,10 @@ class Node(object, metaclass=ABCMeta):
         # The children
         self._children = []
 
-        if depth > 0:
-            self.add_children(depth)
+        self._depth = depth
+
+        if deeper > 0:
+            self.add_children(deeper)
 
 
 
@@ -228,6 +230,11 @@ class Node(object, metaclass=ABCMeta):
         return self._position
 
 
+    ##
+    #   @brief
+    def get_depth(self):
+        return self._depth
+
 
     parent = property(get_parent, doc="Parent Node")
     children = property(get_children, doc="Children Nodes, if any")
@@ -236,6 +243,7 @@ class Node(object, metaclass=ABCMeta):
                                             + " identifier.")
     position = property(get_position, doc="Position of the Node among " \
                                          + "its brothers")
+    depth = property(get_depth, doc="Depth of the Node")
 
 
 
