@@ -101,10 +101,10 @@ while True:
                 t.move_to_1st_child()
 
             elif cmd == "CMD_MOVE_TO_PREV_NODE":
-                t.move_to_prev_node()
+                t.move_to_prev_node(nb_step=1)
 
             elif cmd == "CMD_MOVE_TO_NEXT_NODE":
-                t.move_to_next_node()
+                t.move_to_next_node(nb_step=1)
 
             elif cmd == "CMD_MOVE_TO_PARENT":
                 t.move_to_parent()
