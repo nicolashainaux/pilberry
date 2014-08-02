@@ -69,9 +69,9 @@ def report():
           + " and has " \
           + str(len(t.xnode.children)) \
           + " children.")
-    print("head is " \
+    print("head is \033[32m" \
           + t.head['file_name']\
-          + " and has " \
+          + "\033[0m and has " \
           + str(len(t.head.children)) \
           + " children.")
     print("global.exploring: " + str(globals.exploring) \
@@ -81,8 +81,8 @@ def report():
         open_bracket = "["
         close_bracket = "]"
         if t.xnode.neighbours[i]['file_name'] == t.xnode['file_name']:
-            open_bracket = "<<"
-            close_bracket = ">>"
+            open_bracket = "\033[33m<<"
+            close_bracket = ">>\033[0m"
 
         result += open_bracket \
                + t.xnode.neighbours[i]['file_name'] \
