@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# This is a simple tcp chat to a destination socket
+
+# Python packages|modules imports
+import sys
+import argparse
+
+# Pilberry packages|modules imports
+from lib.carrier.Carrier import Carrier
+
+SHORTCUTS = {'e' : 'CMD_A1',
+             ' ' : 'CMD_A2',
+             'j' : 'CMD_B1',
+             'l' : 'CMD_C1',
+             'i' : 'CMD_D1',
+             'k' : 'CMD_E1',
+             's' : 'CMD_E2',
+             'Q' : 'QUIT',
+             'D' : 'DONE'
+             }
+
+HUMAN_TRANSLATION = {'e' : 'select',
+                     ' ' : 'esc',
+                     'j' : 'prev',
+                     'l' : 'next',
+                     'i' : 'parent',
+                     'k' : 'to_child',
+                     's' : 'stop',
+                     'Q' : 'QUIT',
+                     'D' : 'DONE'
+                     }
+
+
+parser = argparse.ArgumentParser(description='Sends a message to a dest process')
+parser.add_argument('dest', metavar='DESTINATION', type=str, nargs='+',
+                   help='the "adress" of the destination process')
+
+args = vars(parser.parse_args())
+
+class _Getch:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+user_entry = _Getch()
+
+
+with Carrier() as C:
+    while True:
+        y = user_entry()
+        if y in SHORTCUTS.keys():
+            x = SHORTCUTS[y]
+        #if "" == x:
+        #    C.send(args['dest'][0], 'CMD_A1')
+        if "D" == y or "Q" == y:
+            print("Shutting down.")
+            if "Q" == y:
+                C.send(args['dest'][0], 'QUIT')
+            sys.exit()
+        else:
+            print(HUMAN_TRANSLATION[y])
+            C.send(args['dest'][0], x)
+
+
+
+
