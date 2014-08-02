@@ -251,7 +251,7 @@ class Tree(object):
 
     ##
     #   @brief
-    def move_to_prev_node(self, nb_step):
+    def move_to_prev_node(self, nb_step=1):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
         new_position = (self.current_node.position - nb_step) \
