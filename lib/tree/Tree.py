@@ -169,7 +169,7 @@ class Tree(object):
 
     ##
     #   @brief
-    def move_to_next_node(self):
+    def move_to_node_next(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
         new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
@@ -188,7 +188,7 @@ class Tree(object):
 
     ##
     #   @brief
-    def move_to_prev_node(self):
+    def move_to_node_prev(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
         new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
