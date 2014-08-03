@@ -102,7 +102,8 @@ class Tree(object):
                        'CMD_MOVE_TO_NODE_PREV' : self.move_to_node_prev,
                        'CMD_MOVE_TO_NODE_NEXT' : self.move_to_node_next,
                        'CMD_ESC' : self.esc,
-                       'CMD_STOP' : self.stop
+                       'CMD_STOP' : self.stop,
+                       'CMD_ROGER' : self.roger
                       }
 
 
@@ -179,8 +180,8 @@ class Tree(object):
         if not globals.exploring:
             if len(self.xnode.children) == 0:
                 self.set_head(self.xnode)
-                self.md.stop()
-                self.md.start_playing()
+                #self.md.stop()
+                #self.md.start_playing()
             else:
                 globals.exploring = True
 
@@ -198,10 +199,18 @@ class Tree(object):
         if not globals.exploring:
             if len(self.xnode.children) == 0:
                 self.set_head(self.xnode)
-                self.md.stop()
-                self.md.start_playing()
+                #self.md.stop()
+                #self.md.start_playing()
             else:
                 globals.exploring = True
+
+
+    ##
+    #   @brief
+    def roger(self):
+        if 'playing' == globals.cmus_status:
+            self.md.stop()
+            self.md.start_playing()
 
 
     ##
