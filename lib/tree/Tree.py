@@ -99,8 +99,8 @@ class Tree(object):
         self.HANDLE = {'CMD_MOVE_TO_PARENT' : self.move_to_parent,
                        'CMD_MOVE_TO_1ST_CHILD' : self.move_to_1st_child,
                        'CMD_SELECT' : self.select,
-                       'CMD_MOVE_TO_PREV_NODE' : self.move_to_prev_node,
-                       'CMD_MOVE_TO_NEXT_NODE' : self.move_to_next_node,
+                       'CMD_MOVE_TO_NODE_PREV' : self.move_to_node_prev,
+                       'CMD_MOVE_TO_NODE_NEXT' : self.move_to_node_next,
                        'CMD_ESC' : self.esc,
                        'CMD_STOP' : self.stop
                       }

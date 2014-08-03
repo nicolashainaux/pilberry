@@ -108,7 +108,7 @@ def socket_callback(socket, data):
                 globals.current_tree.move_to_1st_child()
                 md.start_playing()
 
-            elif cmd == "CMD_MOVE_TO_PREV_NODE":
+            elif cmd == "CMD_MOVE_TO_NODE_PREV":
                 if len(raw_cmd) >= 8 and raw_cmd[6] == 'x':
                     globals.current_tree.\
                          move_to_prev_node(nb_step=int(raw_cmd[7:len(raw_cmd)]))
@@ -121,7 +121,7 @@ def socket_callback(socket, data):
                         md.stop()
                         md.start_playing()
 
-            elif cmd == "CMD_MOVE_TO_NEXT_NODE":
+            elif cmd == "CMD_MOVE_TO_NODE_NEXT":
                 if len(raw_cmd) >= 8 and raw_cmd[6] == 'x':
                     globals.current_tree.\
                          move_to_next_node(nb_step=int(raw_cmd[7:len(raw_cmd)]))
