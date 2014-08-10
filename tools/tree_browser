@@ -32,17 +32,24 @@ import sys, os
 import argparse
 import RPIO
 import logging
+import logging.config
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, cmd_match_list
 from lib.tree.Tree import Tree
 import lib.globals as globals
 
-logging.basicConfig(filename='../log/tree_browser.log',
-                    filemode='w',
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
-                    datefmt='%Y/%m/%d %H:%M:%S')
+
+#logging.getLogger('RPIO.py').addHandler(logging.NullHandler())
+logging.config.fileConfig('../log/logging.conf')
+
+#logging.basicConfig(filename='../log/tree_browser.log',
+#                    filemode='w',
+#                    level=logging.DEBUG,
+#                    format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
+#                    datefmt='%Y/%m/%d %H:%M:%S')
+
+#logging.basicConfig(filemode='w')
 
 # Get the socket file name from sockets' conf file
 SOCKETS_PORTS = [int(SOCKETS_CONFIG['TREE_BROWSER']['PORT']),
