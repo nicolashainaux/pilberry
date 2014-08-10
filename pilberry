@@ -32,7 +32,9 @@ from lib.globals import SOCKETS_CONFIG
 from lib.globals import AUDIO_FEEDBACK_SCRIPT
 
 def __main__():
-    subprocess.Popen(['cmus', '--listen', SOCKETS_CONFIG['CMUS']['FILE']])
+    subprocess.Popen(['cmus',
+                      '--listen',
+                      SOCKETS_CONFIG['CORE_TO_CMUS']['FILE']])
 
     ##
     #   @todo   Check if the timing below is enough/not too much
@@ -42,7 +44,7 @@ def __main__():
 
     subprocess.Popen(['cmus-remote',
                       '--server',
-                      SOCKETS_CONFIG['CMUS']['FILE'],
+                      SOCKETS_CONFIG['CORE_TO_CMUS']['FILE'],
                       '-C',
                       'set status_display_program=' + AUDIO_FEEDBACK_SCRIPT])
 

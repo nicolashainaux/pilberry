@@ -25,7 +25,6 @@
 
 # Python packages|modules imports
 import sys
-import argparse
 
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
@@ -52,13 +51,6 @@ HUMAN_TRANSLATION = {'e' : 'select',
                      'D' : 'DONE'
                      }
 
-
-parser = argparse.ArgumentParser(description='Sends a message to a dest process')
-parser.add_argument('dest', metavar='DESTINATION', type=str, nargs='+',
-                   help='the "adress" of the destination process')
-
-args = vars(parser.parse_args())
-
 class _Getch:
     def __init__(self):
         import tty, sys
@@ -82,16 +74,14 @@ with Carrier() as C:
         y = user_entry()
         if y in SHORTCUTS.keys():
             x = SHORTCUTS[y]
-        #if "" == x:
-        #    C.send(args['dest'][0], 'CMD_A1')
         if "D" == y or "Q" == y:
             print("Shutting down.")
             if "Q" == y:
-                C.send(args['dest'][0], 'QUIT')
+                C.send('KEYPAD_TO_CORE', 'QUIT')
             sys.exit()
         else:
             print(HUMAN_TRANSLATION[y])
-            C.send(args['dest'][0], x)
+            C.send('KEYPAD_TO_CORE', x)
 
 
 

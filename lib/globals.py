@@ -29,15 +29,17 @@ import configparser
 #YES = ['Y', 'YES', 'Yes', 'True', 'TRUE', 1, "ON", "On", "on"]
 #NO = ['N', 'NO', 'No', 'False', 'FALSE', 0, "OFF", "Off", "off"]
 PILBERRY_ROOT = os.path.abspath(os.path.dirname(sys.argv[0])) + '/'
+BIN_DIR = PILBERRY_ROOT + 'bin/'
 CONF_DIR = PILBERRY_ROOT + 'etc/'
+LOCKS_DIR = PILBERRY_ROOT + 'locks/'
+LOG_DIR = PILBERRY_ROOT + 'log/'
+
 SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
 USER_CONF_FILE = CONF_DIR + 'user.conf'
 
-AUDIO_FEEDBACK_SCRIPT = PILBERRY_ROOT + 'pilberry_audio_feedback'
-
-LOCKS_DIR = PILBERRY_ROOT + 'locks/'
+AUDIO_FEEDBACK_SCRIPT = BIN_DIR + 'audio_feedback'
 AUDIO_FEEDBACK_LOCK_FILE = LOCKS_DIR + 'audio_feedback'
 
 # Read the modes' list from appropriate conf file
@@ -65,7 +67,7 @@ cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode]['TYPE']])
 # Get the port from sockets' conf file
 SOCKETS_CONFIG = configparser.ConfigParser()
 SOCKETS_CONFIG.read(SOCKETS_CONF_FILE)
-MODES_PORT = int(SOCKETS_CONFIG['MODES']['PORT'])
+#KEYPAD_TO_CORE_PORT = int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT'])
 
 # Read the modes' list from appropriate conf file
 USER_CONFIG = configparser.ConfigParser()
