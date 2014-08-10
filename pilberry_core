@@ -40,6 +40,8 @@ import lib.globals as globals
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
+console = logging.getLogger('console')
+
 # Get the socket file name from sockets' conf file
 SOCKETS_PORTS = [int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT']),
                  int(SOCKETS_CONFIG['AUDIO_FEEDBACK_TO_CORE']['PORT'])
@@ -57,19 +59,20 @@ globals.current_tree = Tree(root=tree_root)
 t = globals.current_tree
 
 def report():
-    print("xnode is in: " + t.xnode.parent['full_path'])
-    print("xnode is " \
+    console.debug("xnode is in: " + t.xnode.parent['full_path'])
+    console.debug("xnode is " \
           + t.xnode['file_name']\
           + " and has " \
           + str(len(t.xnode.children)) \
           + " children.")
-    print("head is \033[32m" \
+    console.debug("head is \033[32m" \
           + t.head['file_name']\
           + "\033[0m and has " \
           + str(len(t.head.children)) \
           + " children.")
-    print("global.exploring: " + str(globals.exploring) \
+    console.debug("global.exploring: " + str(globals.exploring) \
           + "          global.cmus_status: "+ str(globals.cmus_status))
+
     result = ""
     for i in range(len(t.xnode.neighbours)):
         open_bracket = "["
@@ -85,7 +88,7 @@ def report():
 
     result += "\nWaiting for next command..."
 
-    print(result)
+    console.debug(result)
 
 
 report()
