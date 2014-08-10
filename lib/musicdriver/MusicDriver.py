@@ -65,8 +65,8 @@ class MusicDriver(object):
     #   @brief
     def start_playing(self):
         self.clear_queue()
-        for n in [globals.current_tree.head] \
-            + globals.current_tree.head.neighbours_after:
+        for n in [globals.current_mode.head] \
+            + globals.current_mode.head.neighbours_after:
         #___
             self.queue(n.full_path)
 
@@ -80,6 +80,12 @@ class MusicDriver(object):
         #                shell=True)
 
         self._send(['-p'])
+
+
+    ##
+    #   @brief
+    def start_playing_after_delay(self):
+        self.start_playing()
 
 
     ##

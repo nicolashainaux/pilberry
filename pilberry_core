@@ -35,7 +35,7 @@ import logging.config
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, MODES_CONFIG, LOG_DIR
 from lib.globals import cmd_match_list, modes_list
-from lib.tree.Tree import Tree
+from lib.mode.Mode import Mode
 import lib.globals as globals
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
@@ -55,34 +55,33 @@ if not os.path.isdir(tree_root):
     print(tree_root + " is not a valid directory. Exiting")
     sys.exit()
 
-globals.current_tree = Tree(root=tree_root)
-t = globals.current_tree
+globals.current_mode = Mode(root=tree_root)
+m = globals.current_mode
 
 def report():
-    console.debug("xnode is in: " + t.xnode.parent['full_path'])
+    console.debug("xnode is in: " + m.xnode.parent['full_path'])
     console.debug("xnode is " \
-          + t.xnode['file_name']\
+          + m.xnode['file_name']\
           + " and has " \
-          + str(len(t.xnode.children)) \
+          + str(len(m.xnode.children)) \
           + " children.")
     console.debug("head is \033[32m" \
-          + t.head['file_name']\
+          + m.head['file_name']\
           + "\033[0m and has " \
-          + str(len(t.head.children)) \
+          + str(len(m.head.children)) \
           + " children.")
-    console.debug("global.exploring: " + str(globals.exploring) \
-          + "          global.cmus_status: "+ str(globals.cmus_status))
+    console.debug("global.cmus_status: "+ str(globals.cmus_status))
 
     result = ""
-    for i in range(len(t.xnode.neighbours)):
+    for i in range(len(m.xnode.neighbours)):
         open_bracket = "["
         close_bracket = "]"
-        if t.xnode.neighbours[i]['file_name'] == t.xnode['file_name']:
+        if m.xnode.neighbours[i]['file_name'] == m.xnode['file_name']:
             open_bracket = "\033[33m<<"
             close_bracket = ">>\033[0m"
 
         result += open_bracket \
-               + t.xnode.neighbours[i]['file_name'] \
+               + m.xnode.neighbours[i]['file_name'] \
                + close_bracket \
                + " "
 
@@ -107,7 +106,7 @@ def cmd_callback(socket, data):
 
         else:
             print("Received: \033[92m" + cmd + "\033[0m")
-            t.handle(cmd)
+            m.handle(cmd)
 
             report()
 
@@ -119,29 +118,9 @@ def cmus_callback(socket, data):
                 + notification['status']
                 + '\033[0m')
         globals.cmus_status = notification['status']
-        if 'playing' == globals.cmus_status:
-            if t.head['full_path'] != notification['full_path']:
-            #___
-                logging.debug("noticed that head doesn't match current song")
-                # Current song doesn't match head node
-                # Let's try to find the node matching current song
-                # First, check if it's one of the song of the same 'directory'
-                found = False
-                for n in t.head.neighbours:
-                    if n['full_path'] == notification['full_path']:
-                        t.set_head(n)
-                        found = True
-                if found:
-                    logging.debug("found the node matching current song")
-                    print("Updated head Node, waiting for next command...\n")
-                    if not globals.exploring:
-                        t.set_xnode(t.head)
-                ##
-                #   @todo   If the right node is not among the neighbours, it has
-                #           to be found elsewhere. In the best case, a data-
-                #           base is available and we can find it thanks to its
-                #           full path. If no database is available, then a
-                #           search algorithm has to be found...
+
+        m.handle(notification['status'], full_path=notification['full_path'])
+
 
 
     else:

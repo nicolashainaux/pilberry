@@ -52,22 +52,21 @@ for s in MODES_CONFIG.sections():
 
 ##
 #   @todo   At startup, define the current_mode as last used mode
-current_mode = modes_list[0]
+current_mode_id = modes_list[0]
 current_state = {}
 ##
 #   @todo   At startup, get the tree matching the current mode and state
-current_tree = None
+current_mode = None
 
 # Read the modes' list from appropriate conf file
 CMD_CONFIG = configparser.ConfigParser()
 CMD_CONFIG.optionxform = lambda option: option
 CMD_CONFIG.read(CMD_CONF_FILE)
-cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode]['TYPE']])
+cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode_id]['TYPE']])
 
 # Get the port from sockets' conf file
 SOCKETS_CONFIG = configparser.ConfigParser()
 SOCKETS_CONFIG.read(SOCKETS_CONF_FILE)
-#KEYPAD_TO_CORE_PORT = int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT'])
 
 # Read the modes' list from appropriate conf file
 USER_CONFIG = configparser.ConfigParser()
@@ -83,4 +82,3 @@ CMUS_NOTIFICATIONS = ['stopped',
                       'paused']
 
 cmus_status = 'stopped'
-exploring = True
