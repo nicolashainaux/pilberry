@@ -81,7 +81,7 @@ with Carrier() as C:
 
     logging.debug('cmus sent feedback: ' + str(data))
 
-    # Notification to pilberry_modes
+    # Notification to pilberry_core
     notification = {'status' : data['status'],
                     'full_path' : data['file']
                    }
