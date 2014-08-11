@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# -*- coding: utf-8 -*-
+
+grep -v "_RPIO.py" pilberry_core.log | grep -v "pilberry_core: report:" | grep -v "Waiting for next command..." | tail -n 36

@@ -54,13 +54,14 @@ class State_B(object):
         new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
         self.set_xnode(self.xnode.neighbours[new_position])
 
+        ##
+        #   @todo   Cycling does not work because it's based on the cmus queue,
+        #           and at the end cmus finds no next song, so try to check
+        #           if the last song has been passed, and repopulate the queue?
         if len(self.xnode.children) == 0:
             self.set_head(self.xnode)
-            ##
-            #   @todo   Check if this stop is still necessary once the delayed
-            #           play is implemented
-            self.md.stop()
-            self.md.start_playing_after_delay()
+            self.md.skip_to_next_song()
+
         else:
             self.md.stop()
             self.set_state('State_A')
@@ -71,16 +72,15 @@ class State_B(object):
     def move_to_node_prev(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
+        self.md.queue_first(self.head.full_path)
         new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
         self.set_xnode(self.xnode.neighbours[new_position])
 
         if len(self.xnode.children) == 0:
             self.set_head(self.xnode)
-            ##
-            #   @todo   Check if this stop is still necessary once the delayed
-            #           play is implemented
-            self.md.stop()
-            self.md.start_playing_after_delay()
+            self.md.queue_first(self.head.full_path)
+            self.md.skip_to_next_song()
+
         else:
             self.md.stop()
             self.set_state('State_A')

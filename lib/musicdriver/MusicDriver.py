@@ -28,6 +28,7 @@ import logging
 # Pilberry packages|modules imports
 import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG, AUDIO_FEEDBACK_LOCK_FILE
+from lib.globals import ROGER_ROGER_SCRIPT
 
 
 ##
@@ -47,6 +48,13 @@ class MusicDriver(object):
     def queue(self, full_path):
         logging.debug('queuing: ' + full_path)
         self._send(['-C', 'add -q ' + full_path])
+
+
+    ##
+    #   @brief
+    def queue_first(self, full_path):
+        logging.debug('queuing: ' + full_path)
+        self._send(['-C', 'add -Q ' + full_path])
 
 
     ##
@@ -73,19 +81,33 @@ class MusicDriver(object):
         self.skip_to_next_song()
         logging.debug("sending order to PLAY!")
 
-        #subprocess.call(['echo ' \
-        #                 + str(time.time() + 7) \
-        #                 + ' > ' \
-        #                 + AUDIO_FEEDBACK_LOCK_FILE],
-        #                shell=True)
-
         self._send(['-p'])
 
 
     ##
     #   @brief
-    def start_playing_after_delay(self):
-        self.start_playing()
+    #def start_playing_after_delay(self):
+
+        #self.stop()
+
+    #    q = []
+    #    for n in [globals.current_mode.head] \
+    #        + globals.current_mode.head.neighbours_after:
+        #___
+    #        q += [n.full_path]
+
+        #try:
+        #    killall = subprocess.Popen(['killall', 'roger_roger'])
+        #except:
+        #    logging.debug('no roger_roger was here')
+        #else:
+        #    logging.debug('killed roger_roger')
+
+    #    r = subprocess.Popen([ROGER_ROGER_SCRIPT] + q)
+
+     #   logging.debug('after having sent a new roger_roger')
+
+
 
 
     ##
