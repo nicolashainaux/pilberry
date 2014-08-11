@@ -109,7 +109,7 @@ class MusicDriver(object):
         logging.debug('sending ' + str(cmd_list) + ' via cmus-remote')
         subprocess.Popen(['cmus-remote',
                           '--server',
-                          SOCKETS_CONFIG['CORE_TO_CMUS']['FILE']
+                          SOCKETS_CONFIG['TO_CMUS']['FILE']
                          ]
                          + cmd_list)
 
