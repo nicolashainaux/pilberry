@@ -121,8 +121,6 @@ def cmus_callback(socket, data):
 
         m.handle(notification['status'], full_path=notification['full_path'])
 
-
-
     else:
         print("Received UNKNOWN status notification: " + notification['status'])
 

@@ -66,30 +66,14 @@ class State_C(object):
     ##
     #   @brief
     def move_to_1st_child(self):
+        # xnode is an inode
         if len(self.xnode.children) >= 1:
             for n in self.xnode.children:
                 if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
                     n.add_children(1)
             self.set_xnode(self.xnode.children[0])
 
-        elif self.head != self.xnode:
-            self.set_head(self.xnode)
-            self.md.start_playing()
-            self.set_state('State_B')
-
-        else:
-            pass
-
-
-    ##
-    #   @brief
-    def select(self):
-        if len(self.xnode.children) >= 1:
-            for n in self.xnode.children:
-                if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
-                    n.add_children(1)
-            self.set_xnode(self.xnode.children[0])
-
+        # xnode is a leaf
         elif self.head != self.xnode:
             self.set_head(self.xnode)
             ##
@@ -99,8 +83,19 @@ class State_C(object):
             self.md.start_playing()
             self.set_state('State_B')
 
+        # xnode is head
         else:
-            pass
+            if globals.cmus_status == 'paused':
+                self.md.toggle_pause()
+                self.set_state('State_B')
+            elif globals.cmus_status == 'playing':
+                self.set_state('State_B')
+
+
+    ##
+    #   @brief
+    def select(self):
+        self.handle('CMD_MOVE_TO_1ST_CHILD')
 
 
     ##

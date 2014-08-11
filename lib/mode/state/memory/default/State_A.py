@@ -27,6 +27,7 @@ import lib.globals as globals
 ##
 # @class State_A
 # @brief
+#   @todo   Code factorization between the different State_* classes
 class State_A(object):
 
 
