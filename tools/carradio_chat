@@ -25,9 +25,12 @@
 
 # Python packages|modules imports
 import sys
+import subprocess
+#import logging
 
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
+from lib.globals import SOCKETS_CONFIG
 
 SHORTCUTS = {'e' : 'CMD_A1',
              ' ' : 'CMD_A2',
@@ -37,8 +40,12 @@ SHORTCUTS = {'e' : 'CMD_A1',
              'k' : 'CMD_E1',
              's' : 'CMD_E2',
              'Q' : 'QUIT',
-             'D' : 'DONE'
+             'D' : 'DONE',
+             '+' : 'vol +5%',
+             '-' : 'vol -5%'
              }
+
+VOLUME_CMD = ['vol +5%', 'vol -5%']
 
 HUMAN_TRANSLATION = {'e' : 'select',
                      ' ' : 'esc',
@@ -48,7 +55,9 @@ HUMAN_TRANSLATION = {'e' : 'select',
                      'k' : 'to_child',
                      's' : 'stop',
                      'Q' : 'QUIT',
-                     'D' : 'DONE'
+                     'D' : 'DONE',
+                     '+' : 'volume UP',
+                     '-' : 'volume DOWN'
                      }
 
 class _Getch:
@@ -70,18 +79,28 @@ user_entry = _Getch()
 
 
 with Carrier() as C:
+    print("ready")
     while True:
         y = user_entry()
-        if y in SHORTCUTS.keys():
-            x = SHORTCUTS[y]
         if "D" == y or "Q" == y:
             print("Shutting down.")
             if "Q" == y:
                 C.send('KEYPAD_TO_CORE', 'QUIT')
             sys.exit()
-        else:
+
+        elif y in SHORTCUTS.keys():
+            x = SHORTCUTS[y]
             print(HUMAN_TRANSLATION[y])
-            C.send('KEYPAD_TO_CORE', x)
+
+            if x in VOLUME_CMD:
+                #logging.debug('sending ' + x + ' via cmus-remote')
+                subprocess.Popen(['cmus-remote',
+                                  '--server',
+                                  SOCKETS_CONFIG['TO_CMUS']['FILE'],
+                                  '-C',
+                                  x])
+            else:
+                C.send('KEYPAD_TO_CORE', x)
 
 
 
