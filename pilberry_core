@@ -21,7 +21,7 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Simple server script that waits for command, to test browsing a file system
+# Pilberry's core script
 
 # Python packages|modules imports
 import time
@@ -42,10 +42,9 @@ logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
 console = logging.getLogger('console')
 
-# Get the socket file name from sockets' conf file
-SOCKETS_PORTS = [int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT']),
-                 int(SOCKETS_CONFIG['AUDIO_FEEDBACK_TO_CORE']['PORT'])
-                 ]
+# Get the sockets' ports from sockets' conf file
+KEYPAD_PORT = int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT'])
+AUDIO_FEEDBACK_PORT = int(SOCKETS_CONFIG['AUDIO_FEEDBACK_TO_CORE']['PORT'])
 
 tree_root = MODES_CONFIG[modes_list[0]]['ROOT_PATH']
 
@@ -92,29 +91,29 @@ def report():
 
 report()
 
-def cmd_callback(socket, data):
+def keypad_callback(socket, data):
     raw_cmd = pickle.loads(data)
     if raw_cmd == 'QUIT':
-        print("Shutting down server")
+        console.debug("Shutting down server")
         sys.exit()
     else:
         try:
             cmd = cmd_match_list[raw_cmd]
         except KeyError:
-            print("Received: \033[92m" + raw_cmd \
+            console.debug("Received: \033[92m" + raw_cmd \
                             + ". Unknown command, no action\033[0m")
 
         else:
-            print("Received: \033[92m" + cmd + "\033[0m")
+            console.debug("Received: \033[92m" + cmd + "\033[0m")
             m.handle(cmd)
 
             report()
 
 
-def cmus_callback(socket, data):
+def audio_feedback_callback(socket, data):
     notification = pickle.loads(data)
     if notification['status'] in globals.CMUS_NOTIFICATIONS:
-        print("Received status notification: \033[31m" \
+        console.debug("Received status notification: \033[31m" \
                 + notification['status']
                 + '\033[0m')
         globals.cmus_status = notification['status']
@@ -122,15 +121,16 @@ def cmus_callback(socket, data):
         m.handle(notification['status'], full_path=notification['full_path'])
 
     else:
-        print("Received UNKNOWN status notification: " + notification['status'])
+        console.debug("Received UNKNOWN status notification: " \
+                      + notification['status'])
 
-    print("On full path: " + notification['full_path'])
+    console.debug("On full path: " + notification['full_path'])
 
     report()
 
 
-RPIO.add_tcp_callback(SOCKETS_PORTS[0], cmd_callback)
-RPIO.add_tcp_callback(SOCKETS_PORTS[1], cmus_callback)
+RPIO.add_tcp_callback(KEYPAD_PORT, keypad_callback)
+RPIO.add_tcp_callback(AUDIO_FEEDBACK_PORT, audio_feedback_callback)
 
 # Blocking main epoll loop
 RPIO.wait_for_interrupts()
