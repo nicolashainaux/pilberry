@@ -37,10 +37,11 @@ from lib.globals import SOCKETS_CONFIG, MODES_CONFIG, LOG_DIR
 from lib.globals import cmd_match_list, modes_list
 from lib.mode.Mode import Mode
 import lib.globals as globals
+from lib.carrier.Carrier import Carrier
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
-console = logging.getLogger('console')
+coreLog = logging.getLogger('coreLog')
 
 # Get the sockets' ports from sockets' conf file
 KEYPAD_PORT = int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT'])
@@ -58,18 +59,18 @@ globals.current_mode = Mode(root=tree_root)
 m = globals.current_mode
 
 def report():
-    console.debug("xnode is in: " + m.xnode.parent['full_path'])
-    console.debug("xnode is " \
+    coreLog.debug("xnode is in: " + m.xnode.parent['full_path'])
+    coreLog.debug("xnode is " \
           + m.xnode['file_name']\
           + " and has " \
           + str(len(m.xnode.children)) \
           + " children.")
-    console.debug("head is \033[32m" \
+    coreLog.debug("head is \033[32m" \
           + m.head['file_name']\
           + "\033[0m and has " \
           + str(len(m.head.children)) \
           + " children.")
-    console.debug("global.cmus_status: "+ str(globals.cmus_status))
+    coreLog.debug("global.cmus_status: "+ str(globals.cmus_status))
 
     result = ""
     for i in range(len(m.xnode.neighbours)):
@@ -86,52 +87,69 @@ def report():
 
     result += "\nWaiting for next command..."
 
-    console.debug(result)
+    coreLog.debug(result)
 
 
 report()
 
-def keypad_callback(socket, data):
-    raw_cmd = pickle.loads(data)
-    if raw_cmd == 'QUIT':
-        console.debug("Shutting down server")
-        sys.exit()
-    else:
-        try:
-            cmd = cmd_match_list[raw_cmd]
-        except KeyError:
-            console.debug("Received: \033[92m" + raw_cmd \
-                            + ". Unknown command, no action\033[0m")
+with Carrier() as C:
+    data = {'parent' : m.xnode.parent['file_name'],
+            'xnode_name' : m.xnode['file_name'],
+            'status' : globals.cmus_status}
+    C.send('CORE_TO_DISPLAY', data)
+
+
+    def keypad_callback(socket, data):
+        raw_cmd = pickle.loads(data)
+        if raw_cmd == 'QUIT':
+            coreLog.debug("Shutting down server")
+            sys.exit()
+        else:
+            try:
+                cmd = cmd_match_list[raw_cmd]
+            except KeyError:
+                coreLog.debug("Received: \033[92m" + raw_cmd \
+                                + ". Unknown command, no action\033[0m")
+
+            else:
+                coreLog.debug("Received: \033[92m" + cmd + "\033[0m")
+                m.handle(cmd)
+
+                report()
+
+                data = {'parent' : m.xnode.parent['file_name'],
+                        'xnode_name' : m.xnode['file_name'],
+                        'status' : globals.cmus_status}
+                C.send('CORE_TO_DISPLAY', data)
+
+
+    def audio_feedback_callback(socket, data):
+        notification = pickle.loads(data)
+        if notification['status'] in globals.CMUS_NOTIFICATIONS:
+            coreLog.debug("Received status notification: \033[31m" \
+                    + notification['status']
+                    + '\033[0m')
+            globals.cmus_status = notification['status']
+
+            m.handle(notification['status'], full_path=notification['full_path'])
 
         else:
-            console.debug("Received: \033[92m" + cmd + "\033[0m")
-            m.handle(cmd)
+            coreLog.debug("Received UNKNOWN status notification: " \
+                          + notification['status'])
 
-            report()
+        coreLog.debug("On full path: " + notification['full_path'])
 
+        report()
 
-def audio_feedback_callback(socket, data):
-    notification = pickle.loads(data)
-    if notification['status'] in globals.CMUS_NOTIFICATIONS:
-        console.debug("Received status notification: \033[31m" \
-                + notification['status']
-                + '\033[0m')
-        globals.cmus_status = notification['status']
-
-        m.handle(notification['status'], full_path=notification['full_path'])
-
-    else:
-        console.debug("Received UNKNOWN status notification: " \
-                      + notification['status'])
-
-    console.debug("On full path: " + notification['full_path'])
-
-    report()
+        data = {'parent' : m.xnode.parent['file_name'],
+                'xnode_name' : m.xnode['file_name'],
+                'status' : globals.cmus_status}
+        C.send('CORE_TO_DISPLAY', data)
 
 
-RPIO.add_tcp_callback(KEYPAD_PORT, keypad_callback)
-RPIO.add_tcp_callback(AUDIO_FEEDBACK_PORT, audio_feedback_callback)
+    RPIO.add_tcp_callback(KEYPAD_PORT, keypad_callback)
+    RPIO.add_tcp_callback(AUDIO_FEEDBACK_PORT, audio_feedback_callback)
 
-# Blocking main epoll loop
-RPIO.wait_for_interrupts()
+    # Blocking main epoll loop
+    RPIO.wait_for_interrupts()
 

@@ -39,8 +39,11 @@ MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
 USER_CONF_FILE = CONF_DIR + 'user.conf'
 
+CORE_SCRIPT = PILBERRY_ROOT + 'pilberry_core'
+DISPLAY_SCRIPT = PILBERRY_ROOT + 'pilberry_display'
 AUDIO_FEEDBACK_SCRIPT = BIN_DIR + 'audio_feedback'
 AUDIO_FEEDBACK_LOCK_FILE = LOCKS_DIR + 'audio_feedback'
+
 
 # Read the modes' list from appropriate conf file
 MODES_CONFIG = configparser.ConfigParser()

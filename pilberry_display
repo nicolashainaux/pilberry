@@ -21,42 +21,45 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Main script that will start all other pilberry components
+# Simple server script that waits for command, to test browsing a file system
 
 # Python packages|modules imports
-import subprocess
 import time
+import pickle
+import socket
+import sys, os
+import RPIO
+import logging
+import logging.config
 
 # Pilberry packages|modules imports
 import lib.globals as globals
-from lib.globals import SOCKETS_CONFIG
-from lib.globals import AUDIO_FEEDBACK_SCRIPT, CORE_SCRIPT, DISPLAY_SCRIPT
+from lib.globals import SOCKETS_CONFIG, LOG_DIR
+from lib.tree.Node import Node
+from lib.tree.NodeFileSystem import NodeFileSystem
 
-def __main__():
-    subprocess.Popen(['cmus',
-                      '--listen',
-                      SOCKETS_CONFIG['TO_CMUS']['FILE']])
+logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
+displayLog = logging.getLogger('displayLog')
 
-    subprocess.Popen([DISPLAY_SCRIPT])
-    time.sleep(1)
+# Get the socket file name from sockets' conf file
+CORE_TCP_PORT = int(SOCKETS_CONFIG['CORE_TO_DISPLAY']['PORT'])
 
-    subprocess.Popen([CORE_SCRIPT])
+displayLog.debug("Waiting for the first info to come...")
 
-    ##
-    #   @todo   Check if the timing below is enough/not too much
-
-    # To ensure cmus is completely open before any cmus-remote command is sent:
-    time.sleep(1)
-
-    subprocess.Popen(['cmus-remote',
-                      '--server',
-                      SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                      '-C',
-                      'set status_display_program=' + AUDIO_FEEDBACK_SCRIPT])
+def core_callback(socket, data):
+    info = pickle.loads(data)
+    displayLog.debug("line1: " + info['parent'])
+    displayLog.debug("line2: " + info['xnode_name'])
+    displayLog.debug("status: " + info['status'])
+    #line1 = globals.current_mode.xnode.parent.full_path
+    #line2 = globals.current_mode.xnode.full_path
+    #console.debug(line1 + "\n" + line2 + "\n\n")
 
 
 
 
-if __name__ == '__main__':
-    __main__()
+RPIO.add_tcp_callback(CORE_TCP_PORT, core_callback)
+
+# Blocking main epoll loop
+RPIO.wait_for_interrupts()
