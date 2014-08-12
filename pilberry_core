@@ -102,7 +102,8 @@ with Carrier() as C:
     def keypad_callback(socket, data):
         raw_cmd = pickle.loads(data)
         if raw_cmd == 'QUIT':
-            coreLog.debug("Shutting down server")
+            C.send('CORE_TO_DISPLAY', 'QUIT')
+            coreLog.debug("Exit")
             sys.exit()
         else:
             try:
