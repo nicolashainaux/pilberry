@@ -22,9 +22,11 @@
 
 # Python packages|modules imports
 import logging
+import subprocess
 
 # Pilberry packages|modules imports
 import lib.globals as globals
+from lib.globals import SOCKETS_CONFIG, USER_CONFIG
 
 ##
 # @class State_C
@@ -152,7 +154,34 @@ class State_C(object):
     def msg_cmus_stopped(self, **options):
         pass
 
+
     ##
     #   @brief
     def msg_cmus_paused(self, **options):
+        pass
+
+
+    ##
+    #   @brief
+    def vol_up(self, **options):
+        subprocess.Popen(['cmus-remote',
+                          '--server',
+                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
+                          '-C',
+                          'vol +' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
+
+
+    ##
+    #   @brief
+    def vol_down(self, **options):
+        subprocess.Popen(['cmus-remote',
+                          '--server',
+                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
+                          '-C',
+                          'vol -' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
+
+
+    ##
+    #   @brief
+    def no_action(self, **options):
         pass

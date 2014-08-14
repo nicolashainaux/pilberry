@@ -28,12 +28,14 @@ import time
 import pickle
 import socket
 import sys, os
+import subprocess
 import RPIO
 import logging
 import logging.config
 
 # Pilberry packages|modules imports
-from lib.globals import SOCKETS_CONFIG, MODES_CONFIG, LOG_DIR
+from lib.globals import SOCKETS_CONFIG, MODES_CONFIG
+from lib.globals import LOG_DIR, VOLUME_PID_FILE
 from lib.globals import cmd_match_list, modes_list
 from lib.mode.Mode import Mode
 import lib.globals as globals
@@ -46,6 +48,8 @@ coreLog = logging.getLogger('coreLog')
 # Get the sockets' ports from sockets' conf file
 KEYPAD_PORT = int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT'])
 AUDIO_FEEDBACK_PORT = int(SOCKETS_CONFIG['AUDIO_FEEDBACK_TO_CORE']['PORT'])
+VOLUME_PORT = int(SOCKETS_CONFIG['VOLUME_TO_CORE']['PORT'])
+
 
 tree_root = MODES_CONFIG[modes_list[0]]['ROOT_PATH']
 
@@ -103,6 +107,9 @@ with Carrier() as C:
         raw_cmd = pickle.loads(data)
         if raw_cmd == 'QUIT':
             C.send('CORE_TO_DISPLAY', 'QUIT')
+            AF_FILE_READ = open(VOLUME_PID_FILE, mode = 'r')
+            vol_pid = int(AF_FILE_READ.readlines()[0])
+            subprocess.Popen(['kill', str(vol_pid)])
             coreLog.debug("Exit")
             sys.exit()
         else:
@@ -150,6 +157,7 @@ with Carrier() as C:
 
     RPIO.add_tcp_callback(KEYPAD_PORT, keypad_callback)
     RPIO.add_tcp_callback(AUDIO_FEEDBACK_PORT, audio_feedback_callback)
+    RPIO.add_tcp_callback(VOLUME_PORT, keypad_callback)
 
     # Blocking main epoll loop
     RPIO.wait_for_interrupts()

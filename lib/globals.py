@@ -33,6 +33,7 @@ BIN_DIR = PILBERRY_ROOT + 'bin/'
 CONF_DIR = PILBERRY_ROOT + 'etc/'
 LOCKS_DIR = PILBERRY_ROOT + 'locks/'
 LOG_DIR = PILBERRY_ROOT + 'log/'
+VAR_RUN = PILBERRY_ROOT + 'var/run/'
 
 SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
@@ -41,8 +42,13 @@ USER_CONF_FILE = CONF_DIR + 'user.conf'
 
 CORE_SCRIPT = PILBERRY_ROOT + 'pilberry_core'
 DISPLAY_SCRIPT = PILBERRY_ROOT + 'pilberry_display'
+VOLUME_SCRIPT = PILBERRY_ROOT + 'pilberry_volume'
 AUDIO_FEEDBACK_SCRIPT = BIN_DIR + 'audio_feedback'
 AUDIO_FEEDBACK_LOCK_FILE = LOCKS_DIR + 'audio_feedback'
+
+CORE_PID_FILE = VAR_RUN + 'cs.pid'
+DISPLAY_PID_FILE = VAR_RUN + 'ds.pid'
+VOLUME_PID_FILE = VAR_RUN + 'vs.pid'
 
 
 # Read the modes' list from appropriate conf file

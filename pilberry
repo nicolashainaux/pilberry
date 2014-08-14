@@ -31,6 +31,7 @@ import time
 import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG
 from lib.globals import AUDIO_FEEDBACK_SCRIPT, CORE_SCRIPT, DISPLAY_SCRIPT
+from lib.globals import VOLUME_SCRIPT
 
 def __main__():
     subprocess.Popen(['cmus',
@@ -38,16 +39,25 @@ def __main__():
                       SOCKETS_CONFIG['TO_CMUS']['FILE']])
 
 
-    subprocess.Popen([DISPLAY_SCRIPT])
+    ds = subprocess.Popen([DISPLAY_SCRIPT])
     time.sleep(1)
 
-    subprocess.Popen([CORE_SCRIPT])
+    cs = subprocess.Popen([CORE_SCRIPT])
 
     ##
     #   @todo   Check if the timing below is enough/not too much
 
     # To ensure cmus is completely open before any cmus-remote command is sent:
     time.sleep(1)
+
+    vs = subprocess.Popen([VOLUME_SCRIPT])
+
+    subprocess.Popen(['echo "' + str(ds.pid) + '" > ./var/run/ds.pid'],
+                      shell=True)
+    subprocess.Popen(['echo "' + str(cs.pid) + '" > ./var/run/cs.pid'],
+                      shell=True)
+    subprocess.Popen(['echo "' + str(vs.pid) + '" > ./var/run/vs.pid'],
+                      shell=True)
 
     subprocess.Popen(['cmus-remote',
                       '--server',

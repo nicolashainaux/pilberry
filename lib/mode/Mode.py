@@ -116,6 +116,9 @@ class Mode(object):
          'playing' : getattr(memory_state, s).msg_cmus_playing,
          'stopped' : getattr(memory_state, s).msg_cmus_stopped,
          'paused' : getattr(memory_state, s).msg_cmus_paused,
+         'CMD_VOL_UP' : getattr(memory_state, s).vol_up,
+         'CMD_VOL_DOWN' : getattr(memory_state, s).vol_down,
+         'CMD_SETTINGS' : getattr(memory_state, s).no_action,
          'CMD_ROGER' : self.roger
         }
 
