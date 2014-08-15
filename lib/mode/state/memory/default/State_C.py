@@ -73,6 +73,17 @@ class State_C(State):
                     n.add_children(1)
             self.set_xnode(self.xnode.children[0])
 
+        else:
+            pass
+
+
+    ##
+    #   @brief
+    def select(self):
+        # xnode is an inode
+        if len(self.xnode.children) >= 1:
+            self.handle('CMD_MOVE_TO_1ST_CHILD')
+
         # xnode is a leaf
         elif self.head != self.xnode:
             self.set_head(self.xnode)
@@ -91,11 +102,6 @@ class State_C(State):
             elif globals.cmus_status == 'playing':
                 self.set_state('State_B')
 
-
-    ##
-    #   @brief
-    def select(self):
-        self.handle('CMD_MOVE_TO_1ST_CHILD')
 
 
     ##

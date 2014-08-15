@@ -76,9 +76,7 @@ class State_A(State):
                     n.add_children(1)
             self.set_xnode(self.xnode.children[0])
         else:
-            self.set_head(self.xnode)
-            self.md.start_playing()
-            self.set_state('State_B')
+            pass
 
 
     ##

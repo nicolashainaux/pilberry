@@ -47,12 +47,12 @@ SHORTCUTS = {'e' : 'CMD_A1',
 
 VOLUME_CMD = ['vol +5%', 'vol -5%']
 
-HUMAN_TRANSLATION = {'e' : 'select',
+HUMAN_TRANSLATION = {'e' : 'to_child',
                      ' ' : 'esc',
                      'j' : 'prev',
                      'l' : 'next',
                      'i' : 'parent',
-                     'k' : 'to_child',
+                     'k' : 'select',
                      's' : 'stop',
                      'Q' : 'QUIT',
                      'D' : 'DONE',
