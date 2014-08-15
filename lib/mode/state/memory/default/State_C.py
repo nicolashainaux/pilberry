@@ -22,16 +22,15 @@
 
 # Python packages|modules imports
 import logging
-import subprocess
 
 # Pilberry packages|modules imports
+from .State import State
 import lib.globals as globals
-from lib.globals import SOCKETS_CONFIG, USER_CONFIG
 
 ##
 # @class State_C
 # @brief
-class State_C(object):
+class State_C(State):
 
 
     ##
@@ -44,7 +43,6 @@ class State_C(object):
         # is equivalent to 'self.xnode.parent is not root'
         if self.xnode.parent.parent != None:
             self.set_xnode(self.xnode.parent)
-
 
 
     ##
@@ -117,13 +115,13 @@ class State_C(object):
             self.set_state('State_B')
 
 
-
     ##
     #   @brief
     def stop(self):
         self.md.stop()
         self.set_xnode(self.head)
         self.set_state('State_A')
+
 
     ##
     #   @brief
@@ -149,39 +147,4 @@ class State_C(object):
             #           full path. If no database is available, then a
             #           search algorithm has to be found...
 
-    ##
-    #   @brief
-    def msg_cmus_stopped(self, **options):
-        pass
 
-
-    ##
-    #   @brief
-    def msg_cmus_paused(self, **options):
-        pass
-
-
-    ##
-    #   @brief
-    def vol_up(self, **options):
-        subprocess.Popen(['cmus-remote',
-                          '--server',
-                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                          '-C',
-                          'vol +' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
-
-
-    ##
-    #   @brief
-    def vol_down(self, **options):
-        subprocess.Popen(['cmus-remote',
-                          '--server',
-                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                          '-C',
-                          'vol -' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
-
-
-    ##
-    #   @brief
-    def no_action(self, **options):
-        pass

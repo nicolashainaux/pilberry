@@ -22,16 +22,14 @@
 
 # Python packages|modules imports
 import logging
-import subprocess
 
 # Pilberry packages|modules imports
-import lib.globals as globals
-from lib.globals import SOCKETS_CONFIG, USER_CONFIG
+from .State import State
 
 ##
 # @class State_B
 # @brief
-class State_B(object):
+class State_B(State):
 
 
     ##
@@ -114,6 +112,7 @@ class State_B(object):
         self.md.stop()
         self.set_state('State_A')
 
+
     ##
     #   @brief
     def msg_cmus_playing(self, **options):
@@ -137,39 +136,3 @@ class State_B(object):
             #           base is available and we can find it thanks to its
             #           full path. If no database is available, then a
             #           search algorithm has to be found...
-
-    ##
-    #   @brief
-    def msg_cmus_stopped(self, **options):
-        pass
-
-    ##
-    #   @brief
-    def msg_cmus_paused(self, **options):
-        pass
-
-
-    ##
-    #   @brief
-    def vol_up(self, **options):
-        subprocess.Popen(['cmus-remote',
-                          '--server',
-                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                          '-C',
-                          'vol +' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
-
-
-    ##
-    #   @brief
-    def vol_down(self, **options):
-        subprocess.Popen(['cmus-remote',
-                          '--server',
-                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                          '-C',
-                          'vol -' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
-
-
-    ##
-    #   @brief
-    def no_action(self, **options):
-        pass

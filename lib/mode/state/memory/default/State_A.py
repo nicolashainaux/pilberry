@@ -21,18 +21,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 # Python packages|modules imports
-import subprocess
+import logging
 
 # Pilberry packages|modules imports
-import lib.globals as globals
-from lib.globals import SOCKETS_CONFIG, USER_CONFIG
+from .State import State
 
 
 ##
 # @class State_A
 # @brief
-#   @todo   Code factorization between the different State_* classes
-class State_A(object):
+class State_A(State):
 
 
     ##
@@ -103,45 +101,4 @@ class State_A(object):
     ##
     #   @brief
     def stop(self):
-        pass
-
-
-    ##
-    #   @brief
-    def msg_cmus_playing(self, **options):
-        pass
-
-    ##
-    #   @brief
-    def msg_cmus_stopped(self, **options):
-        pass
-
-    ##
-    #   @brief
-    def msg_cmus_paused(self, **options):
-        pass
-
-
-    ##
-    #   @brief
-    def vol_up(self, **options):
-        subprocess.Popen(['cmus-remote',
-                          '--server',
-                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                          '-C',
-                          'vol +' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
-
-
-    ##
-    #   @brief
-    def vol_down(self, **options):
-        subprocess.Popen(['cmus-remote',
-                          '--server',
-                          SOCKETS_CONFIG['TO_CMUS']['FILE'],
-                          '-C',
-                          'vol -' + USER_CONFIG['GENERAL']['VOL_STEP'] + '%'])
-
-    ##
-    #   @brief
-    def no_action(self, **options):
         pass
