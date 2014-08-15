@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+### BEGIN INIT INFO
+
+# Provides:          pilberry
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start pilberry
+
+### END INIT INFO
+
+case "$1" in
+
+    start)
+        /home/pi/pilberry/bin/start
+        ;;
+
+    stop)
+        /home/pi/pilberry/bin/stop
+        ;;
+
+    reload|restart)
+        "$0" stop
+        "$0" start
+        ;;
+
+    *)
+        echo "Usage: $0 start|stop|restart|reload"
+        exit 1
+
+esac
+
+exit 0

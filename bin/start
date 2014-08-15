@@ -21,28 +21,46 @@
 # along with Pilberry; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Main script that will start all other pilberry components
+# Script that will start all other pilberry components
 
 # Python packages|modules imports
 import subprocess
 import time
+import re
+import os
 
 # Pilberry packages|modules imports
 import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG
-from lib.globals import AUDIO_FEEDBACK_SCRIPT, CORE_SCRIPT, DISPLAY_SCRIPT
-from lib.globals import VOLUME_SCRIPT
+from lib.globals import PILBERRY_ROOT
+from lib.globals import AUDIO_FEEDBACK_SCRIPT
+from lib.globals import CORE_SCRIPT, DISPLAY_SCRIPT, VOLUME_SCRIPT
+from lib.globals import PID_FILE
 
+##
+#   @todo   Provide a more evolutive script, this is just the minimal version.
+#           It should take the dirs and files names a cleaner way. Remove
+#           the dirty hack
 def __main__():
-    subprocess.Popen(['cmus',
-                      '--listen',
-                      SOCKETS_CONFIG['TO_CMUS']['FILE']])
+    # ? is that also a dirty hack?
+    os.environ['HOME'] = '/root/'
+    os.environ['USER'] = 'root'
+    cmus = subprocess.Popen(['cmus',
+                             '--listen',
+                             SOCKETS_CONFIG['TO_CMUS']['FILE']])
 
+    # dirty hack
+    pilberry_root = re.sub("/bin", "", PILBERRY_ROOT)
+    display_script = re.sub("/bin", "", DISPLAY_SCRIPT)
+    volume_script = re.sub("/bin", "", VOLUME_SCRIPT)
+    core_script = re.sub("/bin", "", CORE_SCRIPT)
+    pid_file = re.sub("/bin", "", PID_FILE)
+    audio_feedback_script = re.sub("/bin", "", AUDIO_FEEDBACK_SCRIPT)
 
-    ds = subprocess.Popen([DISPLAY_SCRIPT])
+    ds = subprocess.Popen([display_script], cwd=pilberry_root)
     time.sleep(1)
 
-    cs = subprocess.Popen([CORE_SCRIPT])
+    cs = subprocess.Popen([core_script], cwd=pilberry_root)
 
     ##
     #   @todo   Check if the timing below is enough/not too much
@@ -50,20 +68,23 @@ def __main__():
     # To ensure cmus is completely open before any cmus-remote command is sent:
     time.sleep(1)
 
-    vs = subprocess.Popen([VOLUME_SCRIPT])
+    vs = subprocess.Popen([volume_script], cwd=pilberry_root)
 
-    subprocess.Popen(['echo "' + str(ds.pid) + '" > ./var/run/ds.pid'],
+    subprocess.Popen(['echo "' + str(ds.pid) + '" > ' + pid_file],
                       shell=True)
-    subprocess.Popen(['echo "' + str(cs.pid) + '" > ./var/run/cs.pid'],
+    subprocess.Popen(['echo "' + str(cs.pid) + '" >> ' + pid_file],
                       shell=True)
-    subprocess.Popen(['echo "' + str(vs.pid) + '" > ./var/run/vs.pid'],
+    subprocess.Popen(['echo "' + str(vs.pid) + '" >> ' + pid_file],
+                      shell=True)
+
+    subprocess.Popen(['echo "' + str(cmus.pid) + '" >> ' + pid_file],
                       shell=True)
 
     subprocess.Popen(['cmus-remote',
                       '--server',
                       SOCKETS_CONFIG['TO_CMUS']['FILE'],
                       '-C',
-                      'set status_display_program=' + AUDIO_FEEDBACK_SCRIPT])
+                      'set status_display_program=' + audio_feedback_script])
 
 
 

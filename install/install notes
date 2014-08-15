@@ -1,0 +1,5 @@
+Steps required to install pilberry (dependencies are already installed):
+
+# cd path_to_pilberry/install/
+# cp pilberry /etc/init.d/
+# update-rc.d pilberry defaults

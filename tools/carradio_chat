@@ -84,8 +84,8 @@ with Carrier() as C:
         y = user_entry()
         if "D" == y or "Q" == y:
             print("Shutting down.")
-            if "Q" == y:
-                C.send('KEYPAD_TO_CORE', 'QUIT')
+            #if "Q" == y:
+            #    C.send('KEYPAD_TO_CORE', 'QUIT')
             sys.exit()
 
         elif y in SHORTCUTS.keys():

@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# Script that will stop all other pilberry components
+
+# Python packages|modules imports
+import subprocess
+import re
+
+# Pilberry packages|modules imports
+from lib.globals import PID_FILE
+
+##
+#   @todo   Remove the dirty hack
+
+def __main__():
+    # dirty hack
+    pid_file = re.sub("/bin", "", PID_FILE)
+
+    AF_FILE_READ = open(pid_file, mode = 'r')
+    display_pid = int(AF_FILE_READ.readlines()[0])
+    subprocess.Popen(['kill', str(display_pid)])
+
+    AF_FILE_READ = open(pid_file, mode = 'r')
+    core_pid = int(AF_FILE_READ.readlines()[1])
+    subprocess.Popen(['kill', str(core_pid)])
+
+    AF_FILE_READ = open(pid_file, mode = 'r')
+    volume_pid = int(AF_FILE_READ.readlines()[2])
+    subprocess.Popen(['kill', str(volume_pid)])
+
+    AF_FILE_READ = open(pid_file, mode = 'r')
+    cmus_pid = int(AF_FILE_READ.readlines()[3])
+    subprocess.Popen(['kill', str(cmus_pid)])
+
+
+
+if __name__ == '__main__':
+    __main__()
+
+
+
+

@@ -35,7 +35,7 @@ import logging.config
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, MODES_CONFIG
-from lib.globals import LOG_DIR, VOLUME_PID_FILE
+from lib.globals import LOG_DIR
 from lib.globals import cmd_match_list, modes_list
 from lib.mode.Mode import Mode
 import lib.globals as globals
@@ -106,12 +106,13 @@ with Carrier() as C:
     def keypad_callback(socket, data):
         raw_cmd = pickle.loads(data)
         if raw_cmd == 'QUIT':
-            C.send('CORE_TO_DISPLAY', 'QUIT')
-            AF_FILE_READ = open(VOLUME_PID_FILE, mode = 'r')
-            vol_pid = int(AF_FILE_READ.readlines()[0])
-            subprocess.Popen(['kill', str(vol_pid)])
-            coreLog.debug("Exit")
-            sys.exit()
+            pass
+            #C.send('CORE_TO_DISPLAY', 'QUIT')
+            #AF_FILE_READ = open(VOLUME_PID_FILE, mode = 'r')
+            #vol_pid = int(AF_FILE_READ.readlines()[0])
+            #subprocess.Popen(['kill', str(vol_pid)])
+            #coreLog.debug("Exit")
+            #sys.exit()
         else:
             try:
                 cmd = cmd_match_list[raw_cmd]

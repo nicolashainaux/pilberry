@@ -46,9 +46,7 @@ VOLUME_SCRIPT = PILBERRY_ROOT + 'pilberry_volume'
 AUDIO_FEEDBACK_SCRIPT = BIN_DIR + 'audio_feedback'
 AUDIO_FEEDBACK_LOCK_FILE = LOCKS_DIR + 'audio_feedback'
 
-CORE_PID_FILE = VAR_RUN + 'cs.pid'
-DISPLAY_PID_FILE = VAR_RUN + 'ds.pid'
-VOLUME_PID_FILE = VAR_RUN + 'vs.pid'
+PID_FILE = VAR_RUN + 'pid'
 
 
 # Read the modes' list from appropriate conf file
