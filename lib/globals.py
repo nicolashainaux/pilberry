@@ -39,6 +39,7 @@ SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
 USER_CONF_FILE = CONF_DIR + 'user.conf'
+GENERAL_CONF_FILE = CONF_DIR + 'general.conf'
 
 CORE_SCRIPT = PILBERRY_ROOT + 'pilberry_core'
 DISPLAY_SCRIPT = PILBERRY_ROOT + 'pilberry_display'
@@ -65,20 +66,24 @@ current_state = {}
 #   @todo   At startup, get the tree matching the current mode and state
 current_mode = None
 
-# Read the modes' list from appropriate conf file
+# Read cmd_match_list from appropriate conf file
 CMD_CONFIG = configparser.ConfigParser()
 CMD_CONFIG.optionxform = lambda option: option
 CMD_CONFIG.read(CMD_CONF_FILE)
 cmd_match_list = dict(CMD_CONFIG[MODES_CONFIG[current_mode_id]['TYPE']])
 
-# Get the port from sockets' conf file
+# Read the sockets' config file
 SOCKETS_CONFIG = configparser.ConfigParser()
 SOCKETS_CONFIG.read(SOCKETS_CONF_FILE)
 
-# Read the modes' list from appropriate conf file
+# Read the user's config file
 USER_CONFIG = configparser.ConfigParser()
 USER_CONFIG.optionxform = lambda option: option
 USER_CONFIG.read(USER_CONF_FILE)
+
+# Read the general config file
+GENERAL_CONFIG = configparser.ConfigParser()
+GENERAL_CONFIG.read(GENERAL_CONF_FILE)
 
 MUSIC_FILE_EXTENSIONS = ['.ogg', '.mp3', '.flac', '.wma', '.m4a',
                          '.mpc', '.mpp', '.wav', '.wv', '.ape',

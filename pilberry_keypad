@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# This script listens to the keypad
+
+# Python packages|modules imports
+import time
+import logging
+
+# Adafruit packages|modules imports
+from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_CharLCD
+from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_RGBCharLCD
+from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_CharLCDPlate
+import lib.hardware_drivers.Adafruit_CharLCDPlate.SELECT as SELECT
+import lib.hardware_drivers.Adafruit_CharLCDPlate.RIGHT as RIGHT
+import lib.hardware_drivers.Adafruit_CharLCDPlate.DOWN as DOWN
+import lib.hardware_drivers.Adafruit_CharLCDPlate.UP as UP
+import lib.hardware_drivers.Adafruit_CharLCDPlate.LEFT as LEFT
+
+# Pilberry packages|modules imports
+from lib.hardware_drivers.key_handler.KeyHandler import KeyHandler
+
+logging.config.fileConfig(LOG_DIR + 'logging.conf')
+
+KEYPAD = Adafruit_CharLCDPlate(Adafruit_RGBCharLCD(Adafruit_CharLCD()))
+
+KEY_IDS = [SELECT, RIGHT, LEFT, UP, DOWN]
+
+KEYPAD_HANDLERS = {SELECT : KeyHandler('SELECT'),
+                   RIGHT : KeyHandler('RIGHT'),
+                   LEFT : KeyHandler('LEFT'),
+                   UP : KeyHandler('UP'),
+                   DOWN : KeyHandler('DOWN'),
+                  }
+
+with Carrier() as C:
+        while True:
+            for k in KEY_IDS:
+                KEYPAD_HANDLERS.handle(KEYPAD.is_pressed(k))
+
+            time.sleep(0.02)
+
