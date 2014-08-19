@@ -22,9 +22,12 @@
 
 # Python packages|modules imports
 import logging
+import subprocess
+import time
 
 # Pilberry packages|modules imports
 from .State import State
+from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
 
 ##
 # @class State_B
@@ -62,6 +65,11 @@ class State_B(State):
             self.set_head(self.xnode)
             self.md.skip_to_next_song()
 
+            #subprocess.call(['echo ' \
+            #                 + str(time.time() + 7) \
+            #                 + ' > ' \
+            #                 + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
+
         else:
             self.md.stop()
             self.set_state('State_A')
@@ -80,6 +88,11 @@ class State_B(State):
             self.set_head(self.xnode)
             self.md.queue_first(self.head.full_path)
             self.md.skip_to_next_song()
+
+            #subprocess.call(['echo ' \
+            #                 + str(time.time() + 7) \
+            #                 + ' > ' \
+            #                 + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
 
         else:
             self.md.stop()
