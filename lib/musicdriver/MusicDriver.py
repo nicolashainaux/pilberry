@@ -27,7 +27,7 @@ import logging
 
 # Pilberry packages|modules imports
 import lib.globals as globals
-from lib.globals import SOCKETS_CONFIG, AUDIO_FEEDBACK_LOCK_FILE
+from lib.globals import SOCKETS_CONFIG
 
 
 ##
