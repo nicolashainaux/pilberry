@@ -55,7 +55,8 @@ def __main__():
     volume_script = re.sub("/bin", "", VOLUME_SCRIPT)
     core_script = re.sub("/bin", "", CORE_SCRIPT)
     pid_file = re.sub("/bin", "", PID_FILE)
-    audio_feedback_script = re.sub("/bin", "", AUDIO_FEEDBACK_SCRIPT)
+    audio_feedback_script = re.sub("/bin", "", AUDIO_FEEDBACK_SCRIPT, count=1)
+
 
     ds = subprocess.Popen([display_script], cwd=pilberry_root)
     time.sleep(1)
