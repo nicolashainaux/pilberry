@@ -25,11 +25,20 @@
 
 # Python packages|modules imports
 import time
+import logging
 
 # Pilberry packages|modules imports
-from lib.globals import USER_CONFIG, GENERAL_CONFIG
+from lib.globals import GENERAL_CONFIG
 from lib.carrier.Carrier import Carrier
 
+LONG_CLICK_DELAY = float(GENERAL_CONFIG['CLICK_DELAYS']['LONG'])
+DOUBLE_CLICK_DELAY = float(GENERAL_CONFIG['CLICK_DELAYS']['DOUBLE'])
+BUTTON = GENERAL_CONFIG['BUTTON_IDS']
+SHORT_CLICK_ID = GENERAL_CONFIG['CLICK_IDS']['SINGLE_SHORT']
+LONG_CLICK_ID = GENERAL_CONFIG['CLICK_IDS']['SINGLE_LONG']
+DOUBLE_CLICK_ID = GENERAL_CONFIG['CLICK_IDS']['DOUBLE']
+
+keypadLog = logging.getLogger('keypadLog')
 
 ##
 # @class KeyHandler
@@ -42,7 +51,7 @@ class KeyHandler(object):
         #   @brief
         def __init__(self, key_id):
             self._key_id = key_id
-            self._cmd = 'CMD_' + GENERAL['BUTTON_IDS'][key_id]
+            self._cmd = 'CMD_' + BUTTON[key_id]
             self._state = self.state_initial
             self._time = time.time()
 
@@ -80,6 +89,7 @@ class KeyHandler(object):
         def set_state(self, new_state):
             self._time = time.time()
             self._state = new_state
+            keypadLog.debug("state set to: " + self._state.__name__)
 
 
         ##
@@ -99,9 +109,11 @@ class KeyHandler(object):
         #   @brief
         def state_single_click(self, is_pressed):
             if not is_pressed:
-                if time.time() - self.time > USER_CONFIG['CLICK_DELAYS']['LONG']:
-                    C.send('KEYPAD_TO_CORE',
-                           self.cmd + USER_CONFIG['CLICK_IDS']['SINGLE_LONG'])
+                if time.time() - self.time > LONG_CLICK_DELAY:
+                    #C.send('KEYPAD_TO_CORE',
+                           #self.cmd + LONG_CLICK_ID)
+                    keypadLog.debug("sending \033[32mLONG CLICK\033[0m")
+                    self.set_state(self.state_initial)
 
                 else:
                     self.set_state(self.state_provisional)
@@ -112,14 +124,16 @@ class KeyHandler(object):
         def state_provisional(self, is_pressed):
             if not is_pressed:
                 if time.time() - self.time \
-                    > USER_CONFIG['CLICK_DELAYS']['DOUBLE']:
+                    > DOUBLE_CLICK_DELAY:
                 #___
-                    C.send('KEYPAD_TO_CORE',
-                           self.cmd + USER_CONFIG['CLICK_IDS']['SINGLE_SHORT'])
+                    #C.send('KEYPAD_TO_CORE',
+                    #       self.cmd + SHORT_CLICK_ID)
+                    keypadLog.debug("sending \033[34mSHORT CLICK\033[0m")
                     self.set_state(self.state_initial)
             else:
-                C.send('KEYPAD_TO_CORE',
-                       self.cmd + USER_CONFIG['CLICK_IDS']['DOUBLE'])
+                #C.send('KEYPAD_TO_CORE',
+                #       self.cmd + DOUBLE_CLICK_ID)
+                keypadLog.debug("sending \033[31mDOUBLE CLICK\033[0m")
                 self.set_state(self.state_double_click)
 
 
@@ -128,10 +142,4 @@ class KeyHandler(object):
         def state_double_click(self, is_pressed):
             if not is_pressed:
                 self.set_state(self.state_initial)
-
-
-
-
-
-
 

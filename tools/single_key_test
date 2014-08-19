@@ -25,18 +25,10 @@
 
 # Python packages|modules imports
 import time
+import datetime
+import RPi.GPIO as GPIO
 import logging
 import logging.config
-
-# Adafruit packages|modules imports
-from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_CharLCD
-from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_RGBCharLCD
-from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_CharLCDPlate
-import lib.hardware_drivers.Adafruit_CharLCDPlate.SELECT as SELECT
-import lib.hardware_drivers.Adafruit_CharLCDPlate.RIGHT as RIGHT
-import lib.hardware_drivers.Adafruit_CharLCDPlate.DOWN as DOWN
-import lib.hardware_drivers.Adafruit_CharLCDPlate.UP as UP
-import lib.hardware_drivers.Adafruit_CharLCDPlate.LEFT as LEFT
 
 # Pilberry packages|modules imports
 from lib.hardware_drivers.key_handler import KeyHandler
@@ -44,21 +36,28 @@ from lib.globals import LOG_DIR
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
-KEYPAD = Adafruit_CharLCDPlate(Adafruit_RGBCharLCD(Adafruit_CharLCD()))
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(22, GPIO.IN)
 
-KEY_IDS = [SELECT, RIGHT, LEFT, UP, DOWN]
+k = KeyHandler('SELECT')
 
-KEYPAD_HANDLERS = {SELECT : KeyHandler('SELECT'),
-                   RIGHT : KeyHandler('RIGHT'),
-                   LEFT : KeyHandler('LEFT'),
-                   UP : KeyHandler('UP'),
-                   DOWN : KeyHandler('DOWN'),
-                  }
+def is_pressed(n):
+    return GPIO.input(n) == False
 
+last = is_pressed(22)
+
+print("ready")
 
 while True:
-    for k in KEY_IDS:
-        KEYPAD_HANDLERS.handle(KEYPAD.is_pressed(k))
+    #if is_pressed(22) != last:
+    #    print(str(datetime.datetime.now()) + " >> is pressed: " + str(not last))
+    #    last = not last
 
-    time.sleep(0.1)
+    k.handle(is_pressed(22))
+
+    time.sleep(0.02)
+
+
+
+
 
