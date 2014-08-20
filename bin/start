@@ -42,12 +42,6 @@ from lib.globals import PID_FILE
 #           It should take the dirs and files names a cleaner way. Remove
 #           the dirty hack
 def __main__():
-    # ? is that also a dirty hack?
-    os.environ['HOME'] = '/root/'
-    os.environ['USER'] = 'root'
-    cmus = subprocess.Popen(['cmus',
-                             '--listen',
-                             SOCKETS_CONFIG['TO_CMUS']['FILE']])
 
     # dirty hack
     pilberry_root = re.sub("/bin", "", PILBERRY_ROOT)
@@ -57,6 +51,13 @@ def __main__():
     pid_file = re.sub("/bin", "", PID_FILE)
     audio_feedback_script = re.sub("/bin", "", AUDIO_FEEDBACK_SCRIPT, count=1)
 
+    # ? is that also a dirty hack?
+    os.environ['HOME'] = '/root/'
+    os.environ['USER'] = 'root'
+    cmus = subprocess.Popen(['cmus',
+                             '--listen',
+                             SOCKETS_CONFIG['TO_CMUS']['FILE']],
+                             cwd=pilberry_root)
 
     ds = subprocess.Popen([display_script], cwd=pilberry_root)
     time.sleep(1)

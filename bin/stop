@@ -50,8 +50,12 @@ def __main__():
     subprocess.Popen(['kill', str(volume_pid)])
 
     AF_FILE_READ = open(pid_file, mode = 'r')
-    cmus_pid = int(AF_FILE_READ.readlines()[3])
-    subprocess.Popen(['kill', str(cmus_pid)])
+    try:
+        cmus_pid = int(AF_FILE_READ.readlines()[3])
+    except:
+        pass
+    else:
+        subprocess.Popen(['kill', str(cmus_pid)])
 
 
 

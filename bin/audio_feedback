@@ -27,21 +27,34 @@
 import sys, os
 import time
 import logging
+import subprocess
+
+subprocess.call(['echo "abc" > i_am_here'], shell=True)
 
 # Pilberry packages|modules imports
 from lib.carrier.Carrier import Carrier
 from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
 
+subprocess.call(['echo "def" >> i_am_here'], shell=True)
 
 logging.basicConfig(filename='./log/audio_feedback.log',
                     level=logging.DEBUG,
                     format='%(asctime)s %(filename)s: %(funcName)s: %(message)s',
                     datefmt='%Y/%m/%d %H:%M:%S')
 
+
+subprocess.call(['echo "ghi" >> i_am_here'], shell=True)
+
 logging.debug('---------------------------------'\
               + '--------------------------------------------------')
 
+subprocess.call(['echo "jkl" >> i_am_here'], shell=True)
+
 logging.debug('AUDIO_FEEDBACK_LOCK_FILE: ' + AUDIO_FEEDBACK_LOCK_FILE)
+
+
+subprocess.call(['echo "mno" >> i_am_here'], shell=True)
+
 AF_FILE_READ = open(AUDIO_FEEDBACK_LOCK_FILE, mode = 'r')
 
 now = time.time()
