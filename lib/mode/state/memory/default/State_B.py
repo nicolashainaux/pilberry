@@ -65,10 +65,10 @@ class State_B(State):
             self.set_head(self.xnode)
             self.md.skip_to_next_song()
 
-            #subprocess.call(['echo ' \
-            #                 + str(time.time() + 7) \
-            #                 + ' > ' \
-            #                 + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
+            subprocess.call(['echo ' \
+                             + str(time.time() + 7) \
+                             + ' > ' \
+                             + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
 
         else:
             self.md.stop()
@@ -89,10 +89,10 @@ class State_B(State):
             self.md.queue_first(self.head.full_path)
             self.md.skip_to_next_song()
 
-            #subprocess.call(['echo ' \
-            #                 + str(time.time() + 7) \
-            #                 + ' > ' \
-            #                 + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
+            subprocess.call(['echo ' \
+                             + str(time.time() + 7) \
+                             + ' > ' \
+                             + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
 
         else:
             self.md.stop()
