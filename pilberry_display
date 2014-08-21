@@ -32,11 +32,16 @@ import RPIO
 import logging
 import logging.config
 
+# Adafruit packages|modules imports
+from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
+
 # Pilberry packages|modules imports
 import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG, LOG_DIR
 from lib.tree.Node import Node
 from lib.tree.NodeFileSystem import NodeFileSystem
+
+lcd = Adafruit_CharLCDPlate()
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
@@ -55,6 +60,9 @@ def core_callback(socket, data):
     displayLog.debug("line1: " + info['parent'][0:16])
     displayLog.debug("line2: " + info['xnode_name'][0:16])
     displayLog.debug("status: " + info['status'])
+    lcd.clear()
+    lcd.message(info['parent'][0:16] + "\n")
+    lcd.message(info['xnode_name'][0:16])
     #line1 = globals.current_mode.xnode.parent.full_path
     #line2 = globals.current_mode.xnode.full_path
     #console.debug(line1 + "\n" + line2 + "\n\n")
