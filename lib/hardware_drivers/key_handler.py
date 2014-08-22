@@ -40,13 +40,14 @@ DOUBLE_CLICK_ID = GENERAL_CONFIG['CLICK_IDS']['DOUBLE']
 
 keypadLog = logging.getLogger('keypadLog')
 
-##
-# @class KeyHandler
-# @brief
-class KeyHandler(object):
 
+with Carrier() as C:
 
-    with Carrier() as C:
+    ##
+    # @class KeyHandler
+    # @brief
+    class KeyHandler(object):
+
         ##
         #   @brief
         def __init__(self, key_id):
@@ -110,9 +111,12 @@ class KeyHandler(object):
         def state_single_click(self, is_pressed):
             if not is_pressed:
                 if time.time() - self.time > LONG_CLICK_DELAY:
-                    #C.send('KEYPAD_TO_CORE',
-                           #self.cmd + LONG_CLICK_ID)
-                    keypadLog.debug("sending \033[32mLONG CLICK\033[0m")
+                    keypadLog.debug("sending \033[32m" \
+                                    + self.cmd \
+                                    + LONG_CLICK_ID \
+                                    + "\033[0m")
+                    C.send('KEYPAD_TO_CORE',
+                           self.cmd + LONG_CLICK_ID)
                     self.set_state(self.state_initial)
 
                 else:
@@ -126,14 +130,20 @@ class KeyHandler(object):
                 if time.time() - self.time \
                     > DOUBLE_CLICK_DELAY:
                 #___
-                    #C.send('KEYPAD_TO_CORE',
-                    #       self.cmd + SHORT_CLICK_ID)
-                    keypadLog.debug("sending \033[34mSHORT CLICK\033[0m")
+                    keypadLog.debug("sending \033[34m" \
+                                    + self.cmd \
+                                    + SHORT_CLICK_ID \
+                                    + "\033[0m")
+                    C.send('KEYPAD_TO_CORE',
+                           self.cmd + SHORT_CLICK_ID)
                     self.set_state(self.state_initial)
             else:
-                #C.send('KEYPAD_TO_CORE',
-                #       self.cmd + DOUBLE_CLICK_ID)
-                keypadLog.debug("sending \033[31mDOUBLE CLICK\033[0m")
+                keypadLog.debug("sending \033[31m" \
+                                    + self.cmd \
+                                    + DOUBLE_CLICK_ID \
+                                    + "\033[0m")
+                C.send('KEYPAD_TO_CORE',
+                       self.cmd + DOUBLE_CLICK_ID)
                 self.set_state(self.state_double_click)
 
 

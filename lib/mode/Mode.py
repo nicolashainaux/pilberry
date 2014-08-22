@@ -119,6 +119,7 @@ class Mode(object):
          'CMD_VOL_UP' : getattr(memory_state, s).vol_up,
          'CMD_VOL_DOWN' : getattr(memory_state, s).vol_down,
          'CMD_SETTINGS' : getattr(memory_state, s).no_action,
+         '' : getattr(memory_state, s).no_action,
          'CMD_ROGER' : self.roger
         }
 

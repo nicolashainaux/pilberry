@@ -29,14 +29,7 @@ import logging
 import logging.config
 
 # Adafruit packages|modules imports
-from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_CharLCD
-from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_RGBCharLCD
-from lib.hardware_drivers.Adafruit_CharLCD import Adafruit_CharLCDPlate
-import lib.hardware_drivers.Adafruit_CharLCDPlate.SELECT as SELECT
-import lib.hardware_drivers.Adafruit_CharLCDPlate.RIGHT as RIGHT
-import lib.hardware_drivers.Adafruit_CharLCDPlate.DOWN as DOWN
-import lib.hardware_drivers.Adafruit_CharLCDPlate.UP as UP
-import lib.hardware_drivers.Adafruit_CharLCDPlate.LEFT as LEFT
+from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 
 # Pilberry packages|modules imports
 from lib.hardware_drivers.key_handler import KeyHandler
@@ -44,7 +37,13 @@ from lib.globals import LOG_DIR
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
-KEYPAD = Adafruit_CharLCDPlate(Adafruit_RGBCharLCD(Adafruit_CharLCD()))
+KEYPAD = Adafruit_CharLCDPlate()
+
+SELECT = KEYPAD.SELECT
+RIGHT = KEYPAD.RIGHT
+DOWN = KEYPAD.DOWN
+UP = KEYPAD.UP
+LEFT = KEYPAD.LEFT
 
 KEY_IDS = [SELECT, RIGHT, LEFT, UP, DOWN]
 
@@ -58,7 +57,7 @@ KEYPAD_HANDLERS = {SELECT : KeyHandler('SELECT'),
 
 while True:
     for k in KEY_IDS:
-        KEYPAD_HANDLERS.handle(KEYPAD.is_pressed(k))
+        KEYPAD_HANDLERS[k].handle(KEYPAD.buttonPressed(k))
 
     time.sleep(0.1)
 
