@@ -27,6 +27,9 @@
 import subprocess
 import re
 
+# Adafruit packages|modules imports
+from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
+
 # Pilberry packages|modules imports
 from lib.globals import PID_FILE
 
@@ -34,24 +37,21 @@ from lib.globals import PID_FILE
 #   @todo   Remove the dirty hack
 
 def __main__():
+
+    lcd = Adafruit_CharLCDPlate()
+    lcd.clear()
+    lcd.message("Goodbye")
     # dirty hack
     pid_file = re.sub("/bin", "", PID_FILE)
 
-    AF_FILE_READ = open(pid_file, mode = 'r')
-    display_pid = int(AF_FILE_READ.readlines()[0])
-    subprocess.Popen(['kill', str(display_pid)])
-
-    AF_FILE_READ = open(pid_file, mode = 'r')
-    core_pid = int(AF_FILE_READ.readlines()[1])
-    subprocess.Popen(['kill', str(core_pid)])
-
-    AF_FILE_READ = open(pid_file, mode = 'r')
-    volume_pid = int(AF_FILE_READ.readlines()[2])
-    subprocess.Popen(['kill', str(volume_pid)])
+    for i in range(4):
+        AF_FILE_READ = open(pid_file, mode = 'r')
+        pid = int(AF_FILE_READ.readlines()[i])
+        subprocess.Popen(['kill', str(pid)])
 
     AF_FILE_READ = open(pid_file, mode = 'r')
     try:
-        cmus_pid = int(AF_FILE_READ.readlines()[3])
+        cmus_pid = int(AF_FILE_READ.readlines()[4])
     except:
         pass
     else:

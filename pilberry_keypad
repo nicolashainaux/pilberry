@@ -38,6 +38,8 @@ from lib.globals import LOG_DIR
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
 KEYPAD = Adafruit_CharLCDPlate()
+KEYPAD.clear()
+KEYPAD.message("")
 
 SELECT = KEYPAD.SELECT
 RIGHT = KEYPAD.RIGHT
@@ -59,5 +61,5 @@ while True:
     for k in KEY_IDS:
         KEYPAD_HANDLERS[k].handle(KEYPAD.buttonPressed(k))
 
-    time.sleep(0.1)
+    time.sleep(0.02)
 

@@ -23,6 +23,13 @@
 
 # Pilberry's core script
 
+# Adafruit packages|modules imports
+from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
+
+lcd = Adafruit_CharLCDPlate()
+lcd.clear()
+lcd.message("Initializing...")
+
 # Python packages|modules imports
 import time
 import pickle
@@ -32,6 +39,7 @@ import subprocess
 import RPIO
 import logging
 import logging.config
+
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, MODES_CONFIG
@@ -44,6 +52,7 @@ from lib.carrier.Carrier import Carrier
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
 coreLog = logging.getLogger('coreLog')
+
 
 # Get the sockets' ports from sockets' conf file
 KEYPAD_PORT = int(SOCKETS_CONFIG['KEYPAD_TO_CORE']['PORT'])
@@ -59,6 +68,9 @@ if not os.path.isdir(tree_root):
     print(tree_root + " is not a valid directory. Exiting")
     sys.exit()
 
+
+lcd.clear()
+lcd.message("Reading\nfilesystem...")
 globals.current_mode = Mode(root=tree_root)
 m = globals.current_mode
 

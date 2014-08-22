@@ -29,12 +29,15 @@ import time
 import re
 import os
 
+# Adafruit packages|modules imports
+from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
+
 # Pilberry packages|modules imports
 import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG
 from lib.globals import PILBERRY_ROOT
 from lib.globals import AUDIO_FEEDBACK_SCRIPT
-from lib.globals import CORE_SCRIPT, DISPLAY_SCRIPT, VOLUME_SCRIPT
+from lib.globals import CORE_SCRIPT, DISPLAY_SCRIPT, VOLUME_SCRIPT, KEYPAD_SCRIPT
 from lib.globals import PID_FILE
 
 ##
@@ -43,11 +46,15 @@ from lib.globals import PID_FILE
 #           the dirty hack
 def __main__():
 
+    lcd = Adafruit_CharLCDPlate()
+    lcd.clear()
+    lcd.message("Hello")
     # dirty hack
     pilberry_root = re.sub("/bin", "", PILBERRY_ROOT)
     display_script = re.sub("/bin", "", DISPLAY_SCRIPT)
     volume_script = re.sub("/bin", "", VOLUME_SCRIPT)
     core_script = re.sub("/bin", "", CORE_SCRIPT)
+    keypad_script = re.sub("/bin", "", KEYPAD_SCRIPT)
     pid_file = re.sub("/bin", "", PID_FILE)
     audio_feedback_script = re.sub("/bin", "", AUDIO_FEEDBACK_SCRIPT, count=1)
 
@@ -59,8 +66,9 @@ def __main__():
                              SOCKETS_CONFIG['TO_CMUS']['FILE']],
                              cwd=pilberry_root)
 
+    ks = subprocess.Popen([keypad_script], cwd=pilberry_root)
+
     ds = subprocess.Popen([display_script], cwd=pilberry_root)
-    time.sleep(1)
 
     cs = subprocess.Popen([core_script], cwd=pilberry_root)
 
@@ -68,9 +76,9 @@ def __main__():
     #   @todo   Check if the timing below is enough/not too much
 
     # To ensure cmus is completely open before any cmus-remote command is sent:
-    time.sleep(1)
 
     vs = subprocess.Popen([volume_script], cwd=pilberry_root)
+
 
     subprocess.Popen(['echo "' + str(ds.pid) + '" > ' + pid_file],
                       shell=True)
@@ -78,9 +86,12 @@ def __main__():
                       shell=True)
     subprocess.Popen(['echo "' + str(vs.pid) + '" >> ' + pid_file],
                       shell=True)
-
+    subprocess.Popen(['echo "' + str(ks.pid) + '" >> ' + pid_file],
+                      shell=True)
     subprocess.Popen(['echo "' + str(cmus.pid) + '" >> ' + pid_file],
                       shell=True)
+
+
 
     subprocess.Popen(['cmus-remote',
                       '--server',

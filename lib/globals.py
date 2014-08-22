@@ -44,7 +44,9 @@ GENERAL_CONF_FILE = CONF_DIR + 'general.conf'
 CORE_SCRIPT = PILBERRY_ROOT + 'pilberry_core'
 DISPLAY_SCRIPT = PILBERRY_ROOT + 'pilberry_display'
 VOLUME_SCRIPT = PILBERRY_ROOT + 'pilberry_volume'
+KEYPAD_SCRIPT = BIN_DIR + 'pilberry_keypad'
 AUDIO_FEEDBACK_SCRIPT = BIN_DIR + 'audio_feedback'
+
 AUDIO_FEEDBACK_LOCK_FILE = LOCKS_DIR + 'audio_feedback'
 
 PID_FILE = VAR_RUN + 'pid'
