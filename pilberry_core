@@ -145,22 +145,24 @@ with Carrier() as C:
 
 
     def audio_feedback_callback(socket, data):
-        notification = pickle.loads(data)
-        if notification['status'] in globals.CMUS_NOTIFICATIONS:
-            coreLog.debug("Received status notification: \033[31m" \
-                    + notification['status']
-                    + '\033[0m')
-            globals.cmus_status = notification['status']
+        #notification = pickle.loads(data)
+        #if notification['status'] in globals.CMUS_NOTIFICATIONS:
+        #    coreLog.debug("Received status notification: \033[31m" \
+        #            + notification['status']
+        #            + '\033[0m')
+        #    globals.cmus_status = notification['status']
 
-            m.handle(notification['status'], full_path=notification['full_path'])
+        #    m.handle(notification['status'], full_path=notification['full_path'])
 
-        else:
-            coreLog.debug("Received UNKNOWN status notification: " \
-                          + notification['status'])
+        #else:
+        #    coreLog.debug("Received UNKNOWN status notification: " \
+        #                  + notification['status'])
 
-        coreLog.debug("On full path: " + notification['full_path'])
+        #coreLog.debug("On full path: " + notification['full_path'])
 
-        report()
+        coreLog.debug("Received " + str(data))
+
+        #report()
 
         data = {'parent' : m.xnode.parent['file_name'],
                 'xnode_name' : m.xnode['file_name'],
