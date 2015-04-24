@@ -22,6 +22,7 @@
 
 # Python packages|modules imports
 import logging
+import logging.config
 
 # Pilberry packages|modules imports
 from lib.tree.Node import Node
@@ -29,10 +30,16 @@ from lib.tree.NodeFileSystem import NodeFileSystem
 # from lib.tree.NodeDataBase import NodeDataBase
 from lib.globals import current_mode_id, MODES_CONFIG, USER_CONFIG
 import lib.globals as globals
+from lib.globals import LOG_DIR
 from lib.musicdriver.MusicDriver import MusicDriver
 
 import lib.mode.state.memory.default as memory_state
 STATES_LIST = ['State_A', 'State_B', 'State_C']
+
+
+logging.config.fileConfig(LOG_DIR + 'logging.conf')
+
+modeLog = logging.getLogger('modeLog')
 
 
 ##
@@ -82,7 +89,7 @@ class Mode(object):
 
 
         s = str(type(self._tree))
-        logging.debug("root node's type is: "\
+        modeLog.debug("root node's type is: "\
                      + s[s.rfind('.')+1:-2] \
                      + " its name is: " \
                      + self._tree['file_name'] \
@@ -95,7 +102,7 @@ class Mode(object):
         self._xnode = self._tree.children[0]
         self._head = self._tree.children[0]
 
-        logging.debug("initialized xnode at: " + self._xnode['file_name'])
+        modeLog.debug("initialized xnode at: " + self._xnode['file_name'])
 
 
         self._md = MusicDriver()
@@ -173,14 +180,14 @@ class Mode(object):
     ##
     #   @brief
     def set_head(self, n):
-        logging.debug("setting head at: " + n['file_name'])
+        modeLog.debug("setting head at: " + n['file_name'])
         self._head = n
 
 
     ##
     #   @brief
     def set_xnode(self, n):
-        logging.debug("setting xnode at: " + n['file_name'])
+        modeLog.debug("setting xnode at: " + n['file_name'])
         self._xnode = n
 
 
@@ -189,7 +196,7 @@ class Mode(object):
     def set_state(self, s):
         ##
         #   @todo   Check that the argument s belongs to the 'authorized' states
-        logging.debug("setting state at: " + s)
+        modeLog.debug("setting state at: \033[32m" + s + "\033[0m")
         self._state = s
 
 

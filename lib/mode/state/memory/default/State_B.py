@@ -22,12 +22,18 @@
 
 # Python packages|modules imports
 import logging
+import logging.config
 import subprocess
 import time
 
 # Pilberry packages|modules imports
 from .State import State
 from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
+from lib.globals import LOG_DIR
+
+logging.config.fileConfig(LOG_DIR + 'logging.conf')
+
+stateBLog = logging.getLogger('stateBLog')
 
 ##
 # @class State_B
@@ -57,18 +63,17 @@ class State_B(State):
         new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
         self.set_xnode(self.xnode.neighbours[new_position])
 
-        ##
-        #   @todo   Cycling does not work because it's based on the cmus queue,
-        #           and at the end cmus finds no next song, so try to check
-        #           if the last song has been passed, and repopulate the queue?
         if len(self.xnode.children) == 0:
             self.set_head(self.xnode)
-            self.md.skip_to_next_song()
 
-            subprocess.call(['echo ' \
-                             + str(time.time() + 7) \
-                             + ' > ' \
-                             + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
+            # If we've just "cycled", e.g. we've landed on the first song again,
+            # then we can repopulate the queue
+            if self.head.position == 0:
+                self.md.clear_queue()
+                for n in [self.head] + self.head.neighbours_after:
+                    self.md.queue(n.full_path)
+
+            self.md.skip_to_next_song()
 
         else:
             self.md.stop()
@@ -81,18 +86,26 @@ class State_B(State):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
         self.md.queue_first(self.head.full_path)
+
+        stateBLog.debug("self.xnode.position - 1 = " \
+                        + str(self.xnode.position - 1))
+        stateBLog.debug("len(self.xnode.neighbours) = " \
+                        + str(len(self.xnode.neighbours)))
         new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
+        stateBLog.debug("new_position = " + str(new_position))
         self.set_xnode(self.xnode.neighbours[new_position])
 
         if len(self.xnode.children) == 0:
             self.set_head(self.xnode)
+
+            # If we've just "cycled", e.g. we've landed on the last song,
+            # then we can clear the queue
+            if self.head.position == len(self.xnode.neighbours) - 1:
+                self.md.clear_queue()
+
             self.md.queue_first(self.head.full_path)
             self.md.skip_to_next_song()
 
-            subprocess.call(['echo ' \
-                             + str(time.time() + 7) \
-                             + ' > ' \
-                             + AUDIO_FEEDBACK_LOCK_FILE], shell=True)
 
         else:
             self.md.stop()
@@ -130,7 +143,7 @@ class State_B(State):
     #   @brief
     def msg_cmus_playing(self, **options):
         if self.head['full_path'] != options['full_path']:
-            logging.debug("noticed that head doesn't match current song")
+            stateBLog.debug("noticed that head doesn't match current song")
             # Current song doesn't match head node
             # Let's try to find the node matching current song
             # First, check if it's one of the song of the same 'directory'
@@ -140,8 +153,8 @@ class State_B(State):
                     self.set_head(n)
                     found = True
             if found:
-                logging.debug("found the node matching current song")
-                logging.debug("Updated head Node, waiting for next command...\n")
+                stateBLog.debug("found the node matching current song")
+                stateBLog.debug("Updated head Node, waiting for next command...\n")
                 self.set_xnode(self.head)
             ##
             #   @todo   If the right node is not among the neighbours, it has

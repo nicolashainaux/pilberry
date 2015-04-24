@@ -24,11 +24,16 @@
 import subprocess
 import time
 import logging
+import logging.config
 
 # Pilberry packages|modules imports
 import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG
+from lib.globals import LOG_DIR
 
+logging.config.fileConfig(LOG_DIR + 'logging.conf')
+
+mdLog = logging.getLogger('mdLog')
 
 ##
 # @class MusicDriver
@@ -45,26 +50,27 @@ class MusicDriver(object):
     ##
     #   @brief
     def queue(self, full_path):
-        logging.debug('queuing: ' + full_path)
+        mdLog.debug('queuing: ' + full_path)
         self._send(['-C', 'add -q ' + full_path])
 
 
     ##
     #   @brief
     def queue_first(self, full_path):
-        logging.debug('queuing: ' + full_path)
+        mdLog.debug('queuing first: ' + full_path)
         self._send(['-C', 'add -Q ' + full_path])
 
 
     ##
     #   @brief
     def clear_queue(self):
-        logging.debug('queue is being cleared')
+        mdLog.debug('queue is being cleared')
         self._send(['-c', '-q'])
 
     ##
     #   @brief
     def skip_to_next_song(self):
+        mdLog.debug('skip to next song')
         self._send(['-C', 'player-next'])
 
 
@@ -78,7 +84,7 @@ class MusicDriver(object):
             self.queue(n.full_path)
 
         self.skip_to_next_song()
-        logging.debug("sending order to PLAY!")
+        mdLog.debug("sending order to PLAY!")
 
         self._send(['-p'])
 
@@ -112,6 +118,7 @@ class MusicDriver(object):
     ##
     #   @brief
     def stop(self):
+        mdLog.debug("sending STOP")
         self._send(['-s'])
 
 
@@ -119,6 +126,7 @@ class MusicDriver(object):
     ##
     #   @brief
     def toggle_pause(self):
+        mdLog.debug("sending PAUSE")
         self._send(['-u'])
 
 
@@ -127,7 +135,7 @@ class MusicDriver(object):
     #   @brief  Sends the given command to cmus, via cmus-remote
     #   @param  cmd_list a list of chains
     def _send(self, cmd_list):
-        logging.debug('sending ' + str(cmd_list) + ' via cmus-remote')
+        mdLog.debug('sending ' + str(cmd_list) + ' via cmus-remote')
         subprocess.Popen(['cmus-remote',
                           '--server',
                           SOCKETS_CONFIG['TO_CMUS']['FILE']
