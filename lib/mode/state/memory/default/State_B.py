@@ -162,3 +162,9 @@ class State_B(State):
             #           base is available and we can find it thanks to its
             #           full path. If no database is available, then a
             #           search algorithm has to be found...
+
+
+    ##
+    #   @brief
+    def msg_cmus_stopped(self, **options):
+        self.set_state('State_A')

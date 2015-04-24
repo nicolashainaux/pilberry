@@ -29,8 +29,25 @@
 
 # todo: maybe fix the hard coded port value (should be read from the config file)
 
-echo "$1 $2" | nc -w 0 127.0.0.1 31417
-echo "$3 $4" | nc -w 0 127.0.0.1 31417
+# debug
+#echo `date "+%T"`": $@" >> /home/pi/pilberry/log/af.log
+
+if [ "$#" -eq 2 ]
+then
+    # debug
+    #echo "2 args, ok" >> /home/pi/pilberry/log/af.log
+
+    if echo "$1 $2" | grep "status stopped" >/dev/null 2>&1
+        then
+            # debug
+            #echo "sending status STOPPED" >> /home/pi/pilberry/log/af.log
+
+            echo "status STOPPED" | nc -w 0 127.0.0.1 31417
+        else
+            echo "$1 $2" | nc -w 0 127.0.0.1 31417
+            echo "$3 $4" | nc -w 0 127.0.0.1 31417
+    fi
+fi
 
 # So far, we only resend the two first informations (status and full path).
 # Below is commented the way to send all informations.
