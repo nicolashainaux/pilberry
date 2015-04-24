@@ -1,5 +1,12 @@
+(incomplete notes)
+
 Steps required to install pilberry (dependencies are already installed):
 
 # cd path_to_pilberry/install/
 # cp pilberry /etc/init.d/
 # update-rc.d pilberry defaults
+
+
+The same seems to have been done with the bootup_message script
+
+cmus config: ? in cmus, :set status_display_program=/home/user/.cmus/status_display_program.sh
