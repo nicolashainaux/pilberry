@@ -89,47 +89,27 @@ class Node(object, metaclass=ABCMeta):
             logging.debug("Node: " \
                           + self['file_name'] \
                           + " will add children")
+
             for i, name in enumerate(self.get_children_list(self.full_path)):
-                ##
-                #   @todo The following line is a hack to avoid encoding errors,
-                #         it would be better to find a way to avoid doing this
-                #         encoding/decoding on each file. Problem is, when more
-                #         than one encoding error shows up, it does not seem
-                #         possible to catch all raised exceptions.
-                #         As it is now, directories with encoding errors in their
-                #         name will be treated as if they were empty.
-                name = name.encode('utf-8', 'replace').decode()
+                n = object.__new__(type(self))
+                n.__init__(self,
+                           self.full_path + name,
+                           i,
+                           self._children[0:i],
+                           [],
+                           self._view,
+                           self.depth + 1,
+                           deeper - 1)
 
-            #    try:
-            #        print("At position " + str(i) + " I've found " + name)
-            #    except UnicodeEncodeError:
-            #        safe_name = "ENCODING ERROR on " + name.encode('ascii',
-            #                                                       'replace')
-
-                file_name, extension = os.path.splitext(name)
-
-                if not self.is_a_leaf(self.full_path + name) \
-                    or extension in MUSIC_FILE_EXTENSIONS:
-                #___
-                    n = object.__new__(type(self))
-                    n.__init__(self,
-                               self.full_path + name,
-                               i,
-                               self._children[0:i],
-                               [],
-                               self._view,
-                               self.depth + 1,
-                               deeper - 1
-                               )
-
+                if not self.is_a_leaf(self.full_path + name):
                     if deeper > 1:
                         n.add_children(deeper - 1)
 
-                    self._children.append(n)
-                    logging.debug("Node: " + self['file_name'] + \
-                                  " has now " \
-                                  + str(len(self._children)) \
-                                  + " children. ")
+                self._children.append(n)
+                logging.debug("Node: " + self['file_name'] + \
+                              " has now " \
+                              + str(len(self._children)) \
+                              + " children. ")
 
             # Now, add the neighbours after!
             for i in range(len(self._children)):

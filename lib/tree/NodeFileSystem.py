@@ -28,6 +28,7 @@ import os
 from .Node import Node
 from lib.utils import natural_sort
 from lib.globals import USER_CONFIG
+from lib.globals import MUSIC_FILE_EXTENSIONS
 
 
 ##
@@ -63,15 +64,36 @@ class NodeFileSystem(Node):
     #           on non-leaves nodes.
     #   @return List
     #   @param  full_path   The full path of directory to test
-    #   @todo   Maybe check full_path is a path to a directory.
+    #   @todo   Check full_path is a path to a directory.
     @staticmethod
     def get_children_list(full_path):
+        dirs = natural_sort(next(os.walk(full_path))[1])
+
+        all_files = natural_sort(next(os.walk(full_path))[2])
+
+        # We will remove the files that are not musical files, according to
+        # their extension
+        files = []
+
+        for f in all_files:
+            ##
+            #   @todo The following line is a hack to avoid encoding errors,
+            #         it would be better to find a way to avoid doing this
+            #         encoding/decoding on each file. Problem is, when more
+            #         than one encoding error shows up, it does not seem
+            #         possible to catch all raised exceptions.
+            #         As it is now, directories with encoding errors in their
+            #         name will be treated as if they were empty.
+            f = f.encode('utf-8', 'replace').decode()
+            file_name, extension = os.path.splitext(f)
+
+            if extension in MUSIC_FILE_EXTENSIONS:
+                files += [f]
+
         if USER_CONFIG['GENERAL'].getboolean('SHOW_FILES_FIRST'):
-            return natural_sort(next(os.walk(full_path))[2]) \
-                   + natural_sort(next(os.walk(full_path))[1])
+            return files + dirs
         else:
-            return natural_sort(next(os.walk(full_path))[1]) \
-                   + natural_sort(next(os.walk(full_path))[2])
+            return dirs + files
 
 
 
