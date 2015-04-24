@@ -27,15 +27,21 @@
 # cmus must be configured to execute this script as the way to send feedback
 # informations to pilberry (core).
 
+# todo: maybe fix the hard coded port value (should be read from the config file)
+
+echo "$1 $2" | nc -w 0 127.0.0.1 31417
+echo "$3 $4" | nc -w 0 127.0.0.1 31417
+
+# So far, we only resend the two first informations (status and full path).
+# Below is commented the way to send all informations.
+
 # This script does nothing but send all the command line arguments, gathered as
 # pairs in strings, to pilberry_core. An even number of arguments is expected;
 # if it ever happens to be odd, the last one will be ignored.
 
-# todo: maybe fix the hard coded port value (should be read from the config file)
-
-while [ "$#" -gt 1 ]
-  do
-    echo "$1 $2" | nc -w 0 127.0.0.1 31417
-    shift
-    shift
-done
+#while [ "$#" -gt 1 ]
+#  do
+#    echo "$1 $2" | nc -w 0 127.0.0.1 31417
+#    shift
+#    shift
+#done
