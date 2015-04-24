@@ -96,3 +96,4 @@ CMUS_NOTIFICATIONS = ['stopped',
                       'paused']
 
 cmus_status = 'stopped'
+cmus_file = ''

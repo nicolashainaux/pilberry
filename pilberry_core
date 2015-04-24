@@ -65,6 +65,8 @@ tree_root = MODES_CONFIG[modes_list[0]]['ROOT_PATH']
 if not os.path.isdir(tree_root):
     ##
     #   @todo   Tell something to LCD if the given root is not valid.
+    #           Maybe also let raspbian (so the carradio) shutdown, after a
+    #           certain time?
     print(tree_root + " is not a valid directory. Exiting")
     sys.exit()
 
@@ -109,10 +111,25 @@ def report():
 report()
 
 with Carrier() as C:
-    data = {'parent' : m.xnode.parent['file_name'],
-            'xnode_name' : m.xnode['file_name'],
-            'status' : globals.cmus_status}
-    C.send('CORE_TO_DISPLAY', data)
+
+    # Let's initialize the display
+
+    ##
+    #   @todo   It's unfortunately not possible to send a Node entirely,
+    #           probably because of buffer size problems (the retrieving
+    #           process ends up with an EOF error).
+    #           So, fix that problem, manage to send Nodes directly, like:
+    #           data = {'xnode' : m.xnode,
+    #                   'head' : m.head}
+    #           it would be way more practical. And reliable. For instance,
+    #           this would allow to compare Nodes directly instead of scattered
+    #           parts of them. See lib/view/default/View_head.update(), for
+    #           instance.
+    data = {'xnode_name' : m.xnode['file_name'],
+            'xnode_parent' : m.xnode.parent['file_name'],
+            'head_name' : m.head['file_name'],
+            'head_parent' : m.head.parent['file_name']}
+    C.send('CORE_DATA_TO_DISPLAY', data)
 
 
     def keypad_callback(socket, data):
@@ -138,36 +155,37 @@ with Carrier() as C:
 
                 report()
 
-                data = {'parent' : m.xnode.parent['file_name'],
-                        'xnode_name' : m.xnode['file_name'],
-                        'status' : globals.cmus_status}
-                C.send('CORE_TO_DISPLAY', data)
+                data = {'xnode_name' : m.xnode['file_name'],
+                        'xnode_parent' : m.xnode.parent['file_name'],
+                        'head_name' : m.head['file_name'],
+                        'head_parent' : m.head.parent['file_name']}
+
+                C.send('CORE_DATA_TO_DISPLAY', data)
 
 
     def audio_feedback_callback(socket, data):
-        #notification = pickle.loads(data)
-        #if notification['status'] in globals.CMUS_NOTIFICATIONS:
-        #    coreLog.debug("Received status notification: \033[31m" \
-        #            + notification['status']
-        #            + '\033[0m')
-        #    globals.cmus_status = notification['status']
+        # Getting the status notification
+        if data[:6].decode('UTF-8') == 'status':
+            globals.cmus_status = data[7:].decode('UTF-8')
+            coreLog.debug("Registring new status: " + str(globals.cmus_status))
+        # Getting the file notification
+        if data[:4].decode('UTF-8') == 'file':
+            globals.cmus_file = data[5:].decode('UTF-8')
+            coreLog.debug("Registring new file: " + str(globals.cmus_file))
+            m.handle(globals.cmus_status, full_path=globals.cmus_file)
 
-        #    m.handle(notification['status'], full_path=notification['full_path'])
+            coreLog.debug("data: xnode_name=" + str(m.xnode['file_name']) + \
+                          "      xnode_parent=" + str(m.xnode.parent['file_name']) + \
+                          "      head_name=" + str(m.head['file_name']) + \
+                          "      head_parent=" + str(m.head.parent['file_name'])
+                          )
 
-        #else:
-        #    coreLog.debug("Received UNKNOWN status notification: " \
-        #                  + notification['status'])
+            data = {'xnode_name' : m.xnode['file_name'],
+                    'xnode_parent' : m.xnode.parent['file_name'],
+                    'head_name' : m.head['file_name'],
+                    'head_parent' : m.head.parent['file_name']}
 
-        #coreLog.debug("On full path: " + notification['full_path'])
-
-        coreLog.debug("Received " + str(data))
-
-        #report()
-
-        data = {'parent' : m.xnode.parent['file_name'],
-                'xnode_name' : m.xnode['file_name'],
-                'status' : globals.cmus_status}
-        C.send('CORE_TO_DISPLAY', data)
+            C.send('CORE_DATA_TO_DISPLAY', data)
 
 
     RPIO.add_tcp_callback(KEYPAD_PORT, keypad_callback)
