@@ -36,7 +36,8 @@ from lib.globals import SOCKETS_CONFIG
 class Carrier(object):
 
     ##
-    #   @brief This initializer builds the list of available sockets.
+    #   @brief This initializer creates the dictionnary of available sockets.
+    #          This dictionnary will be filled only if necessary, by send().
     def __init__(self):
         self._sockets_enabled = {}
 
@@ -52,7 +53,6 @@ class Carrier(object):
                 ##
                 # @todo Check if the connection works
                 #       and handle the possible exception
-
                 self._sockets_enabled[dest].connect((\
                                             str(SOCKETS_CONFIG[dest]['IP']),
                                             int(SOCKETS_CONFIG[dest]['PORT'])))
@@ -68,7 +68,6 @@ class Carrier(object):
                 ##
                 # @todo Check if the connection works
                 #       and handle the possible exception
-
                 self._sockets_enabled[dest].connect(\
                                             str(SOCKETS_CONFIG[dest]['FILE']))
 
