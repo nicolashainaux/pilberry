@@ -14,10 +14,12 @@
 case "$1" in
 
     start)
+        echo "Starting pilberry"
         /home/pi/pilberry/bin/start
         ;;
 
     stop)
+        echo "Stopping pilberry"
         /home/pi/pilberry/bin/stop
         ;;
 
