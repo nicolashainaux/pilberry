@@ -30,8 +30,13 @@
 # todo: maybe fix the hard coded port value (should be read from the config file)
 
 # debug
-#echo `date "+%T"`": $@" >> /home/pi/pilberry/log/af.log
+echo `date "+%T"`": $@" >> /home/pi/pilberry/log/af.log
 
+
+# If there are exactly two arguments: status stopped, alone, it seems that cmus
+# tells it doesn't play music anymore (empty queue). So in this case we will
+# send a special stop to pilberry_core, in order to let it update its own state.
+# Otherwise we send the 4 first arguments (the only that are useful so far)
 if [ "$#" -eq 2 ]
 then
     # debug
@@ -43,10 +48,15 @@ then
             #echo "sending status STOPPED" >> /home/pi/pilberry/log/af.log
 
             echo "status STOPPED" | nc -w 0 127.0.0.1 31417
+
         else
             echo "$1 $2" | nc -w 0 127.0.0.1 31417
-            echo "$3 $4" | nc -w 0 127.0.0.1 31417
+
     fi
+
+else
+    echo "$1 $2" | nc -w 0 127.0.0.1 31417
+    echo "$3 $4" | nc -w 0 127.0.0.1 31417
 fi
 
 # So far, we only resend the two first informations (status and full path).
