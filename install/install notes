@@ -1,5 +1,7 @@
 (incomplete notes)
 
+The locale must be defined correctly! Otherwise there may be encoding errors that may lead pilberry to crash.
+
 Steps required to install pilberry (dependencies are already installed):
 
 # cd path_to_pilberry/install/
