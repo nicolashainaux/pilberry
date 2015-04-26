@@ -79,12 +79,9 @@ class NodeFileSystem(Node):
             ##
             #   @todo The following line is a hack to avoid encoding errors,
             #         it would be better to find a way to avoid doing this
-            #         encoding/decoding on each file. Problem is, when more
-            #         than one encoding error shows up, it does not seem
-            #         possible to catch all raised exceptions.
-            #         As it is now, directories with encoding errors in their
-            #         name will be treated as if they were empty.
+            #         encoding/decoding on each file.
             f = f.encode('utf-8', 'replace').decode()
+
             file_name, extension = os.path.splitext(f)
 
             if extension in MUSIC_FILE_EXTENSIONS:

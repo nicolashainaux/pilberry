@@ -92,8 +92,8 @@ class View(object):
 
     ##
     #   @brief
-    def get_lcd(self):
-        return self._lcd
+    #def get_lcd(self):
+    #    return self._lcd
 
 
     ##
@@ -112,8 +112,8 @@ class View(object):
     #                     doc="...")
     view = property(get_view,
                     doc="The current View")
-    lcd = property(get_lcd,
-                    doc="The LCD object")
+    #lcd = property(get_lcd,
+    #                doc="The LCD object")
     HANDLE = property(get_HANDLE,
                      doc="The HANDLE field")
     infos = property(get_infos,
@@ -155,5 +155,27 @@ class View(object):
     #   @brief
     def handle(self, info, **options):
         self.HANDLE[self._view][info](self, **options)
+
+
+    ##
+    #   @brief
+    def lcd_clear(self):
+        self._lcd.clear()
+
+
+    ##
+    #   @brief  This method is used to send a message "safely" to the LCD. Some
+    #           encoding errors did not trigger any error in pilberry, but they
+    #           did later in the LCD driver.
+    def lcd_message(self, msg):
+        bmsg = msg.encode('utf-8', 'replace')
+
+        if b'\xef\xbf\xbd' in bmsg:
+                bmsg = msg.encode('ascii', 'replace')
+
+        msg = bmsg.decode()
+
+        self._lcd.message(msg)
+
 
 
