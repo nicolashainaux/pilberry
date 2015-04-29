@@ -126,9 +126,10 @@ with Carrier() as C:
     #           parts of them. See lib/view/default/View_head.update(), for
     #           instance.
     data = {'xnode_name' : m.xnode['file_name'],
-            'xnode_parent' : m.xnode.parent['file_name'],
-            'head_name' : m.head['file_name'],
-            'head_parent' : m.head.parent['file_name']}
+            'xnode_parent' : m.xnode.parent['file_name']}
+            #,
+            #'head_name' : m.head['file_name'],
+            #'head_parent' : m.head.parent['file_name']}
     C.send('CORE_DATA_TO_DISPLAY', data)
 
 
@@ -156,9 +157,10 @@ with Carrier() as C:
                 report()
 
                 data = {'xnode_name' : m.xnode['file_name'],
-                        'xnode_parent' : m.xnode.parent['file_name'],
-                        'head_name' : m.head['file_name'],
-                        'head_parent' : m.head.parent['file_name']}
+                        'xnode_parent' : m.xnode.parent['file_name']}
+                        #,
+                        #'head_name' : m.head['file_name'],
+                        #'head_parent' : m.head.parent['file_name']}
 
                 C.send('CORE_DATA_TO_DISPLAY', data)
 
@@ -189,9 +191,10 @@ with Carrier() as C:
                           )
 
             data = {'xnode_name' : m.xnode['file_name'],
-                    'xnode_parent' : m.xnode.parent['file_name'],
-                    'head_name' : m.head['file_name'],
-                    'head_parent' : m.head.parent['file_name']}
+                    'xnode_parent' : m.xnode.parent['file_name']}
+                    #,
+                    #'head_name' : m.head['file_name'],
+                    #'head_parent' : m.head.parent['file_name']}
 
             C.send('CORE_DATA_TO_DISPLAY', data)
 

@@ -31,7 +31,7 @@ from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 import lib.globals as globals
 
 import lib.view.default as display_view
-VIEWS_LIST = ['View_xnode', 'View_head']
+VIEWS_LIST = ['View_memory']
 
 
 ##
@@ -47,7 +47,8 @@ class View(object):
 
         self._lcd = Adafruit_CharLCDPlate()
 
-        self._view = 'View_xnode'
+        # The default view could be chosen from the config file
+        self._view = 'View_memory'
 
         # The two fields will be Node objects
         self._infos = { 'xnode_name' : None,
@@ -66,9 +67,10 @@ class View(object):
 
         for v in VIEWS_LIST:
             self._HANDLE[v] = \
-        {'UPDATE' : getattr(display_view, v).update,
-         'SET_VIEW_XNODE' : getattr(display_view, v).set_view_xnode,
-         'SET_VIEW_HEAD' : getattr(display_view, v).set_view_head
+        {'UPDATE' : getattr(display_view, v).update
+        #,
+         #'SET_VIEW_XNODE' : getattr(display_view, v).set_view_xnode,
+         #'SET_VIEW_HEAD' : getattr(display_view, v).set_view_head
         }
 
 
@@ -125,16 +127,16 @@ class View(object):
 
     ##
     #   @brief
-    def set_view(self, v):
+    #def set_view(self, v):
         ##
         #   @todo   Check that the argument v belongs to the 'authorized' views
-        logging.debug("setting view at: " + v)
-        self._view = v
+    #    logging.debug("setting view at: " + v)
+    #    self._view = v
 
 
     ##
     #   @brief
-    def set_infos_xnode(self, new_infos):
+    def set_infos_memory(self, new_infos):
         self._infos_past['xnode_name'] = self._infos['xnode_name']
         self._infos['xnode_name'] = new_infos['xnode_name']
 
@@ -143,12 +145,12 @@ class View(object):
 
     ##
     #   @brief
-    def set_infos_head(self, new_infos):
-        self._infos_past['head_name'] = self._infos['head_name']
-        self._infos['head_name'] = new_infos['head_name']
+    #def set_infos_head(self, new_infos):
+    #    self._infos_past['head_name'] = self._infos['head_name']
+    #    self._infos['head_name'] = new_infos['head_name']
 
-        self._infos_past['head_parent'] = self._infos['head_parent']
-        self._infos['head_parent'] = new_infos['head_parent']
+    #    self._infos_past['head_parent'] = self._infos['head_parent']
+    #    self._infos['head_parent'] = new_infos['head_parent']
 
 
     ##
@@ -177,7 +179,10 @@ class View(object):
         msg = bmsg.decode()
 
         self._lcd.setCursor(0,line)
-        self._lcd.message(msg)
+
+        carriage_return = "\n" if line == 0 else ""
+
+        self._lcd.message((msg + "                ")[0:16] + carriage_return)
 
 
 

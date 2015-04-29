@@ -67,10 +67,10 @@ def core_callback(socket, data):
 
 def core_data_callback(socket, data):
     info = pickle.loads(data)
-    v.set_infos_xnode({'xnode_name': info['xnode_name'],
-                       'xnode_parent': info['xnode_parent']})
-    v.set_infos_head({'head_name': info['head_name'],
-                      'head_parent': info['head_parent']})
+    v.set_infos_memory({'xnode_name': info['xnode_name'],
+                        'xnode_parent': info['xnode_parent']})
+    #v.set_infos_head({'head_name': info['head_name'],
+    #                  'head_parent': info['head_parent']})
     v.handle('UPDATE')
 
 
