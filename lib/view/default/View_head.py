@@ -57,6 +57,6 @@ class View_head(View_infos):
 
         if self.infos_past['head_name'] != self.infos['head_name'] \
         or self.infos_past['head_parent'] != self.infos['head_parent']:
-            self.lcd_clear()
-            self.lcd_message(self.infos['head_parent'][0:16]+"\n")
-            self.lcd_message(self.infos['head_name'][0:16])
+            #self.lcd_clear()
+            self.lcd_message((self.infos['head_parent']+"                ")[0:16]+"\n",0)
+            self.lcd_message((self.infos['head_name']+"                ")[0:16],1)

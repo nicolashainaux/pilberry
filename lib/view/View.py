@@ -167,7 +167,8 @@ class View(object):
     #   @brief  This method is used to send a message "safely" to the LCD. Some
     #           encoding errors did not trigger any error in pilberry, but they
     #           did later in the LCD driver.
-    def lcd_message(self, msg):
+    #   @todo   Check if line == 0 or line == 1
+    def lcd_message(self, msg, line):
         bmsg = msg.encode('utf-8', 'replace')
 
         if b'\xef\xbf\xbd' in bmsg:
@@ -175,6 +176,7 @@ class View(object):
 
         msg = bmsg.decode()
 
+        self._lcd.setCursor(0,line)
         self._lcd.message(msg)
 
 

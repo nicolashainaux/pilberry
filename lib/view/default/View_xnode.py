@@ -52,6 +52,6 @@ class View_xnode(View_infos):
     def update(self, **options):
         if self.infos_past['xnode_name'] != self.infos['xnode_name'] \
         or self.infos_past['xnode_parent'] != self.infos['xnode_parent']:
-            self.lcd_clear()
-            self.lcd_message(self.infos['xnode_parent'][0:16]+"\n")
-            self.lcd_message(self.infos['xnode_name'][0:16])
+            #self.lcd_clear()
+            self.lcd_message((self.infos['xnode_parent']+"                ")[0:16]+"\n",0)
+            self.lcd_message((self.infos['xnode_name']+"                ")[0:16],1)
