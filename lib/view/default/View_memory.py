@@ -29,22 +29,22 @@ from .View_infos import View_infos
 
 
 ##
-# @class View_xnode
+# @class View_memory
 # @brief Gathers the methods to view the xnode data
-class View_xnode(View_infos):
+class View_memory(View_infos):
 
 
     ##
     #   @brief
-    def set_view_head(self):
-        self.set_view('View_head')
-        self.update()
+    #def set_view_head(self):
+    #    self.set_view('View_head')
+    #    self.update()
 
 
     ##
     #   @brief
-    def set_view_xnode(self):
-        pass
+    #def set_view_xnode(self):
+    #    pass
 
 
     ##
@@ -52,6 +52,5 @@ class View_xnode(View_infos):
     def update(self, **options):
         if self.infos_past['xnode_name'] != self.infos['xnode_name'] \
         or self.infos_past['xnode_parent'] != self.infos['xnode_parent']:
-            #self.lcd_clear()
-            self.lcd_message((self.infos['xnode_parent']+"                ")[0:16]+"\n",0)
-            self.lcd_message((self.infos['xnode_name']+"                ")[0:16],1)
+            self.lcd_message(self.infos['xnode_parent'], 0)
+            self.lcd_message(self.infos['xnode_name'], 1)
