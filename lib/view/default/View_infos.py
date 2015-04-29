@@ -35,16 +35,20 @@ class View_infos(object, metaclass=ABCMeta):
 
     ##
     #   @brief
-    #@abstractmethod
-    #def set_view_head(self):
-    #    pass
+    def State_A(self):
+        pass
 
 
     ##
     #   @brief
-    #@abstractmethod
-    #def set_view_xnode(self):
-    #    pass
+    def State_B(self):
+        pass
+
+
+    ##
+    #   @brief
+    def State_C(self):
+        pass
 
 
     ##

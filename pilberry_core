@@ -127,9 +127,6 @@ with Carrier() as C:
     #           instance.
     data = {'xnode_name' : m.xnode['file_name'],
             'xnode_parent' : m.xnode.parent['file_name']}
-            #,
-            #'head_name' : m.head['file_name'],
-            #'head_parent' : m.head.parent['file_name']}
     C.send('CORE_DATA_TO_DISPLAY', data)
 
 
@@ -158,11 +155,9 @@ with Carrier() as C:
 
                 data = {'xnode_name' : m.xnode['file_name'],
                         'xnode_parent' : m.xnode.parent['file_name']}
-                        #,
-                        #'head_name' : m.head['file_name'],
-                        #'head_parent' : m.head.parent['file_name']}
 
                 C.send('CORE_DATA_TO_DISPLAY', data)
+                C.send('CORE_TO_DISPLAY', m.state)
 
 
     def audio_feedback_callback(socket, data):
@@ -192,11 +187,9 @@ with Carrier() as C:
 
             data = {'xnode_name' : m.xnode['file_name'],
                     'xnode_parent' : m.xnode.parent['file_name']}
-                    #,
-                    #'head_name' : m.head['file_name'],
-                    #'head_parent' : m.head.parent['file_name']}
 
             C.send('CORE_DATA_TO_DISPLAY', data)
+            C.send('CORE_TO_DISPLAY', m.state)
 
 
     RPIO.add_tcp_callback(KEYPAD_PORT, keypad_callback)

@@ -36,15 +36,20 @@ class View_memory(View_infos):
 
     ##
     #   @brief
-    #def set_view_head(self):
-    #    self.set_view('View_head')
-    #    self.update()
+    def State_A(self):
+        self.lcd_set_no_indicator()
 
 
     ##
     #   @brief
-    #def set_view_xnode(self):
-    #    pass
+    def State_B(self):
+        self.lcd_set_play_indicator()
+
+
+    ##
+    #   @brief
+    def State_C(self):
+        self.lcd_set_explore_indicator()
 
 
     ##

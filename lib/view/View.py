@@ -61,9 +61,15 @@ class View(object):
 
         self._HANDLE = {}
 
+        ##
+        #   @todo   Check the names there below, ensure the States names match
+        #           Mode.STATES_LIST
         for v in VIEWS_LIST:
             self._HANDLE[v] = \
-        {'UPDATE' : getattr(display_view, v).update
+        {'UPDATE' : getattr(display_view, v).update,
+         'State_A' : getattr(display_view, v).State_A,
+         'State_B' : getattr(display_view, v).State_B,
+         'State_C' : getattr(display_view, v).State_C
         }
 
 
@@ -165,4 +171,31 @@ class View(object):
         self._lcd.message((msg + "                ")[0:16] + carriage_return)
 
 
+
+    ##
+    #   @brief
+    def lcd_set_play_indicator(self):
+        self._lcd.setCursor(15, 1)
+        self._lcd.noCursor()
+        self._lcd.blink()
+
+
+    ##
+    #   @brief
+    def lcd_set_pause_indicator(self):
+        pass
+
+    ##
+    #   @brief
+    def lcd_set_explore_indicator(self):
+        self._lcd.setCursor(15, 1)
+        self._lcd.noBlink()
+        self._lcd.cursor()
+
+    ##
+    #   @brief
+    def lcd_set_no_indicator(self):
+        self._lcd.setCursor(15, 1)
+        self._lcd.noBlink()
+        self._lcd.noCursor()
 
