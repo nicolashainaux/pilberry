@@ -52,15 +52,11 @@ class View(object):
 
         # The two fields will be Node objects
         self._infos = { 'xnode_name' : None,
-                        'xnode_parent' : None,
-                        'head_name' : None,
-                        'head_parent' : None
+                        'xnode_parent' : None
                       }
 
         self._infos_past = { 'xnode_name' : None,
-                             'xnode_parent' : None,
-                             'head_name' : None,
-                             'head_parent' : None
+                             'xnode_parent' : None
                            }
 
         self._HANDLE = {}
@@ -68,9 +64,6 @@ class View(object):
         for v in VIEWS_LIST:
             self._HANDLE[v] = \
         {'UPDATE' : getattr(display_view, v).update
-        #,
-         #'SET_VIEW_XNODE' : getattr(display_view, v).set_view_xnode,
-         #'SET_VIEW_HEAD' : getattr(display_view, v).set_view_head
         }
 
 
@@ -94,12 +87,6 @@ class View(object):
 
     ##
     #   @brief
-    #def get_lcd(self):
-    #    return self._lcd
-
-
-    ##
-    #   @brief
     def get_view(self):
         return self._view
 
@@ -114,8 +101,6 @@ class View(object):
     #                     doc="...")
     view = property(get_view,
                     doc="The current View")
-    #lcd = property(get_lcd,
-    #                doc="The LCD object")
     HANDLE = property(get_HANDLE,
                      doc="The HANDLE field")
     infos = property(get_infos,
@@ -142,15 +127,6 @@ class View(object):
 
         self._infos_past['xnode_parent'] = self._infos['xnode_parent']
         self._infos['xnode_parent'] = new_infos['xnode_parent']
-
-    ##
-    #   @brief
-    #def set_infos_head(self, new_infos):
-    #    self._infos_past['head_name'] = self._infos['head_name']
-    #    self._infos['head_name'] = new_infos['head_name']
-
-    #    self._infos_past['head_parent'] = self._infos['head_parent']
-    #    self._infos['head_parent'] = new_infos['head_parent']
 
 
     ##
@@ -182,6 +158,10 @@ class View(object):
 
         carriage_return = "\n" if line == 0 else ""
 
+        # We send the 16 first chars of (the msg added to 16 spaces), to display
+        # either the 16 first chars of a msg that would be longer than 16 chars,
+        # or all the msg plus the right number of spaces to delete the possibly
+        # remaining chars of the string previously displayed
         self._lcd.message((msg + "                ")[0:16] + carriage_return)
 
 
