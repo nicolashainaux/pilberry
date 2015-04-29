@@ -88,6 +88,8 @@ class Adafruit_CharLCDPlate(Adafruit_I2C):
 
         self.i2c = Adafruit_I2C(addr, busnum, debug)
 
+        self.numlines = 2
+
         # I2C is relatively slow.  MCP output port states are cached
         # so we don't need to constantly poll-and-change bit states.
         self.porta, self.portb, self.ddrb = 0, 0, 0b00000010
