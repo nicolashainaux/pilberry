@@ -122,14 +122,14 @@ class State_B(State):
     #   @brief
     def select(self):
         self.md.toggle_pause()
-        self.set_state('State_C')
+        self.set_state('State_D')
 
 
     ##
     #   @brief
     def esc(self):
         self.md.toggle_pause()
-        self.set_state('State_C')
+        self.set_state('State_D')
 
 
     ##

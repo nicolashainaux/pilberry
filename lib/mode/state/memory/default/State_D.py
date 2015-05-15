@@ -28,9 +28,9 @@ from .State import State
 import lib.globals as globals
 
 ##
-# @class State_C
+# @class State_D
 # @brief
-class State_C(State):
+class State_D(State):
 
 
     ##
@@ -49,6 +49,8 @@ class State_C(State):
                 #           delayed play is implemented
                 self.md.stop()
                 self.md.start_playing()
+            else:
+                self.md.toggle_pause()
 
             self.set_state('State_B')
 
@@ -56,12 +58,13 @@ class State_C(State):
     ##
     #   @brief
     def esc(self):
-        if globals.cmus_status == 'playing':
-            self.set_xnode(self.head)
-            self.set_state('State_B')
+        self.set_xnode(self.head)
+        self.md.toggle_pause()
+        self.set_state('State_B')
 
-        elif globals.cmus_status == 'stopped':
-            self.set_state('State_A')
+
+# From there on, all methods are copied from State_C
+# Couldn't find a solution to inherit from State_C... didn't work!
 
 
     ##
@@ -70,34 +73,6 @@ class State_C(State):
         self.md.stop()
         self.set_xnode(self.head)
         self.set_state('State_A')
-
-
-# From there on, all methods are copied from State_A
-# Couldn't find a solution to inherit from State_A... didn't work!
-
-    ##
-    #   @brief
-    def msg_cmus_playing(self, **options):
-        if self.head['full_path'] != options['full_path']:
-            logging.debug("noticed that head doesn't match current song")
-            # Current song doesn't match head node
-            # Let's try to find the node matching current song
-            # First, check if it's one of the song of the same 'directory'
-            found = False
-            for n in self.head.neighbours:
-                if n['full_path'] == options['full_path']:
-                    self.set_head(n)
-                    found = True
-            if found:
-                logging.debug("found the node matching current song")
-                logging.debug("Updated head Node, waiting for next command...\n")
-
-            ##
-            #   @todo   If the right node is not among the neighbours, it has
-            #           to be found elsewhere. In the best case, a data-
-            #           base is available and we can find it thanks to its
-            #           full path. If no database is available, then a
-            #           search algorithm has to be found...
 
 
     ##

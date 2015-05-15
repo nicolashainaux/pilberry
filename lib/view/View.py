@@ -69,7 +69,8 @@ class View(object):
         {'UPDATE' : getattr(display_view, v).update,
          'State_A' : getattr(display_view, v).State_A,
          'State_B' : getattr(display_view, v).State_B,
-         'State_C' : getattr(display_view, v).State_C
+         'State_C' : getattr(display_view, v).State_C,
+         'State_D' : getattr(display_view, v).State_D
         }
 
 

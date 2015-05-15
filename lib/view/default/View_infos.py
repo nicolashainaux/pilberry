@@ -53,6 +53,12 @@ class View_infos(object, metaclass=ABCMeta):
 
     ##
     #   @brief
+    def State_D(self):
+        pass
+
+
+    ##
+    #   @brief
     @abstractmethod
     def update(self, **options):
         pass

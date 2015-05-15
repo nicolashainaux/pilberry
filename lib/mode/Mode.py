@@ -34,7 +34,7 @@ from lib.globals import LOG_DIR
 from lib.musicdriver.MusicDriver import MusicDriver
 
 import lib.mode.state.memory.default as memory_state
-STATES_LIST = ['State_A', 'State_B', 'State_C']
+STATES_LIST = ['State_A', 'State_B', 'State_C', 'State_D']
 
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')

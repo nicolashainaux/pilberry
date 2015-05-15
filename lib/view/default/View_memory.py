@@ -54,6 +54,12 @@ class View_memory(View_infos):
 
     ##
     #   @brief
+    def State_D(self):
+        self.lcd_set_explore_indicator()
+
+
+    ##
+    #   @brief
     def update(self, **options):
         if self.infos_past['xnode_name'] != self.infos['xnode_name'] \
         or self.infos_past['xnode_parent'] != self.infos['xnode_parent']:
