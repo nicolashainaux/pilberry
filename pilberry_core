@@ -169,6 +169,7 @@ with Carrier() as C:
                 coreLog.debug("Received STOPPED")
                 new_status = 'stopped'
                 m.handle(new_status)
+                C.send('CORE_TO_DISPLAY', m.state)
 
             globals.cmus_status = new_status
             coreLog.debug("Registring new status: " + str(globals.cmus_status))
