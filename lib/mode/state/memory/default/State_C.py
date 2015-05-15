@@ -44,10 +44,6 @@ class State_C(State):
         else:
             if self.xnode != self.head:
                 self.set_head(self.xnode)
-                ##
-                #   @todo   Check if this stop is still necessary once the
-                #           delayed play is implemented
-                self.md.stop()
                 self.md.start_playing()
 
             self.set_state('State_B')
