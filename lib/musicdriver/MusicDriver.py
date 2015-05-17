@@ -25,6 +25,7 @@ import subprocess
 import time
 import logging
 import logging.config
+from collections import deque
 
 # Pilberry packages|modules imports
 import lib.globals as globals
@@ -44,20 +45,20 @@ class MusicDriver(object):
     ##
     #   @brief
     def __init__(self):
-        self._songs_queue = ['']
+        self._songs_queue = deque()
 
 
     ##
     #   @brief
-    def queue(self, full_path):
-        mdLog.debug('queuing: ' + full_path)
+    def queue_song(self, full_path):
+        mdLog.debug('queuing song: ' + full_path)
         self._send(['-C', 'add -q ' + full_path])
 
 
     ##
     #   @brief
-    def queue_first(self, full_path):
-        mdLog.debug('queuing first: ' + full_path)
+    def queue_song_first(self, full_path):
+        mdLog.debug('queuing song first: ' + full_path)
         self._send(['-C', 'add -Q ' + full_path])
 
 
@@ -81,7 +82,7 @@ class MusicDriver(object):
         for n in [globals.current_mode.head] \
             + globals.current_mode.head.neighbours_after:
         #___
-            self.queue(n.full_path)
+            self.queue_song(n.full_path)
 
         self.skip_to_next_song()
         mdLog.debug("sending order to PLAY!")

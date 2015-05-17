@@ -71,7 +71,7 @@ class State_B(State):
             if self.head.position == 0:
                 self.md.clear_queue()
                 for n in [self.head] + self.head.neighbours_after:
-                    self.md.queue(n.full_path)
+                    self.md.queue_song(n.full_path)
 
             self.md.skip_to_next_song()
 
