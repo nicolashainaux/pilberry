@@ -30,10 +30,16 @@ import time
 from .State import State
 from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
 from lib.globals import LOG_DIR
+from lib import globals
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
 stateBLog = logging.getLogger('stateBLog')
+
+current_milli_time = lambda: int(round(time.time() * 1000))
+
+globals.last_playing_notification = current_milli_time()
+
 
 ##
 # @class State_B
@@ -142,26 +148,27 @@ class State_B(State):
     ##
     #   @brief
     def msg_cmus_playing(self, **options):
-        if self.head['full_path'] != options['full_path']:
-            stateBLog.debug("noticed that head doesn't match current song")
-            # Current song doesn't match head node
-            # Let's try to find the node matching current song
-            # First, check if it's one of the song of the same 'directory'
-            found = False
-            for n in self.head.neighbours:
-                if n['full_path'] == options['full_path']:
-                    self.set_head(n)
-                    found = True
-            if found:
-                stateBLog.debug("found the node matching current song")
-                stateBLog.debug("Updated head Node, waiting for next command...\n")
-                self.set_xnode(self.head)
-            ##
-            #   @todo   If the right node is not among the neighbours, it has
-            #           to be found elsewhere. In the best case, a data-
-            #           base is available and we can find it thanks to its
-            #           full path. If no database is available, then a
-            #           search algorithm has to be found...
+        new_time = current_milli_time()
+
+        stateBLog.debug("playing notification received...")
+        stateBLog.debug(str(new_time) \
+                        + " - " \
+                        + str(globals.last_playing_notification) \
+                        + " = " \
+                        + str(new_time - globals.last_playing_notification))
+
+        if new_time - globals.last_playing_notification > 1000:
+            if globals.cmus_playing_notifications_disabled:
+                stateBLog.debug("Turning globals." \
+                                + "cmus_playing_notifications_disabled" \
+                                + " to False...")
+                globals.cmus_playing_notifications_disabled = False
+            else:
+                self.md.unqueue_song_first()
+                self.set_xnode(self.md.current_song)
+                self.set_head(self.md.current_song)
+
+        globals.last_playing_notification = new_time
 
 
     ##

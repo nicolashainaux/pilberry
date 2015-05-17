@@ -97,3 +97,6 @@ CMUS_NOTIFICATIONS = ['stopped',
 
 cmus_status = 'stopped'
 cmus_file = ''
+
+last_playing_notification = 0
+cmus_playing_notifications_disabled = True

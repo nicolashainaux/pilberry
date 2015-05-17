@@ -28,7 +28,8 @@ import logging.config
 from collections import deque
 
 # Pilberry packages|modules imports
-import lib.globals as globals
+from lib import globals
+#import lib.globals as globals
 from lib.globals import SOCKETS_CONFIG
 from lib.globals import LOG_DIR
 
@@ -47,6 +48,16 @@ class MusicDriver(object):
     def __init__(self):
         self._songs_queue = deque()
         self._current_song = []
+
+
+    ##
+    #   @brief
+    def get_current_song(self):
+        return self._songs_queue[0]
+
+
+    current_song = property(get_current_song,
+                            doc="The Mode's MusicDriver")
 
 
     ##
@@ -75,6 +86,16 @@ class MusicDriver(object):
 
     ##
     #   @brief
+    def unqueue_song_first(self):
+        mdLog.debug('unqueuing first song: ')
+        self._songs_queue.popleft()
+        mdLog.debug('deque content:\n' \
+                    + str([n.full_path for n in self._songs_queue]))
+
+
+
+    ##
+    #   @brief
     def clear_queue(self):
         mdLog.debug('queue is being cleared')
         self._songs_queue.clear()
@@ -94,6 +115,18 @@ class MusicDriver(object):
                     + str([n['file_name'] for n in self._current_song]))
         mdLog.debug('deque content:\n' \
                     + str([n['file_name'] for n in self._songs_queue]))
+        globals.cmus_playing_notifications_disabled = True
+
+
+    ##
+    #   @brief
+    #def play_next_song(self):
+    #    mdLog.debug('play next song')
+    #    self._songs_queue.popleft()
+    #    globals.cmus_playing_notifications_disabled = True
+    #    self._send(['-C', 'player-next'])
+    #    mdLog.debug('deque content:\n' \
+    #                + str([n.full_path for n in self._songs_queue]))
 
 
     ##
@@ -107,6 +140,8 @@ class MusicDriver(object):
 
         self.skip_to_next_song()
         mdLog.debug("sending order to PLAY!")
+
+        globals.cmus_playing_notifications_disabled = True
 
         self._send(['-p'])
 
