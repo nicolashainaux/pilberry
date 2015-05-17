@@ -25,7 +25,10 @@ import logging
 
 # Pilberry packages|modules imports
 from .State import State
-import lib.globals as globals
+#import lib.globals as globals
+from lib import globals
+
+current_milli_time = lambda: int(round(time.time() * 1000))
 
 ##
 # @class State_C
@@ -68,32 +71,23 @@ class State_C(State):
         self.set_state('State_A')
 
 
-# From there on, all methods are copied from State_A
-# Couldn't find a solution to inherit from State_A... didn't work!
-
     ##
     #   @brief
     def msg_cmus_playing(self, **options):
-        if self.head['full_path'] != options['full_path']:
-            logging.debug("noticed that head doesn't match current song")
-            # Current song doesn't match head node
-            # Let's try to find the node matching current song
-            # First, check if it's one of the song of the same 'directory'
-            found = False
-            for n in self.head.neighbours:
-                if n['full_path'] == options['full_path']:
-                    self.set_head(n)
-                    found = True
-            if found:
-                logging.debug("found the node matching current song")
-                logging.debug("Updated head Node, waiting for next command...\n")
+        new_time = current_milli_time()
 
-            ##
-            #   @todo   If the right node is not among the neighbours, it has
-            #           to be found elsewhere. In the best case, a data-
-            #           base is available and we can find it thanks to its
-            #           full path. If no database is available, then a
-            #           search algorithm has to be found...
+        if new_time - globals.last_playing_notification > 1000:
+            if globals.cmus_playing_notifications_disabled:
+                globals.cmus_playing_notifications_disabled = False
+            else:
+                self.md.unqueue_song_first()
+                self.set_head(self.md.current_song)
+
+        globals.last_playing_notification = new_time
+
+
+# From there on, all methods are copied from State_A
+# Couldn't find a solution to inherit from State_A... didn't work!
 
 
     ##
