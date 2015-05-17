@@ -52,6 +52,7 @@ class MusicDriver(object):
     #   @brief
     def queue_song(self, full_path):
         mdLog.debug('queuing song: ' + full_path)
+        self._songs_queue.append(full_path)
         self._send(['-C', 'add -q ' + full_path])
 
 
@@ -59,6 +60,7 @@ class MusicDriver(object):
     #   @brief
     def queue_song_first(self, full_path):
         mdLog.debug('queuing song first: ' + full_path)
+        self._songs_queue.append_left(full_path)
         self._send(['-C', 'add -Q ' + full_path])
 
 
@@ -66,12 +68,14 @@ class MusicDriver(object):
     #   @brief
     def clear_queue(self):
         mdLog.debug('queue is being cleared')
+        self._songs_queue.clear()
         self._send(['-c', '-q'])
 
     ##
     #   @brief
     def skip_to_next_song(self):
         mdLog.debug('skip to next song')
+        self._songs_queue.popleft()
         self._send(['-C', 'player-next'])
 
 
@@ -120,6 +124,7 @@ class MusicDriver(object):
     #   @brief
     def stop(self):
         mdLog.debug("sending STOP")
+        self._songs_queue.popleft()
         self._send(['-s'])
 
 
