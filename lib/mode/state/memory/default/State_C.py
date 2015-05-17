@@ -22,6 +22,7 @@
 
 # Python packages|modules imports
 import logging
+import time
 
 # Pilberry packages|modules imports
 from .State import State
