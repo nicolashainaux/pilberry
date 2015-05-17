@@ -85,7 +85,7 @@ class State_B(State):
     def move_to_node_prev(self):
         # We compute the new position with a modulo to go to first position if
         # we were at end and vice-versa
-        self.md.queue_first(self.head.full_path)
+        self.md.queue_song_first(self.head.full_path)
 
         stateBLog.debug("self.xnode.position - 1 = " \
                         + str(self.xnode.position - 1))
@@ -103,7 +103,7 @@ class State_B(State):
             if self.head.position == len(self.xnode.neighbours) - 1:
                 self.md.clear_queue()
 
-            self.md.queue_first(self.head.full_path)
+            self.md.queue_song_first(self.head.full_path)
             self.md.skip_to_next_song()
 
 
