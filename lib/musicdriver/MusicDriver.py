@@ -50,18 +50,18 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def queue_song(self, full_path):
-        mdLog.debug('queuing song: ' + full_path)
-        self._songs_queue.append(full_path)
-        self._send(['-C', 'add -q ' + full_path])
+    def queue_song(self, n):
+        mdLog.debug('queuing song: ' + n.full_path)
+        self._songs_queue.append(n)
+        self._send(['-C', 'add -q ' + n.full_path])
 
 
     ##
     #   @brief
-    def queue_song_first(self, full_path):
-        mdLog.debug('queuing song first: ' + full_path)
-        self._songs_queue.append_left(full_path)
-        self._send(['-C', 'add -Q ' + full_path])
+    def queue_song_first(self, n):
+        mdLog.debug('queuing song first: ' + n.full_path)
+        self._songs_queue.append_left(n)
+        self._send(['-C', 'add -Q ' + n.full_path])
 
 
     ##
