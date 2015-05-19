@@ -46,29 +46,31 @@ class MusicDriver(object):
     #   @brief
     def __init__(self):
         self._songs_queue = deque()
-        self._current_song = None
+        self._current_song = []
 
 
     ##
     #   @brief
     def queue_song(self, n):
-        mdLog.debug('queuing song: ' + n.full_path)
+        mdLog.debug('queuing song: ' + n['file_name'])
         self._songs_queue.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
-        mdLog.debug('current song: ' + str(self._current_song))
+        mdLog.debug('current song: ' \
+                    + str([n['file_name'] for n in self._current_song]))
         mdLog.debug('deque content:\n' \
-                    + str([n.full_path for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._songs_queue]))
 
 
     ##
     #   @brief
     def queue_song_first(self, n):
-        mdLog.debug('queuing song first: ' + n.full_path)
-        self._songs_queue.append_left(n)
+        mdLog.debug('queuing song first: ' + n['file_name'])
+        self._songs_queue.appendleft(n)
         self._send(['-C', 'add -Q ' + n.full_path])
-        mdLog.debug('current song: ' + str(self._current_song))
+        mdLog.debug('current song: ' \
+                    + str([n['file_name'] for n in self._current_song]))
         mdLog.debug('deque content:\n' \
-                    + str([n.full_path for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._songs_queue]))
 
 
     ##
@@ -77,19 +79,21 @@ class MusicDriver(object):
         mdLog.debug('queue is being cleared')
         self._songs_queue.clear()
         self._send(['-c', '-q'])
-        mdLog.debug('current song: ' + str(self._current_song))
+        mdLog.debug('current song: ' \
+                    + str([n['file_name'] for n in self._current_song]))
         mdLog.debug('deque content:\n' \
-                    + str([n.full_path for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._songs_queue]))
 
     ##
     #   @brief
     def skip_to_next_song(self):
         mdLog.debug('skip to next song')
-        self._songs_queue.popleft()
+        self._current_song = [self._songs_queue.popleft()]
         self._send(['-C', 'player-next'])
-        mdLog.debug('current song: ' + str(self._current_song))
+        mdLog.debug('current song: ' \
+                    + str([n['file_name'] for n in self._current_song]))
         mdLog.debug('deque content:\n' \
-                    + str([n.full_path for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._songs_queue]))
 
 
     ##
@@ -99,7 +103,7 @@ class MusicDriver(object):
         for n in [globals.current_mode.head] \
             + globals.current_mode.head.neighbours_after:
         #___
-            self.queue_song(n.full_path)
+            self.queue_song(n)
 
         self.skip_to_next_song()
         mdLog.debug("sending order to PLAY!")
@@ -137,11 +141,13 @@ class MusicDriver(object):
     #   @brief
     def stop(self):
         mdLog.debug("sending STOP")
-        self._songs_queue.popleft()
+        #self._songs_queue.popleft()
+        #self._current_song = []
         self._send(['-s'])
-        mdLog.debug('current song: ' + str(self._current_song))
+        mdLog.debug('current song: ' \
+                    + str([n['file_name'] for n in self._current_song]))
         mdLog.debug('deque content:\n' \
-                    + str([n.full_path for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._songs_queue]))
 
 
 
