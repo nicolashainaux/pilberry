@@ -54,6 +54,8 @@ class MusicDriver(object):
         mdLog.debug('queuing song: ' + n.full_path)
         self._songs_queue.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
+        mdLog.debug('deque content:\n' \
+                    + str([n.full_path for n in self._songs_queue]))
 
 
     ##
@@ -62,6 +64,8 @@ class MusicDriver(object):
         mdLog.debug('queuing song first: ' + n.full_path)
         self._songs_queue.append_left(n)
         self._send(['-C', 'add -Q ' + n.full_path])
+        mdLog.debug('deque content:\n' \
+                    + str([n.full_path for n in self._songs_queue]))
 
 
     ##
@@ -70,6 +74,8 @@ class MusicDriver(object):
         mdLog.debug('queue is being cleared')
         self._songs_queue.clear()
         self._send(['-c', '-q'])
+        mdLog.debug('deque content:\n' \
+                    + str([n.full_path for n in self._songs_queue]))
 
     ##
     #   @brief
@@ -77,6 +83,8 @@ class MusicDriver(object):
         mdLog.debug('skip to next song')
         self._songs_queue.popleft()
         self._send(['-C', 'player-next'])
+        mdLog.debug('deque content:\n' \
+                    + str([n.full_path for n in self._songs_queue]))
 
 
     ##
@@ -126,6 +134,8 @@ class MusicDriver(object):
         mdLog.debug("sending STOP")
         self._songs_queue.popleft()
         self._send(['-s'])
+        mdLog.debug('deque content:\n' \
+                    + str([n.full_path for n in self._songs_queue]))
 
 
 
