@@ -53,7 +53,7 @@ class MusicDriver(object):
     ##
     #   @brief
     def get_current_song(self):
-        return self._songs_queue[0]
+        return self._current_song[0]
 
 
     current_song = property(get_current_song,
@@ -88,7 +88,7 @@ class MusicDriver(object):
     #   @brief
     def unqueue_song_first(self):
         mdLog.debug('unqueuing first song: ')
-        self._songs_queue.popleft()
+        self._current_song = [self._songs_queue.popleft()]
         mdLog.debug('deque content:\n' \
                     + str([n.full_path for n in self._songs_queue]))
 
