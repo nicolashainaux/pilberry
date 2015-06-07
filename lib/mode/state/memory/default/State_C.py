@@ -74,6 +74,12 @@ class State_C(State):
 
     ##
     #   @brief
+    def play_queue(self):
+        pass
+
+
+    ##
+    #   @brief
     def msg_cmus_playing(self, **options):
         new_time = current_milli_time()
 

@@ -26,6 +26,7 @@ from abc import ABCMeta, abstractmethod
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, USER_CONFIG
+import lib.globals as globals
 
 
 ##
@@ -85,13 +86,54 @@ class State(object, metaclass=ABCMeta):
 
     ##
     #   @brief
+    def queue(self):
+        globals.queue_mode_activated = True
+
+        if len(self.xnode.children) >= 1:
+            for elt in self.xnode:
+                if len(elt) == 0:
+                    self.md.queue(elt)
+        else:
+            self.md.queue(self.xnode)
+
+
+    ##
+    #   @brief
+    def queue_as_next(self):
+        globals.queue_mode_activated = True
+
+        if len(self.xnode.children) >= 1:
+            for elt in self.xnode:
+                if len(elt) == 0:
+                    self.md.queue_song_first(elt)
+        else:
+            self.md.queue_song_first(self.xnode)
+
+
+    ##
+    #   @brief
+    def clear_queue(self):
+        globals.queue_mode_activated = False
+        self.md.clear_queue()
+
+
+    ##
+    #   @brief
+    def play_queue(self):
+        self.md.start_playing_queue()
+
+
+    ##
+    #   @brief
     def msg_cmus_playing(self, **options):
         pass
+
 
     ##
     #   @brief
     def msg_cmus_stopped(self, **options):
         pass
+
 
     ##
     #   @brief

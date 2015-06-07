@@ -64,58 +64,74 @@ class State_B(State):
     ##
     #   @brief
     def move_to_node_next(self):
-        # We compute the new position with a modulo to go to first position if
-        # we were at end and vice-versa
-        new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
-        self.set_xnode(self.xnode.neighbours[new_position])
-
-        if len(self.xnode.children) == 0:
-            self.set_head(self.xnode)
-
-            # If we've just "cycled", e.g. we've landed on the first song again,
-            # then we can repopulate the queue
-            if self.head.position == 0:
-                self.md.clear_queue()
-                for n in [self.head] + self.head.neighbours_after:
-                    self.md.queue_song(n)
-
-            self.md.skip_to_next_song()
+        if globals.queue_mode_activated:
+            if not self.md.queue_is_empty():
+                self.md.skip_to_next_song()
+            else:
+                pass
+                # So far, we do not loop over the queue...
 
         else:
-            self.md.stop()
-            self.set_state('State_A')
+            # We compute the new position with a modulo to go to first position
+            # if we were at end and vice-versa
+            new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
+            self.set_xnode(self.xnode.neighbours[new_position])
+
+            if len(self.xnode.children) == 0:
+                self.set_head(self.xnode)
+
+                # If we've just "cycled", e.g. we've landed on the first song
+                # again, then we can repopulate the queue
+                if self.head.position == 0:
+                    self.md.clear_queue()
+                    for n in [self.head] + self.head.neighbours_after:
+                        self.md.queue_song(n)
+
+                self.md.skip_to_next_song()
+
+            else:
+                self.md.stop()
+                self.set_state('State_A')
 
 
     ##
     #   @brief
     def move_to_node_prev(self):
-        # We compute the new position with a modulo to go to first position if
-        # we were at end and vice-versa
-        self.md.queue_song_first(self.head)
-
-        stateBLog.debug("self.xnode.position - 1 = " \
-                        + str(self.xnode.position - 1))
-        stateBLog.debug("len(self.xnode.neighbours) = " \
-                        + str(len(self.xnode.neighbours)))
-        new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
-        stateBLog.debug("new_position = " + str(new_position))
-        self.set_xnode(self.xnode.neighbours[new_position])
-
-        if len(self.xnode.children) == 0:
-            self.set_head(self.xnode)
-
-            # If we've just "cycled", e.g. we've landed on the last song,
-            # then we can clear the queue
-            if self.head.position == len(self.xnode.neighbours) - 1:
-                self.md.clear_queue()
-
-            self.md.queue_song_first(self.head)
-            self.md.skip_to_next_song()
-
+        if globals.queue_mode_activated:
+            if not self.md.queue_past_is_empty():
+                self.md.skip_to_prev_song_in_queue()
+            else:
+                pass
+                # So far, we do not loop over the queue...
 
         else:
-            self.md.stop()
-            self.set_state('State_A')
+            # We compute the new position with a modulo to go to first position
+            # if we were at end and vice-versa
+            self.md.queue_song_first(self.head)
+
+            stateBLog.debug("self.xnode.position - 1 = " \
+                            + str(self.xnode.position - 1))
+            stateBLog.debug("len(self.xnode.neighbours) = " \
+                            + str(len(self.xnode.neighbours)))
+            new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
+            stateBLog.debug("new_position = " + str(new_position))
+            self.set_xnode(self.xnode.neighbours[new_position])
+
+            if len(self.xnode.children) == 0:
+                self.set_head(self.xnode)
+
+                # If we've just "cycled", e.g. we've landed on the last song,
+                # then we can clear the queue
+                if self.head.position == len(self.xnode.neighbours) - 1:
+                    self.md.clear_queue()
+
+                self.md.queue_song_first(self.head)
+                self.md.skip_to_next_song()
+
+
+            else:
+                self.md.stop()
+                self.set_state('State_A')
 
 
     ##
@@ -143,6 +159,12 @@ class State_B(State):
     def stop(self):
         self.md.stop()
         self.set_state('State_A')
+
+
+    ##
+    #   @brief
+    def play_queue(self):
+        pass
 
 
     ##

@@ -126,6 +126,10 @@ class Mode(object):
          'CMD_VOL_UP' : getattr(memory_state, s).vol_up,
          'CMD_VOL_DOWN' : getattr(memory_state, s).vol_down,
          'CMD_SETTINGS' : getattr(memory_state, s).no_action,
+         'CMD_QUEUE' : getattr(memory_state, s).queue,
+         'CMD_QUEUE_AS_NEXT' : getattr(memory_state, s).queue_as_next,
+         'CMD_CLEAR_QUEUE' : getattr(memory_state, s).clear_queue,
+         'CMD_PLAY_QUEUE' : getattr(memory_state, s).play_queue,
          '' : getattr(memory_state, s).no_action,
          'CMD_ROGER' : self.roger
         }

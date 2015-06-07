@@ -47,17 +47,28 @@ class MusicDriver(object):
     #   @brief
     def __init__(self):
         self._songs_queue = deque()
-        self._current_song = []
+        self._past_songs = deque()
+        #self._current_song = []
 
 
     ##
     #   @brief
     def get_current_song(self):
-        return self._current_song[0]
+        #return self._current_song[0]
+        if len(self._past_songs) >= 1:
+            return self._past_songs[len(self._past_songs) - 1]
+        else:
+            return None
 
 
     current_song = property(get_current_song,
                             doc="The Mode's MusicDriver")
+
+
+    ##
+    #   @brief
+    def set_current_song(self, n):
+        self._past_songs.append(n)
 
 
     ##
@@ -67,7 +78,7 @@ class MusicDriver(object):
         self._songs_queue.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
         mdLog.debug('current song: ' \
-                    + str([n['file_name'] for n in self._current_song]))
+                    + self.current_song['file_name'])
         mdLog.debug('deque content:\n' \
                     + str([n['file_name'] for n in self._songs_queue]))
 
@@ -79,7 +90,7 @@ class MusicDriver(object):
         self._songs_queue.appendleft(n)
         self._send(['-C', 'add -Q ' + n.full_path])
         mdLog.debug('current song: ' \
-                    + str([n['file_name'] for n in self._current_song]))
+                    + self.current_song['file_name'])
         mdLog.debug('deque content:\n' \
                     + str([n['file_name'] for n in self._songs_queue]))
 
@@ -88,9 +99,31 @@ class MusicDriver(object):
     #   @brief
     def unqueue_song_first(self):
         mdLog.debug('unqueuing first song: ')
-        self._current_song = [self._songs_queue.popleft()]
+        if not self.queue_is_empty():
+            self.set_current_song(self._songs_queue.popleft())
         mdLog.debug('deque content:\n' \
                     + str([n.full_path for n in self._songs_queue]))
+
+
+    ##
+    #   @brief
+    def queue_is_empty(self):
+        if len(self._songs_queue) == 0:
+            return True
+        else:
+            return False
+
+
+
+    ##
+    #   @brief
+    def queue_past_is_empty(self):
+        # Remember the song at the right of past_songs is actually current_song
+        # so we check if there are other songs before it.
+        if len(self._past_songs) <= 1:
+            return True
+        else:
+            return False
 
 
 
@@ -99,20 +132,22 @@ class MusicDriver(object):
     def clear_queue(self):
         mdLog.debug('queue is being cleared')
         self._songs_queue.clear()
+        self._past_songs.clear()
         self._send(['-c', '-q'])
         mdLog.debug('current song: ' \
-                    + str([n['file_name'] for n in self._current_song]))
+                    + self.current_song['file_name'])
         mdLog.debug('deque content:\n' \
                     + str([n['file_name'] for n in self._songs_queue]))
+
 
     ##
     #   @brief
     def skip_to_next_song(self):
         mdLog.debug('skip to next song')
-        self._current_song = [self._songs_queue.popleft()]
+        self._past_songs.append(self._songs_queue.popleft())
         self._send(['-C', 'player-next'])
         mdLog.debug('current song: ' \
-                    + str([n['file_name'] for n in self._current_song]))
+                    + self.current_song['file_name'])
         mdLog.debug('deque content:\n' \
                     + str([n['file_name'] for n in self._songs_queue]))
         globals.cmus_playing_notifications_disabled = True
@@ -120,13 +155,15 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    #def play_next_song(self):
-    #    mdLog.debug('play next song')
-    #    self._songs_queue.popleft()
-    #    globals.cmus_playing_notifications_disabled = True
-    #    self._send(['-C', 'player-next'])
-    #    mdLog.debug('deque content:\n' \
-    #                + str([n.full_path for n in self._songs_queue]))
+    def skip_to_prev_song_in_queue(self):
+        mdLog.debug('skip to prev song in queue')
+        self.queue_song_first(self._past_songs.pop())
+        self._send(['-C', 'player-next'])
+        mdLog.debug('current song: ' \
+                    + self.current_song['file_name'])
+        mdLog.debug('deque content:\n' \
+                    + str([n['file_name'] for n in self._songs_queue]))
+        globals.cmus_playing_notifications_disabled = True
 
 
     ##
@@ -138,6 +175,28 @@ class MusicDriver(object):
         #___
             self.queue_song(n)
 
+        self.play()
+
+
+    ##
+    #   @brief
+    def start_playing_queue(self):
+        if len(self._past_songs) >= 1:
+            self._past_songs.reverse()
+            self._songs_queue.extend_left(self._past_songs)
+            self._past_songs.clear()
+
+        # Clearing and repopulating cmus' queue
+        self._send(['-c', '-q'])
+        for n in self._songs_queue:
+            self._send(['-C', 'add -q ' + n.full_path])
+
+        self.play()
+
+
+    ##
+    #   @brief
+    def play(self):
         self.skip_to_next_song()
         mdLog.debug("sending order to PLAY!")
 
@@ -170,8 +229,6 @@ class MusicDriver(object):
      #   logging.debug('after having sent a new roger_roger')
 
 
-
-
     ##
     #   @brief
     def stop(self):
@@ -180,10 +237,9 @@ class MusicDriver(object):
         #self._current_song = []
         self._send(['-s'])
         mdLog.debug('current song: ' \
-                    + str([n['file_name'] for n in self._current_song]))
+                    + self.current_song['file_name'])
         mdLog.debug('deque content:\n' \
                     + str([n['file_name'] for n in self._songs_queue]))
-
 
 
     ##
@@ -191,7 +247,6 @@ class MusicDriver(object):
     def toggle_pause(self):
         mdLog.debug("sending PAUSE")
         self._send(['-u'])
-
 
 
     ##
@@ -204,7 +259,6 @@ class MusicDriver(object):
                           SOCKETS_CONFIG['TO_CMUS']['FILE']
                          ]
                          + cmd_list)
-
 
 
     ##

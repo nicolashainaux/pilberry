@@ -100,3 +100,11 @@ class State_A(State):
     #   @brief
     def stop(self):
         pass
+
+
+    ##
+    #   @brief
+    def play_queue(self):
+
+
+

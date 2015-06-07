@@ -76,6 +76,12 @@ class State_D(State):
 
 
     ##
+    #   @brief
+    def play_queue(self):
+        pass
+
+
+    ##
     #   @brief  Moves to the parent Node. Returns the new current Node.
     #   @return Node
     def move_to_parent(self):
