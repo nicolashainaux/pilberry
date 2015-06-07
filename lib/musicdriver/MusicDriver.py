@@ -169,11 +169,11 @@ class MusicDriver(object):
     ##
     #   @brief
     def start_playing(self):
-        self.clear_queue()
-        for n in [globals.current_mode.head] \
-            + globals.current_mode.head.neighbours_after:
+        #self.clear_queue()
+        for n in globals.current_mode.head.neighbours_after.reverse() \
+            + [globals.current_mode.head]:
         #___
-            self.queue_song(n)
+            self.queue_song_first(n)
 
         self.play()
 
