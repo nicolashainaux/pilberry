@@ -96,7 +96,9 @@ class MusicDriver(object):
 
 
     ##
-    #   @brief
+    #   @brief  This is only used to synchronize pilberry's queue with cmus'.
+    #           cmus has already unqueued the song, so this method only deals
+    #           with pilberry's queue.
     def unqueue_song_first(self):
         mdLog.debug('unqueuing first song: ')
         if not self.queue_is_empty():

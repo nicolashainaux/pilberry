@@ -102,9 +102,3 @@ class State_A(State):
         pass
 
 
-    ##
-    #   @brief
-    def play_queue(self):
-
-
-
