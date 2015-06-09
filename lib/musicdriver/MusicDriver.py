@@ -58,7 +58,7 @@ class MusicDriver(object):
         if len(self._past_songs) >= 1:
             return self._past_songs[len(self._past_songs) - 1]
         else:
-            return None
+            return {'file_name' : "(No song)"}
 
 
     current_song = property(get_current_song,
@@ -172,8 +172,8 @@ class MusicDriver(object):
     #   @brief
     def start_playing(self):
         #self.clear_queue()
-        for n in globals.current_mode.head.neighbours_after.reverse() \
-            + [globals.current_mode.head]:
+        for n in reversed([globals.current_mode.head] \
+            + globals.current_mode.head.neighbours_after):
         #___
             self.queue_song_first(n)
 
