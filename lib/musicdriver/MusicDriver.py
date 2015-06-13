@@ -104,7 +104,7 @@ class MusicDriver(object):
         if not self.queue_is_empty():
             self.set_current_song(self._songs_queue.popleft())
         mdLog.debug('deque content:\n' \
-                    + str([n.full_path for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._songs_queue]))
 
 
     ##
