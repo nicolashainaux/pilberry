@@ -109,6 +109,8 @@ class Mode(object):
 
         self._state = 'State_A'
 
+        self.queue_mode_activated = False
+
         self._HANDLE = {}
 
         for s in STATES_LIST:

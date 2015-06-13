@@ -87,7 +87,7 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def queue(self):
-        globals.queue_mode_activated = True
+        self.queue_mode_activated = True
 
         if len(self.xnode.children) >= 1:
             for elt in self.xnode:
@@ -100,7 +100,7 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def queue_as_next(self):
-        globals.queue_mode_activated = True
+        self.queue_mode_activated = True
 
         if len(self.xnode.children) >= 1:
             for elt in self.xnode:
@@ -113,7 +113,7 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def clear_queue(self):
-        globals.queue_mode_activated = False
+        self.queue_mode_activated = False
         self.md.clear_queue()
 
 

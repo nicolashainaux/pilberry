@@ -64,7 +64,7 @@ class State_B(State):
     ##
     #   @brief
     def move_to_node_next(self):
-        if globals.queue_mode_activated:
+        if self.queue_mode_activated:
             if not self.md.queue_is_empty():
                 self.md.skip_to_next_song()
             else:
@@ -97,7 +97,7 @@ class State_B(State):
     ##
     #   @brief
     def move_to_node_prev(self):
-        if globals.queue_mode_activated:
+        if self.queue_mode_activated:
             if not self.md.queue_past_is_empty():
                 self.md.skip_to_prev_song_in_queue()
             else:

@@ -100,5 +100,3 @@ cmus_file = ''
 
 last_playing_notification = 0
 cmus_playing_notifications_disabled = True
-
-queue_mode_activated = False
