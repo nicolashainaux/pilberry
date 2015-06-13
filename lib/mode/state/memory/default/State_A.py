@@ -86,7 +86,7 @@ class State_A(State):
             self.handle('CMD_MOVE_TO_1ST_CHILD')
         else:
             if self.queue_mode_activated:
-                self.md.start_playing_queue()
+                self.md.play()
                 self.set_xnode(self.md.current_song)
                 self.set_head(self.xnode)
             else:

@@ -106,7 +106,10 @@ class State_B(State):
     def stop(self):
         self.md.stop()
         self.set_state('State_A')
-        if not self.queue_mode_activated:
+        if self.queue_mode_activated:
+            self.md.requeue_current_song_first()
+            self.md.shift_queue_to_right()
+        else:
             self.md.clear_queue()
 
 

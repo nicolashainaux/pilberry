@@ -107,6 +107,12 @@ class MusicDriver(object):
 
 
     ##
+    #   @brief
+    def shift_queue_to_right(self):
+        self._songs_queue.appendleft(self._past_songs.pop())
+
+
+    ##
     #   @brief  This is only used to synchronize pilberry's queue with cmus'.
     #           cmus has already unqueued the song, so this method only deals
     #           with pilberry's queue.
@@ -129,7 +135,6 @@ class MusicDriver(object):
             return False
 
 
-
     ##
     #   @brief
     def queue_past_is_empty(self):
@@ -139,7 +144,6 @@ class MusicDriver(object):
             return True
         else:
             return False
-
 
 
     ##
@@ -200,22 +204,6 @@ class MusicDriver(object):
 
         for n in globals.current_mode.head.neighbours_before:
             self._past_songs.append(n)
-
-        self.play()
-
-
-    ##
-    #   @brief
-    def start_playing_queue(self):
-        if len(self._past_songs) >= 1:
-            self._past_songs.reverse()
-            self._songs_queue.extendleft(self._past_songs)
-            self._past_songs.clear()
-
-        # Clearing and repopulating cmus' queue
-        self._send(['-c', '-q'])
-        for n in self._songs_queue:
-            self._send(['-C', 'add -q ' + n.full_path])
 
         self.play()
 
