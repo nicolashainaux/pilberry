@@ -92,9 +92,9 @@ class State(object, metaclass=ABCMeta):
         if len(self.xnode.children) >= 1:
             for elt in self.xnode:
                 if len(elt) == 0:
-                    self.md.queue(elt)
+                    self.md.queue_song(elt)
         else:
-            self.md.queue(self.xnode)
+            self.md.queue_song(self.xnode)
 
 
     ##

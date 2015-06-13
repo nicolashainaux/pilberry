@@ -185,7 +185,7 @@ class MusicDriver(object):
     def start_playing_queue(self):
         if len(self._past_songs) >= 1:
             self._past_songs.reverse()
-            self._songs_queue.extend_left(self._past_songs)
+            self._songs_queue.extendleft(self._past_songs)
             self._past_songs.clear()
 
         # Clearing and repopulating cmus' queue
