@@ -79,7 +79,9 @@ class MusicDriver(object):
         self._send(['-C', 'add -q ' + n.full_path])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
-        mdLog.debug('deque content:\n' \
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
                     + str([n['file_name'] for n in self._songs_queue]))
 
 
@@ -91,8 +93,17 @@ class MusicDriver(object):
         self._send(['-C', 'add -Q ' + n.full_path])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
-        mdLog.debug('deque content:\n' \
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
                     + str([n['file_name'] for n in self._songs_queue]))
+
+
+    ##
+    #   @brief
+    def requeue_current_song_first(self):
+        mdLog.debug('requeuing current song first')
+        self._send(['-C', 'add -Q ' + self.current_song.full_path])
 
 
     ##
@@ -103,7 +114,9 @@ class MusicDriver(object):
         mdLog.debug('unqueuing first song: ')
         if not self.queue_is_empty():
             self.set_current_song(self._songs_queue.popleft())
-        mdLog.debug('deque content:\n' \
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
                     + str([n['file_name'] for n in self._songs_queue]))
 
 
@@ -138,7 +151,9 @@ class MusicDriver(object):
         self._send(['-c', '-q'])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
-        mdLog.debug('deque content:\n' \
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
                     + str([n['file_name'] for n in self._songs_queue]))
 
 
@@ -150,7 +165,9 @@ class MusicDriver(object):
         self._send(['-C', 'player-next'])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
-        mdLog.debug('deque content:\n' \
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
                     + str([n['file_name'] for n in self._songs_queue]))
         globals.cmus_playing_notifications_disabled = True
 
@@ -159,13 +176,17 @@ class MusicDriver(object):
     #   @brief
     def skip_to_prev_song_in_queue(self):
         mdLog.debug('skip to prev song in queue')
-        self.queue_song_first(self._past_songs.pop())
-        self._send(['-C', 'player-next'])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
-        mdLog.debug('deque content:\n' \
-                    + str([n['file_name'] for n in self._songs_queue]))
-        globals.cmus_playing_notifications_disabled = True
+        if len(self._past_songs) >= 2:
+            self.queue_song_first(self._past_songs.pop())
+            self.requeue_current_song_first()
+            self._send(['-C', 'player-next'])
+            mdLog.debug('current song: ' \
+                        + self.current_song['file_name'])
+            mdLog.debug('past songs: ' \
+                        + str([n['file_name'] for n in self._past_songs]))
+            mdLog.debug('future songs: ' \
+                        + str([n['file_name'] for n in self._songs_queue]))
+            globals.cmus_playing_notifications_disabled = True
 
 
     ##
@@ -240,7 +261,9 @@ class MusicDriver(object):
         self._send(['-s'])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
-        mdLog.debug('deque content:\n' \
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
                     + str([n['file_name'] for n in self._songs_queue]))
 
 

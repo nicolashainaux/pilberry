@@ -100,13 +100,9 @@ class State_B(State):
     #   @brief
     def move_to_node_prev(self):
         if self.queue_mode_activated:
-            if not self.md.queue_past_is_empty():
-                self.md.skip_to_prev_song_in_queue()
-                self.set_xnode(self.md.current_song)
-                self.set_head(self.xnode)
-            else:
-                pass
-                # So far, we do not loop over the queue...
+            self.md.skip_to_prev_song_in_queue()
+            self.set_xnode(self.md.current_song)
+            self.set_head(self.xnode)
 
         else:
             # We compute the new position with a modulo to go to first position
