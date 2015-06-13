@@ -67,6 +67,8 @@ class State_B(State):
         if self.queue_mode_activated:
             if not self.md.queue_is_empty():
                 self.md.skip_to_next_song()
+                self.set_xnode(self.md.current_song)
+                self.set_head(self.xnode)
             else:
                 pass
                 # So far, we do not loop over the queue...
@@ -100,6 +102,8 @@ class State_B(State):
         if self.queue_mode_activated:
             if not self.md.queue_past_is_empty():
                 self.md.skip_to_prev_song_in_queue()
+                self.set_xnode(self.md.current_song)
+                self.set_head(self.xnode)
             else:
                 pass
                 # So far, we do not loop over the queue...

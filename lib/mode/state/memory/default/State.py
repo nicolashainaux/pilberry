@@ -119,13 +119,6 @@ class State(object, metaclass=ABCMeta):
 
     ##
     #   @brief
-    def play_queue(self):
-        self.md.start_playing_queue()
-        self.set_state('State_B')
-
-
-    ##
-    #   @brief
     def msg_cmus_playing(self, **options):
         pass
 
