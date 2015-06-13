@@ -106,6 +106,8 @@ class State_B(State):
     def stop(self):
         self.md.stop()
         self.set_state('State_A')
+        if not self.queue_mode_activated:
+            self.md.clear_queue()
 
 
     ##
@@ -138,3 +140,5 @@ class State_B(State):
     #   @brief
     def msg_cmus_stopped(self, **options):
         self.set_state('State_A')
+        if not self.queue_mode_activated:
+            self.md.clear_queue()
