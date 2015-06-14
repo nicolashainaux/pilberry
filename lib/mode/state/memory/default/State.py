@@ -124,7 +124,8 @@ class State(object, metaclass=ABCMeta):
     def clear_playlist(self):
         self.unactivate_playlist_mode()
         self.md.clear_playlist()
-
+        with Carrier() as C:
+            C.send('CORE_STATE_TO_DISPLAY', "Playlist cleared")
 
     ##
     #   @brief

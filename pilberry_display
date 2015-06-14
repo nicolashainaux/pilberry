@@ -77,7 +77,7 @@ def core_data_callback(socket, data):
 
 def core_state_callback(socket, data):
     info = pickle.loads(data)
-    if info[:6] == 'Queued':
+    if info[:6] == 'Queued' or info == 'Playlist cleared':
         v.set_infos_memory({'xnode_name': info,
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
@@ -90,6 +90,7 @@ def core_state_callback(socket, data):
         v.set_infos_memory({'xnode_name': info,
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
+
 
 def core_mode_color_callback(socket, data):
     info = pickle.loads(data)
