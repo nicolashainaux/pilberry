@@ -48,6 +48,7 @@ class State_C(State):
         else:
             if self.xnode != self.head:
                 self.set_head(self.xnode)
+                self.queue_mode_activated = False
                 self.md.start_playing()
 
             self.set_state('State_B')

@@ -48,8 +48,10 @@ class State_D(State):
                 #   @todo   Check if this stop is still necessary once the
                 #           delayed play is implemented
                 self.md.stop()
+                self.queue_mode_activated = False
                 self.md.start_playing()
             else:
+                globals.cmus_playing_notifications_disabled = True
                 self.md.toggle_pause()
 
             self.set_state('State_B')
