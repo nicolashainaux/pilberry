@@ -27,6 +27,7 @@ from abc import ABCMeta, abstractmethod
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, USER_CONFIG
 import lib.globals as globals
+from lib.carrier.Carrier import Carrier
 
 
 ##
@@ -89,12 +90,16 @@ class State(object, metaclass=ABCMeta):
     def append_song(self):
         self.playlist_mode_activated = True
 
-        if len(self.xnode.children) >= 1:
-            for elt in self.xnode.children:
-                if len(elt.children) == 0:
-                    self.md.append_song(elt)
-        else:
-            self.md.append_song(self.xnode)
+        with Carrier() as C:
+            if len(self.xnode.children) >= 1:
+                C.send('CORE_STATE_TO_DISPLAY', "Queuing songs...")
+                for elt in self.xnode.children:
+                    if len(elt.children) == 0:
+                        self.md.append_song(elt)
+                C.send('CORE_STATE_TO_DISPLAY', "Queued all songs")
+            else:
+                self.md.append_song(self.xnode)
+                C.send('CORE_STATE_TO_DISPLAY', "Queued a song")
 
 
     ##
@@ -102,12 +107,13 @@ class State(object, metaclass=ABCMeta):
     def prepend_song(self):
         self.playlist_mode_activated = True
 
-        if len(self.xnode.children) >= 1:
-            for elt in self.xnode.children:
-                if len(elt.children) == 0:
-                    self.md.prepend_song(elt)
-        else:
-            self.md.prepend_song(self.xnode)
+        with Carrier() as C:
+            if len(self.xnode.children) >= 1:
+                for elt in self.xnode.children:
+                    if len(elt.children) == 0:
+                        self.md.prepend_song(elt)
+            else:
+                self.md.prepend_song(self.xnode)
 
 
     ##

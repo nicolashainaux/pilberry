@@ -51,6 +51,7 @@ displayLog = logging.getLogger('displayLog')
 # Get the sockets' ports from sockets' conf file
 CORE_TCP_PORT = int(SOCKETS_CONFIG['CORE_TO_DISPLAY']['PORT'])
 CORE_DATA_TCP_PORT = int(SOCKETS_CONFIG['CORE_DATA_TO_DISPLAY']['PORT'])
+CORE_STATE_TCP_PORT = int(SOCKETS_CONFIG['CORE_STATE_TO_DISPLAY']['PORT'])
 
 displayLog.debug("Waiting for the first info to come...")
 
@@ -73,10 +74,26 @@ def core_data_callback(socket, data):
     #                  'head_parent': info['head_parent']})
     v.handle('UPDATE')
 
+def core_state_callback(socket, data):
+    info = pickle.loads(data)
+    if info[:6] == 'Queued':
+        v.set_infos_memory({'xnode_name': info,
+                            'xnode_parent': v.infos['xnode_parent']})
+        v.handle('UPDATE')
+        time.sleep(1)
+        v.set_infos_memory({'xnode_name': v.infos_past['xnode_name'],
+                            'xnode_parent': v.infos['xnode_parent']})
+        v.handle('UPDATE')
+
+    elif info[:7] == 'Queuing':
+        v.set_infos_memory({'xnode_name': info,
+                            'xnode_parent': v.infos['xnode_parent']})
+        v.handle('UPDATE')
 
 
 RPIO.add_tcp_callback(CORE_TCP_PORT, core_callback)
 RPIO.add_tcp_callback(CORE_DATA_TCP_PORT, core_data_callback)
+RPIO.add_tcp_callback(CORE_STATE_TCP_PORT, core_state_callback)
 
 # Blocking main epoll loop
 RPIO.wait_for_interrupts()
