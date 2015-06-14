@@ -48,7 +48,7 @@ class State_C(State_CD):
         else:
             if self.xnode != self.head:
                 self.set_head(self.xnode)
-                self.playlist_mode_activated = False
+                self.unactivate_playlist_mode()
                 self.md.play_from_here()
 
             self.set_state('State_B')

@@ -48,7 +48,7 @@ class State_D(State_CD):
                 #   @todo   Check if this stop is still necessary once the
                 #           delayed play is implemented
                 self.md.stop()
-                self.playlist_mode_activated = False
+                self.unactivate_playlist_mode()
                 self.md.play_from_here()
             else:
                 globals.cmus_playing_notifications_disabled = True

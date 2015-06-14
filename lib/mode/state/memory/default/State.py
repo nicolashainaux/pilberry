@@ -88,7 +88,7 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def append_song(self):
-        self.playlist_mode_activated = True
+        self.activate_playlist_mode()
 
         with Carrier() as C:
             if len(self.xnode.children) >= 1:
@@ -105,21 +105,24 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def prepend_song(self):
-        self.playlist_mode_activated = True
+        self.activate_playlist_mode()
 
         with Carrier() as C:
             if len(self.xnode.children) >= 1:
+                C.send('CORE_STATE_TO_DISPLAY', "Queuing songs...")
                 for elt in self.xnode.children:
                     if len(elt.children) == 0:
                         self.md.prepend_song(elt)
+                C.send('CORE_STATE_TO_DISPLAY', "Queued all songs")
             else:
                 self.md.prepend_song(self.xnode)
+                C.send('CORE_STATE_TO_DISPLAY', "Queued a song")
 
 
     ##
     #   @brief
     def clear_playlist(self):
-        self.playlist_mode_activated = False
+        self.unactivate_playlist_mode()
         self.md.clear_playlist()
 
 

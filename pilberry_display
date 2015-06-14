@@ -52,6 +52,7 @@ displayLog = logging.getLogger('displayLog')
 CORE_TCP_PORT = int(SOCKETS_CONFIG['CORE_TO_DISPLAY']['PORT'])
 CORE_DATA_TCP_PORT = int(SOCKETS_CONFIG['CORE_DATA_TO_DISPLAY']['PORT'])
 CORE_STATE_TCP_PORT = int(SOCKETS_CONFIG['CORE_STATE_TO_DISPLAY']['PORT'])
+CORE_MODE_COLOR_TCP_PORT = int(SOCKETS_CONFIG['CORE_MODE_COLOR_TO_DISPLAY']['PORT'])
 
 displayLog.debug("Waiting for the first info to come...")
 
@@ -90,10 +91,20 @@ def core_state_callback(socket, data):
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
 
+def core_mode_color_callback(socket, data):
+    info = pickle.loads(data)
+    if info == "on":
+        # Weird behaviour of the colors here. Had to use lcd.VIOLET to see
+        # a new color... which is absolutely not violet...
+        lcd.backlight(lcd.VIOLET)
+    else:
+        lcd.backlight(lcd.WHITE)
+
 
 RPIO.add_tcp_callback(CORE_TCP_PORT, core_callback)
 RPIO.add_tcp_callback(CORE_DATA_TCP_PORT, core_data_callback)
 RPIO.add_tcp_callback(CORE_STATE_TCP_PORT, core_state_callback)
+RPIO.add_tcp_callback(CORE_MODE_COLOR_TCP_PORT, core_mode_color_callback)
 
 # Blocking main epoll loop
 RPIO.wait_for_interrupts()

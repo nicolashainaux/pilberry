@@ -32,6 +32,7 @@ from lib.globals import current_mode_id, MODES_CONFIG, USER_CONFIG
 import lib.globals as globals
 from lib.globals import LOG_DIR
 from lib.musicdriver.MusicDriver import MusicDriver
+from lib.carrier.Carrier import Carrier
 
 import lib.mode.state.memory.default as memory_state
 STATES_LIST = ['State_A', 'State_B', 'State_C', 'State_D']
@@ -202,6 +203,22 @@ class Mode(object):
         #   @todo   Check that the argument s belongs to the 'authorized' states
         modeLog.debug("setting state at: \033[32m" + s + "\033[0m")
         self._state = s
+
+
+    ##
+    #   @brief
+    def activate_playlist_mode(self):
+        self.playlist_mode_activated = True
+        with Carrier() as C:
+            C.send('CORE_MODE_COLOR_TO_DISPLAY', "on")
+
+
+    ##
+    #   @brief
+    def unactivate_playlist_mode(self):
+        self.playlist_mode_activated = False
+        with Carrier() as C:
+            C.send('CORE_MODE_COLOR_TO_DISPLAY', "off")
 
 
     ##
