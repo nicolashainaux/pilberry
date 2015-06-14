@@ -90,8 +90,8 @@ class State(object, metaclass=ABCMeta):
         self.queue_mode_activated = True
 
         if len(self.xnode.children) >= 1:
-            for elt in self.xnode:
-                if len(elt) == 0:
+            for elt in self.xnode.children:
+                if len(elt.children) == 0:
                     self.md.queue_song(elt)
         else:
             self.md.queue_song(self.xnode)
@@ -103,8 +103,8 @@ class State(object, metaclass=ABCMeta):
         self.queue_mode_activated = True
 
         if len(self.xnode.children) >= 1:
-            for elt in self.xnode:
-                if len(elt) == 0:
+            for elt in self.xnode.children:
+                if len(elt.children) == 0:
                     self.md.queue_song_first(elt)
         else:
             self.md.queue_song_first(self.xnode)
