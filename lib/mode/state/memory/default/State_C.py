@@ -48,8 +48,8 @@ class State_C(State):
         else:
             if self.xnode != self.head:
                 self.set_head(self.xnode)
-                self.queue_mode_activated = False
-                self.md.start_playing()
+                self.playlist_mode_activated = False
+                self.md.play_from_here()
 
             self.set_state('State_B')
 
@@ -82,7 +82,7 @@ class State_C(State):
             if globals.cmus_playing_notifications_disabled:
                 globals.cmus_playing_notifications_disabled = False
             else:
-                self.md.unqueue_song_first()
+                self.md.resync_playlist()
                 self.set_head(self.md.current_song)
 
         globals.last_playing_notification = new_time

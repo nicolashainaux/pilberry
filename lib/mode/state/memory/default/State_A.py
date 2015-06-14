@@ -85,13 +85,13 @@ class State_A(State):
         if len(self.xnode.children) >= 1:
             self.handle('CMD_MOVE_TO_1ST_CHILD')
         else:
-            if self.queue_mode_activated:
-                self.md.play()
+            if self.playlist_mode_activated:
+                self.md.play_playlist()
                 self.set_xnode(self.md.current_song)
                 self.set_head(self.xnode)
             else:
                 self.set_head(self.xnode)
-                self.md.start_playing()
+                self.md.play_from_here()
             self.set_state('State_B')
 
 

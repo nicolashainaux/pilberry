@@ -64,7 +64,7 @@ class State_B(State):
     ##
     #   @brief
     def move_to_node_next(self):
-        self.md.skip_to_next_song()
+        self.md.jump_to_next_song()
         self.set_xnode(self.md.current_song)
         self.set_head(self.xnode)
 
@@ -72,7 +72,7 @@ class State_B(State):
     ##
     #   @brief
     def move_to_node_prev(self):
-        self.md.skip_to_prev_song_in_queue()
+        self.md.jump_to_prev_song()
         self.set_xnode(self.md.current_song)
         self.set_head(self.xnode)
 
@@ -102,11 +102,10 @@ class State_B(State):
     def stop(self):
         self.md.stop()
         self.set_state('State_A')
-        if self.queue_mode_activated:
-            self.md.requeue_current_song_first()
-            #self.md.shift_queue_to_right()
+        if self.playlist_mode_activated:
+            self.md.reinsert_current_song()
         else:
-            self.md.clear_queue()
+            self.md.clear_playlist()
 
 
     ##
@@ -128,7 +127,7 @@ class State_B(State):
                                 + " to False...")
                 globals.cmus_playing_notifications_disabled = False
             else:
-                self.md.unqueue_song_first()
+                self.md.resync_playlist()
                 self.set_xnode(self.md.current_song)
                 self.set_head(self.md.current_song)
 
@@ -139,5 +138,5 @@ class State_B(State):
     #   @brief
     def msg_cmus_stopped(self, **options):
         self.set_state('State_A')
-        if not self.queue_mode_activated:
-            self.md.clear_queue()
+        if not self.playlist_mode_activated:
+            self.md.clear_playlist()

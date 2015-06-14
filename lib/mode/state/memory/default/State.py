@@ -86,35 +86,35 @@ class State(object, metaclass=ABCMeta):
 
     ##
     #   @brief
-    def queue(self):
-        self.queue_mode_activated = True
+    def append_song(self):
+        self.playlist_mode_activated = True
 
         if len(self.xnode.children) >= 1:
             for elt in self.xnode.children:
                 if len(elt.children) == 0:
-                    self.md.queue_song(elt)
+                    self.md.append_song(elt)
         else:
-            self.md.queue_song(self.xnode)
+            self.md.append_song(self.xnode)
 
 
     ##
     #   @brief
-    def queue_as_next(self):
-        self.queue_mode_activated = True
+    def prepend_song(self):
+        self.playlist_mode_activated = True
 
         if len(self.xnode.children) >= 1:
             for elt in self.xnode.children:
                 if len(elt.children) == 0:
-                    self.md.queue_song_first(elt)
+                    self.md.prepend_song(elt)
         else:
-            self.md.queue_song_first(self.xnode)
+            self.md.prepend_song(self.xnode)
 
 
     ##
     #   @brief
-    def clear_queue(self):
-        self.queue_mode_activated = False
-        self.md.clear_queue()
+    def clear_playlist(self):
+        self.playlist_mode_activated = False
+        self.md.clear_playlist()
 
 
     ##

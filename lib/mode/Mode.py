@@ -109,7 +109,7 @@ class Mode(object):
 
         self._state = 'State_A'
 
-        self.queue_mode_activated = False
+        self.playlist_mode_activated = False
 
         self._HANDLE = {}
 
@@ -128,11 +128,10 @@ class Mode(object):
          'CMD_VOL_UP' : getattr(memory_state, s).vol_up,
          'CMD_VOL_DOWN' : getattr(memory_state, s).vol_down,
          'CMD_SETTINGS' : getattr(memory_state, s).no_action,
-         'CMD_QUEUE' : getattr(memory_state, s).queue,
-         'CMD_QUEUE_AS_NEXT' : getattr(memory_state, s).queue_as_next,
-         'CMD_CLEAR_QUEUE' : getattr(memory_state, s).clear_queue,
-         '' : getattr(memory_state, s).no_action,
-         'CMD_ROGER' : self.roger
+         'CMD_APPEND_SONG' : getattr(memory_state, s).append_song,
+         'CMD_PREPEND_SONG' : getattr(memory_state, s).prepend_song,
+         'CMD_CLEAR_PLAYLIST' : getattr(memory_state, s).clear_playlist,
+         '' : getattr(memory_state, s).no_action
         }
 
     ##
@@ -203,14 +202,6 @@ class Mode(object):
         #   @todo   Check that the argument s belongs to the 'authorized' states
         modeLog.debug("setting state at: \033[32m" + s + "\033[0m")
         self._state = s
-
-
-    ##
-    #   @brief
-    def roger(self):
-        if 'playing' == globals.cmus_status:
-            self.md.stop()
-            self.md.start_playing()
 
 
     ##

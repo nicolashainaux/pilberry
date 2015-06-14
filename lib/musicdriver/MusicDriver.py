@@ -46,15 +46,13 @@ class MusicDriver(object):
     ##
     #   @brief
     def __init__(self):
-        self._songs_queue = deque()
         self._past_songs = deque()
-        #self._current_song = []
+        self._next_songs = deque()
 
 
     ##
     #   @brief
     def get_current_song(self):
-        #return self._current_song[0]
         if len(self._past_songs) >= 1:
             return self._past_songs[len(self._past_songs) - 1]
         else:
@@ -67,77 +65,71 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def set_current_song(self, n):
-        self._past_songs.append(n)
+    def append_song(self, n):
+        mdLog.debug('appending song: ' + n['file_name'])
 
-
-    ##
-    #   @brief
-    def queue_song(self, n):
-        mdLog.debug('queuing song: ' + n['file_name'])
         if len(self._past_songs) == 0:
             self._past_songs.append(n)
         else:
-            self._songs_queue.append(n)
+            self._next_songs.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
+
         mdLog.debug('past songs: ' \
                     + str([n['file_name'] for n in self._past_songs]))
         mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
     #   @brief
-    def queue_song_first(self, n):
-        mdLog.debug('queuing song first: ' + n['file_name'])
-        self._songs_queue.appendleft(n)
+    def prepend_song(self, n):
+        mdLog.debug('prepending song: ' + n['file_name'])
+
+        self._next_songs.appendleft(n)
         self._send(['-C', 'add -Q ' + n.full_path])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
+
         mdLog.debug('past songs: ' \
                     + str([n['file_name'] for n in self._past_songs]))
         mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
     #   @brief
-    def requeue_current_song_first(self):
-        mdLog.debug('requeuing current song first')
+    def reinsert_current_song(self):
+        mdLog.debug('re-inserting current song')
         self._send(['-C', 'add -Q ' + self.current_song.full_path])
 
 
     ##
     #   @brief
-    def shift_queue_to_left(self):
-        if len(self._songs_queue) >= 1:
-            self._past_songs.append(self._songs_queue.popleft())
+    def shift_playlist_to_left(self):
+        if len(self._next_songs) >= 1:
+            self._past_songs.append(self._next_songs.popleft())
 
         # In this case we've reached the end of the next songs.
-        # As a default behaviour, we will loop over the queue.
-        elif len(self._songs_queue) == 0:
-            self._songs_queue, self._past_songs = \
-                                            self._past_songs, self._songs_queue
+        # As a default behaviour, we will loop over the playlist.
+        elif len(self._next_songs) == 0:
+            self._next_songs, self._past_songs = \
+                                            self._past_songs, self._next_songs
             self._send(['-c', '-q'])
-            for n in self._songs_queue:
+            for n in self._next_songs:
                 self._send(['-C', 'add -q ' + n.full_path])
-            self._past_songs.append(self._songs_queue.popleft())
+            self._past_songs.append(self._next_songs.popleft())
 
 
     ##
     #   @brief
-    def shift_queue_to_right(self):
+    def shift_playlist_to_right(self):
         if len(self._past_songs) >= 1:
             self._send(['-C', 'add -Q ' + self.current_song.full_path])
-            self._songs_queue.appendleft(self._past_songs.pop())
+            self._next_songs.appendleft(self._past_songs.pop())
 
         # In this case we've reached the end of the past songs.
-        # As a default behaviour, we will loop over the queue.
+        # As a default behaviour, we will loop over the playlist.
         if len(self._past_songs) == 0:
-            self._songs_queue, self._past_songs = \
-                                            self._past_songs, self._songs_queue
+            self._next_songs, self._past_songs = \
+                                            self._past_songs, self._next_songs
             self._send(['-c', '-q'])
 
         self._send(['-C', 'add -Q ' + self.current_song.full_path])
@@ -146,159 +138,106 @@ class MusicDriver(object):
     ##
     #   @brief  This is only used to synchronize pilberry's queue with cmus'.
     #           cmus has already unqueued the song, so this method only deals
-    #           with pilberry's queue.
-    def unqueue_song_first(self):
-        mdLog.debug('unqueuing first song: ')
-        if not self.queue_is_empty():
-            self.set_current_song(self._songs_queue.popleft())
+    #           with pilberry's queues.
+    def resync_playlist(self):
+        mdLog.debug("shifting internal playlist to the left: ")
+        if len(self._next_songs) >= 1:
+            self._past_songs.append(self._next_songs.popleft())
+
         mdLog.debug('past songs: ' \
                     + str([n['file_name'] for n in self._past_songs]))
         mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
     #   @brief
-    def queue_is_empty(self):
-        if len(self._songs_queue) == 0:
-            return True
-        else:
-            return False
-
-
-    ##
-    #   @brief
-    def queue_past_is_empty(self):
-        # Remember the song at the right of past_songs is actually current_song
-        # so we check if there are other songs before it.
-        if len(self._past_songs) <= 1:
-            return True
-        else:
-            return False
-
-
-    ##
-    #   @brief
-    def clear_queue(self):
-        mdLog.debug('queue is being cleared')
-        self._songs_queue.clear()
+    def clear_playlist(self):
+        mdLog.debug('playlist is being cleared')
+        self._next_songs.clear()
         self._past_songs.clear()
         self._send(['-c', '-q'])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
+
         mdLog.debug('past songs: ' \
                     + str([n['file_name'] for n in self._past_songs]))
         mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
     #   @brief
-    def skip_to_next_song(self):
-        mdLog.debug('skip to next song')
-        self.shift_queue_to_left()
-        #self._past_songs.append(self._songs_queue.popleft())
+    def jump_to_next_song(self):
+        mdLog.debug('jump to next song')
+
+        self.shift_playlist_to_left()
         self._send(['-C', 'player-next'])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
         globals.cmus_playing_notifications_disabled = True
 
-
-    ##
-    #   @brief
-    def skip_to_prev_song_in_queue(self):
-        mdLog.debug('skip to prev song in queue')
-        #self.requeue_current_song_first()
-        self.shift_queue_to_right()
-        self._send(['-C', 'player-next'])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
         mdLog.debug('past songs: ' \
                     + str([n['file_name'] for n in self._past_songs]))
         mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
-        globals.cmus_playing_notifications_disabled = True
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
     #   @brief
-    def start_playing(self):
-        self.clear_queue()
+    def jump_to_prev_song(self):
+        mdLog.debug('jump to prev song')
+
+        self.shift_playlist_to_right()
+        self._send(['-C', 'player-next'])
+        globals.cmus_playing_notifications_disabled = True
+
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
+                    + str([n['file_name'] for n in self._next_songs]))
+
+
+    ##
+    #   @brief
+    def play_from_here(self):
+        self.clear_playlist()
+
         for n in reversed([globals.current_mode.head] \
             + globals.current_mode.head.neighbours_after):
         #___
-            self.queue_song_first(n)
+            self.prepend_song(n)
 
         for n in globals.current_mode.head.neighbours_before:
             self._past_songs.append(n)
 
-        self.play_next()
+        self.jump_to_next_song()
+        self.play()
 
 
     ##
     #   @brief
-    def play_next(self):
-        self.skip_to_next_song()
-        mdLog.debug("sending order to PLAY!")
-
-        globals.cmus_playing_notifications_disabled = True
-
-        self._send(['-p'])
+    def play_playlist(self):
+        self._send(['-C', 'player-next'])
+        self.play()
 
 
     ##
     #   @brief
     def play(self):
-        #self.skip_to_next_song()
-        self._send(['-C', 'player-next'])
         mdLog.debug("sending order to PLAY!")
 
         globals.cmus_playing_notifications_disabled = True
-
         self._send(['-p'])
-
-
-    ##
-    #   @brief
-    #def start_playing_after_delay(self):
-
-        #self.stop()
-
-    #    q = []
-    #    for n in [globals.current_mode.head] \
-    #        + globals.current_mode.head.neighbours_after:
-        #___
-    #        q += [n.full_path]
-
-        #try:
-        #    killall = subprocess.Popen(['killall', 'roger_roger'])
-        #except:
-        #    logging.debug('no roger_roger was here')
-        #else:
-        #    logging.debug('killed roger_roger')
-
-    #    r = subprocess.Popen([ROGER_ROGER_SCRIPT] + q)
-
-     #   logging.debug('after having sent a new roger_roger')
 
 
     ##
     #   @brief
     def stop(self):
         mdLog.debug("sending STOP")
-        #self._songs_queue.popleft()
-        #self._current_song = []
+
         self._send(['-s'])
-        mdLog.debug('current song: ' \
-                    + self.current_song['file_name'])
+
         mdLog.debug('past songs: ' \
                     + str([n['file_name'] for n in self._past_songs]))
         mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._songs_queue]))
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
