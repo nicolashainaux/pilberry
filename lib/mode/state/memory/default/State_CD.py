@@ -22,35 +22,28 @@
 
 # Python packages|modules imports
 import logging
+from abc import ABCMeta, abstractmethod
 
 # Pilberry packages|modules imports
 from .State_ACD import State_ACD
 
 
 ##
-# @class State_A
+# @class State_CD
 # @brief
-class State_A(State_ACD):
+class State_CD(State_ACD, metaclass=ABCMeta):
 
 
     ##
     #   @brief
+    @abstractmethod
     def select(self):
-        if len(self.xnode.children) >= 1:
-            self.handle('CMD_MOVE_TO_1ST_CHILD')
-        else:
-            if self.playlist_mode_activated:
-                self.md.play_playlist()
-                self.set_xnode(self.md.current_song)
-                self.set_head(self.xnode)
-            else:
-                self.set_head(self.xnode)
-                self.md.play_from_here()
-            self.set_state('State_B')
+        pass
 
 
     ##
     #   @brief
+    @abstractmethod
     def esc(self):
         pass
 
@@ -58,6 +51,8 @@ class State_A(State_ACD):
     ##
     #   @brief
     def stop(self):
-        pass
+        self.md.stop()
+        self.set_xnode(self.head)
+        self.set_state('State_A')
 
 

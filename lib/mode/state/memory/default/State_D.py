@@ -24,13 +24,13 @@
 import logging
 
 # Pilberry packages|modules imports
-from .State import State
+from .State_CD import State_CD
 import lib.globals as globals
 
 ##
 # @class State_D
 # @brief
-class State_D(State):
+class State_D(State_CD):
 
 
     ##
@@ -64,60 +64,3 @@ class State_D(State):
         self.md.toggle_pause()
         self.set_state('State_B')
 
-
-# From there on, all methods are copied from State_C
-# Couldn't find a solution to inherit from State_C... didn't work!
-
-
-    ##
-    #   @brief
-    def stop(self):
-        self.md.stop()
-        self.set_xnode(self.head)
-        self.set_state('State_A')
-
-
-    ##
-    #   @brief  Moves to the parent Node. Returns the new current Node.
-    #   @return Node
-    def move_to_parent(self):
-        # self.xnode.parent should never be None because we forbid
-        # to access the root directory
-        # So, self.xnode.parent.parent != None
-        # is equivalent to 'self.xnode.parent is not root'
-        if self.xnode.parent.parent != None:
-            self.set_xnode(self.xnode.parent)
-
-
-    ##
-    #   @brief
-    def move_to_node_next(self):
-        # We compute the new position with a modulo to go to first position if
-        # we were at end and vice-versa
-        new_position = (self.xnode.position + 1) % len(self.xnode.neighbours)
-        self.set_xnode(self.xnode.neighbours[new_position])
-
-
-    ##
-    #   @brief
-    def move_to_node_prev(self):
-        # We compute the new position with a modulo to go to first position if
-        # we were at end and vice-versa
-        new_position = (self.xnode.position - 1) % len(self.xnode.neighbours)
-        self.set_xnode(self.xnode.neighbours[new_position])
-
-
-    ##
-    #   @brief
-    def move_to_1st_child(self):
-        # There it is not useful to use the is_a_leaf() method on self.xnode
-        # because we don't need to check the filesystem neither to make a
-        # request in the DB. If there are children, they are already here.
-        # So just check len(children)
-        if len(self.xnode.children) >= 1:
-            for n in self.xnode.children:
-                if (not n.is_a_leaf(n.full_path) and len(n.children) == 0):
-                    n.add_children(1)
-            self.set_xnode(self.xnode.children[0])
-        else:
-            pass
