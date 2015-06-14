@@ -37,7 +37,6 @@ from lib.carrier.Carrier import Carrier
 import lib.mode.state.memory.default as memory_state
 STATES_LIST = ['State_A', 'State_B', 'State_C', 'State_D']
 
-
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
 modeLog = logging.getLogger('modeLog')
@@ -132,6 +131,8 @@ class Mode(object):
          'CMD_APPEND_SONG' : getattr(memory_state, s).append_song,
          'CMD_PREPEND_SONG' : getattr(memory_state, s).prepend_song,
          'CMD_CLEAR_PLAYLIST' : getattr(memory_state, s).clear_playlist,
+         'CMD_LOAD_PLAYLIST' : getattr(memory_state, s).load_playlist,
+         'CMD_SAVE_PLAYLIST' : getattr(memory_state, s).save_playlist,
          '' : getattr(memory_state, s).no_action
         }
 

@@ -26,6 +26,7 @@ import logging
 # Pilberry packages|modules imports
 from .State_CD import State_CD
 import lib.globals as globals
+from lib.globals import PLAYLIST_FILE_EXTENSIONS
 
 ##
 # @class State_D
@@ -42,17 +43,24 @@ class State_D(State_CD):
 
         # xnode is a leaf
         else:
-            if self.xnode != self.head:
+            if self.xnode.extension in PLAYLIST_FILE_EXTENSIONS:
+                self.handle("CMD_LOAD_PLAYLIST", file=self.xnode)
+                self.set_xnode(self.md.current_song)
                 self.set_head(self.xnode)
-                ##
-                #   @todo   Check if this stop is still necessary once the
-                #           delayed play is implemented
-                self.md.stop()
-                self.unactivate_playlist_mode()
-                self.md.play_from_here()
+                self.md.play_playlist()
+
             else:
-                globals.cmus_playing_notifications_disabled = True
-                self.md.toggle_pause()
+                if self.xnode != self.head:
+                    self.set_head(self.xnode)
+                    ##
+                    #   @todo   Check if this stop is still necessary once the
+                    #           delayed play is implemented
+                    self.md.stop()
+                    self.unactivate_playlist_mode()
+                    self.md.play_from_here()
+                else:
+                    globals.cmus_playing_notifications_disabled = True
+                    self.md.toggle_pause()
 
             self.set_state('State_B')
 

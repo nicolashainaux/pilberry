@@ -29,6 +29,7 @@ from .Node import Node
 from lib.utils import natural_sort
 from lib.globals import USER_CONFIG
 from lib.globals import MUSIC_FILE_EXTENSIONS
+from lib.globals import PLAYLIST_FILE_EXTENSIONS
 
 
 ##
@@ -84,7 +85,9 @@ class NodeFileSystem(Node):
 
             file_name, extension = os.path.splitext(f)
 
-            if extension in MUSIC_FILE_EXTENSIONS:
+            if extension in MUSIC_FILE_EXTENSIONS \
+                or extension in PLAYLIST_FILE_EXTENSIONS:
+            #___
                 files += [f]
 
         if USER_CONFIG['GENERAL'].getboolean('SHOW_FILES_FIRST'):

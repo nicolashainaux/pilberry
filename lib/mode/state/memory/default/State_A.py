@@ -25,6 +25,7 @@ import logging
 
 # Pilberry packages|modules imports
 from .State_ACD import State_ACD
+from lib.globals import PLAYLIST_FILE_EXTENSIONS
 
 
 ##
@@ -44,8 +45,16 @@ class State_A(State_ACD):
                 self.set_xnode(self.md.current_song)
                 self.set_head(self.xnode)
             else:
-                self.set_head(self.xnode)
-                self.md.play_from_here()
+                if self.xnode.extension in PLAYLIST_FILE_EXTENSIONS:
+                    self.handle("CMD_LOAD_PLAYLIST", file=self.xnode)
+                    self.set_xnode(self.md.current_song)
+                    self.set_head(self.xnode)
+                    self.md.play_playlist()
+
+                else:
+                    self.set_head(self.xnode)
+                    self.md.play_from_here()
+
             self.set_state('State_B')
 
 

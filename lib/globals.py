@@ -91,6 +91,8 @@ MUSIC_FILE_EXTENSIONS = ['.ogg', '.mp3', '.flac', '.wma', '.m4a',
                          '.mpc', '.mpp', '.wav', '.wv', '.ape',
                          '.aac', '.mp4', '.mod', '.s3m']
 
+PLAYLIST_FILE_EXTENSIONS = ['.pil']
+
 CMUS_NOTIFICATIONS = ['stopped',
                       'playing',
                       'paused']

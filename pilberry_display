@@ -77,7 +77,7 @@ def core_data_callback(socket, data):
 
 def core_state_callback(socket, data):
     info = pickle.loads(data)
-    if info[:6] == 'Queued' or info == 'Playlist cleared':
+    if info[:6] == 'Queued' or info[:8] == 'Playlist':
         v.set_infos_memory({'xnode_name': info,
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
@@ -86,7 +86,7 @@ def core_state_callback(socket, data):
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
 
-    elif info[:7] == 'Queuing':
+    elif info[:7] == 'Queuing' or info[:6] == 'Saving' or info[:7] == 'Loading':
         v.set_infos_memory({'xnode_name': info,
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')

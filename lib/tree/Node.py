@@ -237,6 +237,13 @@ class Node(object, metaclass=ABCMeta):
 
     ##
     #   @brief
+    def get_extension(self):
+        file_name, extension = os.path.splitext(self.full_path)
+        return extension
+
+
+    ##
+    #   @brief
     def get_position(self):
         return self._position
 
@@ -256,7 +263,11 @@ class Node(object, metaclass=ABCMeta):
     neighbours = property(get_neighbours,
                           doc="Neighbours of the Node, including it")
 
-    full_path = property(get_full_path, doc="The full patht to the file or "\
+    extension = property(get_extension, doc="The full path to the file or "\
+                                            + "directory. Will also be a unique"\
+                                            + " identifier.")
+
+    full_path = property(get_full_path, doc="The full path to the file or "\
                                             + "directory. Will also be a unique"\
                                             + " identifier.")
     position = property(get_position, doc="Position of the Node among " \

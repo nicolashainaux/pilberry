@@ -22,7 +22,9 @@
 
 # Python packages|modules imports
 import subprocess
+import pickle
 from abc import ABCMeta, abstractmethod
+from collections import deque
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, USER_CONFIG
@@ -110,7 +112,7 @@ class State(object, metaclass=ABCMeta):
         with Carrier() as C:
             if len(self.xnode.children) >= 1:
                 C.send('CORE_STATE_TO_DISPLAY', "Queuing songs...")
-                for elt in self.xnode.children:
+                for elt in reversed(self.xnode.children):
                     if len(elt.children) == 0:
                         self.md.prepend_song(elt)
                 C.send('CORE_STATE_TO_DISPLAY', "Queued all songs")
@@ -126,6 +128,48 @@ class State(object, metaclass=ABCMeta):
         self.md.clear_playlist()
         with Carrier() as C:
             C.send('CORE_STATE_TO_DISPLAY', "Playlist cleared")
+
+
+    ##
+    #   @brief
+    def save_playlist(self):
+        if self.playlist_mode_activated:
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', "Saving playlist")
+
+                playlist = deque()
+
+                playlist.extend(self.md.past_songs)
+                playlist.extend(self.md.next_songs)
+
+                with open(r"/data/music/05 - Playlists/current.pil", 'wb') \
+                    as outfile:
+                #___
+                    pickle.dump([self._tree, playlist], outfile)
+
+                C.send('CORE_STATE_TO_DISPLAY', "Playlist saved")
+
+
+    ##
+    #   @brief
+    def load_playlist(self, **options):
+        with Carrier() as C:
+            C.send('CORE_STATE_TO_DISPLAY', "Loading playlist")
+
+            data = None
+
+            with open(options['file'].full_path, "rb") as f:
+                data = pickle.load(f)
+
+            self._tree = data[0]
+            self.md.clear_playlist()
+            for n in data[1]:
+                self.md.append_song(n)
+
+            self.activate_playlist_mode()
+
+            C.send('CORE_STATE_TO_DISPLAY', "Playlist loaded")
+
 
     ##
     #   @brief

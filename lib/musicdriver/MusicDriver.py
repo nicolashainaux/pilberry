@@ -65,6 +65,26 @@ class MusicDriver(object):
 
     ##
     #   @brief
+    def get_past_songs(self):
+        return self._past_songs
+
+
+    past_songs = property(get_past_songs,
+                          doc="The past songs' deque")
+
+
+    ##
+    #   @brief
+    def get_next_songs(self):
+        return self._next_songs
+
+
+    next_songs = property(get_next_songs,
+                          doc="The next songs' deque")
+
+
+    ##
+    #   @brief
     def append_song(self, n):
         mdLog.debug('appending song: ' + n['file_name'])
 
@@ -85,7 +105,12 @@ class MusicDriver(object):
     def prepend_song(self, n):
         mdLog.debug('prepending song: ' + n['file_name'])
 
-        self._next_songs.appendleft(n)
+        if len(self._past_songs) == 0:
+            self._past_songs.append(n)
+        else:
+            self._next_songs.appendleft(self._past_songs.pop())
+            self._past_songs.append(n)
+
         self._send(['-C', 'add -Q ' + n.full_path])
 
         mdLog.debug('past songs: ' \
