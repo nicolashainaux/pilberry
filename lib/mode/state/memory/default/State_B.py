@@ -64,13 +64,9 @@ class State_B(State):
     ##
     #   @brief
     def move_to_node_next(self):
-        if not self.md.queue_is_empty():
-            self.md.skip_to_next_song()
-            self.set_xnode(self.md.current_song)
-            self.set_head(self.xnode)
-        else:
-            pass
-            # So far, we do not loop over the queue...
+        self.md.skip_to_next_song()
+        self.set_xnode(self.md.current_song)
+        self.set_head(self.xnode)
 
 
     ##
@@ -108,7 +104,7 @@ class State_B(State):
         self.set_state('State_A')
         if self.queue_mode_activated:
             self.md.requeue_current_song_first()
-            self.md.shift_queue_to_right()
+            #self.md.shift_queue_to_right()
         else:
             self.md.clear_queue()
 

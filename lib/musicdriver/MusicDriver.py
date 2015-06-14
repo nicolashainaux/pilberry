@@ -75,7 +75,10 @@ class MusicDriver(object):
     #   @brief
     def queue_song(self, n):
         mdLog.debug('queuing song: ' + n['file_name'])
-        self._songs_queue.append(n)
+        if len(self._past_songs) == 0:
+            self._past_songs.append(n)
+        else:
+            self._songs_queue.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
@@ -108,8 +111,35 @@ class MusicDriver(object):
 
     ##
     #   @brief
+    def shift_queue_to_left(self):
+        if len(self._songs_queue) >= 1:
+            self._past_songs.append(self._songs_queue.popleft())
+
+        # In this case we've reached the end of the next songs.
+        # As a default behaviour, we will loop over the queue.
+        if len(self._songs_queue) == 0:
+            self._songs_queue, self._past_songs = \
+                                            self._past_songs, self._songs_queue
+            self._send(['-c', '-q'])
+            for n in self._songs_queue:
+                self._send(['-C', 'add -Q ' + n.full_path])
+
+
+    ##
+    #   @brief
     def shift_queue_to_right(self):
-        self._songs_queue.appendleft(self._past_songs.pop())
+        if len(self._past_songs) >= 1:
+            self._send(['-C', 'add -Q ' + self.current_song.full_path])
+            self._songs_queue.appendleft(self._past_songs.pop())
+
+        # In this case we've reached the end of the past songs.
+        # As a default behaviour, we will loop over the queue.
+        if len(self._past_songs) == 0:
+            self._songs_queue, self._past_songs = \
+                                            self._past_songs, self._songs_queue
+            self._send(['-c', '-q'])
+
+        self._send(['-C', 'add -Q ' + self.current_song.full_path])
 
 
     ##
@@ -165,7 +195,8 @@ class MusicDriver(object):
     #   @brief
     def skip_to_next_song(self):
         mdLog.debug('skip to next song')
-        self._past_songs.append(self._songs_queue.popleft())
+        self.shift_queue_to_left()
+        #self._past_songs.append(self._songs_queue.popleft())
         self._send(['-C', 'player-next'])
         mdLog.debug('current song: ' \
                     + self.current_song['file_name'])
@@ -180,17 +211,16 @@ class MusicDriver(object):
     #   @brief
     def skip_to_prev_song_in_queue(self):
         mdLog.debug('skip to prev song in queue')
-        if len(self._past_songs) >= 2:
-            self.queue_song_first(self._past_songs.pop())
-            self.requeue_current_song_first()
-            self._send(['-C', 'player-next'])
-            mdLog.debug('current song: ' \
-                        + self.current_song['file_name'])
-            mdLog.debug('past songs: ' \
-                        + str([n['file_name'] for n in self._past_songs]))
-            mdLog.debug('future songs: ' \
-                        + str([n['file_name'] for n in self._songs_queue]))
-            globals.cmus_playing_notifications_disabled = True
+        #self.requeue_current_song_first()
+        self.shift_queue_to_right()
+        self._send(['-C', 'player-next'])
+        mdLog.debug('current song: ' \
+                    + self.current_song['file_name'])
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
+                    + str([n['file_name'] for n in self._songs_queue]))
+        globals.cmus_playing_notifications_disabled = True
 
 
     ##
@@ -205,13 +235,25 @@ class MusicDriver(object):
         for n in globals.current_mode.head.neighbours_before:
             self._past_songs.append(n)
 
-        self.play()
+        self.play_next()
+
+
+    ##
+    #   @brief
+    def play_next(self):
+        self.skip_to_next_song()
+        mdLog.debug("sending order to PLAY!")
+
+        globals.cmus_playing_notifications_disabled = True
+
+        self._send(['-p'])
 
 
     ##
     #   @brief
     def play(self):
-        self.skip_to_next_song()
+        #self.skip_to_next_song()
+        self._send(['-C', 'player-next'])
         mdLog.debug("sending order to PLAY!")
 
         globals.cmus_playing_notifications_disabled = True
