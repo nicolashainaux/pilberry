@@ -117,12 +117,13 @@ class MusicDriver(object):
 
         # In this case we've reached the end of the next songs.
         # As a default behaviour, we will loop over the queue.
-        if len(self._songs_queue) == 0:
+        elif len(self._songs_queue) == 0:
             self._songs_queue, self._past_songs = \
                                             self._past_songs, self._songs_queue
             self._send(['-c', '-q'])
             for n in self._songs_queue:
-                self._send(['-C', 'add -Q ' + n.full_path])
+                self._send(['-C', 'add -q ' + n.full_path])
+            self._past_songs.append(self._songs_queue.popleft())
 
 
     ##
