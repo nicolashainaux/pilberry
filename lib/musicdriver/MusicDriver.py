@@ -170,6 +170,10 @@ class MusicDriver(object):
         if 'dont_loop' in options and options['dont_loop'] == True:
             loop = False
 
+        requeue = True
+        if 'dont_requeue' in options and options['dont_requeue'] == True:
+            requeue = False
+
         if len(self._past_songs) >= 1:
             self._send(['-C', 'add -Q ' + self.current_song.full_path])
             self._next_songs.appendleft(self._past_songs.pop())
@@ -181,7 +185,8 @@ class MusicDriver(object):
                                             self._past_songs, self._next_songs
             self._send(['-c', '-q'])
 
-        self._send(['-C', 'add -Q ' + self.current_song.full_path])
+        if requeue:
+            self._send(['-C', 'add -Q ' + self.current_song.full_path])
 
 
     ##
@@ -258,6 +263,18 @@ class MusicDriver(object):
 
         self.jump_to_next_song()
         self.play()
+
+
+    ##
+    #   @brief  Will clear cmus' queue and append all songs from current
+    #           next songs' queue.
+    def refresh_playlist(self):
+        self._send(['-c', '-q'])
+
+        self._send(['-C', 'add -q ' + self.current_song.full_path])
+
+        for n in self.next_songs:
+            self._send(['-C', 'add -q ' + n.full_path])
 
 
     ##
