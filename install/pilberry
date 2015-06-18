@@ -20,7 +20,7 @@ case "$1" in
 
     start)
         echo "Starting pilberry"
-        /home/pi/pilberry/bin/start
+        /home/pi/pilberry/bin/start 1> /home/pi/pilberry/log/start_err.log 2>&1
         ;;
 
     stop)
