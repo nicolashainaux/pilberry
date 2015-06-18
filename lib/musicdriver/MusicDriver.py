@@ -83,6 +83,22 @@ class MusicDriver(object):
                           doc="The next songs' deque")
 
 
+    next_songs = property(get_next_songs,
+                          doc="The next songs' deque")
+
+
+    ##
+    #   @brief
+    def next_songs_queue_is_empty(self):
+        return len(self._next_songs) == 0
+
+
+    ##
+    #   @brief
+    def past_songs_queue_is_empty(self):
+        return len(self._past_songs) == 1
+
+
     ##
     #   @brief
     def append_song(self, n):
@@ -128,13 +144,17 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def shift_playlist_to_left(self):
+    def shift_playlist_to_left(self, **options):
+        loop = True
+        if 'dont_loop' in options and options['dont_loop'] == True:
+            loop = False
+
         if len(self._next_songs) >= 1:
             self._past_songs.append(self._next_songs.popleft())
 
         # In this case we've reached the end of the next songs.
         # As a default behaviour, we will loop over the playlist.
-        elif len(self._next_songs) == 0:
+        elif len(self._next_songs) == 0 and loop:
             self._next_songs, self._past_songs = \
                                             self._past_songs, self._next_songs
             self._send(['-c', '-q'])
@@ -145,14 +165,18 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def shift_playlist_to_right(self):
+    def shift_playlist_to_right(self, **options):
+        loop = True
+        if 'dont_loop' in options and options['dont_loop'] == True:
+            loop = False
+
         if len(self._past_songs) >= 1:
             self._send(['-C', 'add -Q ' + self.current_song.full_path])
             self._next_songs.appendleft(self._past_songs.pop())
 
         # In this case we've reached the end of the past songs.
         # As a default behaviour, we will loop over the playlist.
-        if len(self._past_songs) == 0:
+        if len(self._past_songs) == 0 and loop:
             self._next_songs, self._past_songs = \
                                             self._past_songs, self._next_songs
             self._send(['-c', '-q'])
@@ -191,10 +215,10 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def jump_to_next_song(self):
+    def jump_to_next_song(self, **options):
         mdLog.debug('jump to next song')
 
-        self.shift_playlist_to_left()
+        self.shift_playlist_to_left(**options)
         self._send(['-C', 'player-next'])
         globals.cmus_playing_notifications_disabled = True
 
@@ -206,10 +230,10 @@ class MusicDriver(object):
 
     ##
     #   @brief
-    def jump_to_prev_song(self):
+    def jump_to_prev_song(self, **options):
         mdLog.debug('jump to prev song')
 
-        self.shift_playlist_to_right()
+        self.shift_playlist_to_right(**options)
         self._send(['-C', 'player-next'])
         globals.cmus_playing_notifications_disabled = True
 

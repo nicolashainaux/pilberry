@@ -79,6 +79,29 @@ class State_B(State):
 
     ##
     #   @brief
+    def jump_to_album_next(self):
+        if self.playlist_mode_activated:
+            current_parent = self.md.current_song.parent
+            while not self.md.next_songs_queue_is_empty() \
+                and self.md.current_song.parent == current_parent:
+            #___
+                self.md.jump_to_next_song(dont_loop=True)
+
+
+    ##
+    #   @brief
+    def jump_to_album_prev(self):
+        if self.playlist_mode_activated:
+            current_parent = self.md.current_song.parent
+
+            while not self.md.past_songs_queue_is_empty() \
+                and self.md.current_song.parent == current_parent:
+            #___
+                self.md.jump_to_prev_song(dont_loop=True)
+
+
+    ##
+    #   @brief
     def move_to_1st_child(self):
         pass
 

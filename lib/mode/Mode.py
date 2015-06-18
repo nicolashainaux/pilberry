@@ -120,6 +120,8 @@ class Mode(object):
          'CMD_SELECT' : getattr(memory_state, s).select,
          'CMD_MOVE_TO_NODE_PREV' : getattr(memory_state, s).move_to_node_prev,
          'CMD_MOVE_TO_NODE_NEXT' : getattr(memory_state, s).move_to_node_next,
+         'CMD_JUMP_TO_ALBUM_NEXT' : getattr(memory_state, s).jump_to_album_next,
+         'CMD_JUMP_TO_ALBUM_PREV' : getattr(memory_state, s).jump_to_album_prev,
          'CMD_ESC' : getattr(memory_state, s).esc,
          'CMD_STOP' : getattr(memory_state, s).stop,
          'playing' : getattr(memory_state, s).msg_cmus_playing,

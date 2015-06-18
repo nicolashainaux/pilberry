@@ -62,6 +62,20 @@ class State(object, metaclass=ABCMeta):
 
     ##
     #   @brief
+    #@abstractmethod
+    def jump_to_album_next(self):
+        pass
+
+
+    ##
+    #   @brief
+    #@abstractmethod
+    def jump_to_album_prev(self):
+        pass
+
+
+    ##
+    #   @brief
     @abstractmethod
     def move_to_1st_child(self):
         pass
