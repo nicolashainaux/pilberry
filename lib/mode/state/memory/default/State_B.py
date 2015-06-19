@@ -175,7 +175,7 @@ class State_B(State):
                                 + " to False...")
                 globals.cmus_playing_notifications_disabled = False
             else:
-                self.md.resync_playlist()
+                self.md.shift_playlist_to_left()
                 self.set_xnode(self.md.current_song)
                 self.set_head(self.md.current_song)
 

@@ -82,7 +82,7 @@ class State_C(State_CD):
             if globals.cmus_playing_notifications_disabled:
                 globals.cmus_playing_notifications_disabled = False
             else:
-                self.md.resync_playlist()
+                self.md.shift_playlist_to_left()
                 self.set_head(self.md.current_song)
 
         globals.last_playing_notification = new_time

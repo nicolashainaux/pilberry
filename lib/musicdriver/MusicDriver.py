@@ -200,21 +200,6 @@ class MusicDriver(object):
 
 
     ##
-    #   @brief  This is only used to synchronize pilberry's queue with cmus'.
-    #           cmus has already unqueued the song, so this method only deals
-    #           with pilberry's queues.
-    def resync_playlist(self):
-        mdLog.debug("shifting internal playlist to the left: ")
-        if len(self._next_songs) >= 1:
-            self._past_songs.append(self._next_songs.popleft())
-
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
-
-
-    ##
     #   @brief
     def clear_playlist(self):
         mdLog.debug('playlist is being cleared')
