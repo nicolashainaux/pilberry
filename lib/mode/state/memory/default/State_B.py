@@ -81,21 +81,28 @@ class State_B(State):
     #   @brief
     def jump_to_album_next(self):
         if self.playlist_mode_activated:
+            self.md.stop()
             current_parent = self.md.current_song.parent
 
             while not self.md.next_songs_queue_is_empty() \
                 and self.md.current_song.parent == current_parent:
             #___
                 self.md.shift_playlist_to_left(dont_loop=True)
+                self.md.unqueue_next()
 
-            self.md.refresh_playlist()
+            self.md.shift_playlist_to_right(dont_loop=True,
+                                            dont_requeue=True)
             self.md.play_playlist()
+            self.md.shift_playlist_to_left(dont_loop=True)
+            self.set_xnode(self.md.current_song)
+            self.set_head(self.xnode)
 
 
     ##
     #   @brief
     def jump_to_album_prev(self):
         if self.playlist_mode_activated:
+            self.md.stop()
             current_parent = self.md.current_song.parent
 
             while not self.md.past_songs_queue_is_empty() \
@@ -112,9 +119,10 @@ class State_B(State):
                 self.md.shift_playlist_to_right(dont_loop=True,
                                                 dont_requeue=True)
 
-            self.md.jump_to_next_song()
-
-
+            self.md.shift_playlist_to_left(dont_loop=True)
+            self.md.play_playlist()
+            self.set_xnode(self.md.current_song)
+            self.set_head(self.xnode)
 
 
     ##

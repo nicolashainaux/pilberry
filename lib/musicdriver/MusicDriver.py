@@ -162,6 +162,11 @@ class MusicDriver(object):
                 self._send(['-C', 'add -q ' + n.full_path])
             self._past_songs.append(self._next_songs.popleft())
 
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
+                    + str([n['file_name'] for n in self._next_songs]))
+
 
     ##
     #   @brief
@@ -187,6 +192,11 @@ class MusicDriver(object):
 
         if requeue:
             self._send(['-C', 'add -Q ' + self.current_song.full_path])
+
+        mdLog.debug('past songs: ' \
+                    + str([n['file_name'] for n in self._past_songs]))
+        mdLog.debug('future songs: ' \
+                    + str([n['file_name'] for n in self._next_songs]))
 
 
     ##
@@ -266,16 +276,9 @@ class MusicDriver(object):
 
 
     ##
-    #   @brief  Will clear cmus' queue and append all songs from current
-    #           next songs' queue.
-    def refresh_playlist(self):
-        self._send(['-c', '-q'])
-
-        self._send(['-C', 'add -q ' + self.current_song.full_path])
-
-        for n in self.next_songs:
-            self._send(['-C', 'add -q ' + n.full_path])
-
+    #   @brief
+    def unqueue_next(self):
+        self._send(['-C', 'player-next'])
 
     ##
     #   @brief
