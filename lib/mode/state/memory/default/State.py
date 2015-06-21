@@ -175,7 +175,7 @@ class State(object, metaclass=ABCMeta):
     #   @brief
     def load_playlist(self, **options):
         with Carrier() as C:
-            C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Loading playlist"})
+            C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Loading..."})
 
             data = None
 
@@ -194,9 +194,13 @@ class State(object, metaclass=ABCMeta):
                 i += 1
                 if current_milli_time() - last_time > 500:
                     last_time = current_milli_time()
-                    progress = str(int(100*i/how_many)) + " %"
+                    number = str(int(100*i/how_many))
+                    progress_raw = "    " + number + " %"
+                    progress = progress_raw[len(progress_raw) - 5:]
+                    print("progress: " + progress)
                     C.send('CORE_STATE_TO_DISPLAY',
-                           {'msg' : "Loading... " + progress})
+                           {'msg' : "Loading..." + progress,
+                            'last_chars' : 5})
 
             self.activate_playlist_mode()
 

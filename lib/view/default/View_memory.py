@@ -64,4 +64,4 @@ class View_memory(View_infos):
         if self.infos_past['xnode_parent'] != self.infos['xnode_parent']:
             self.lcd_message(self.infos['xnode_parent'], 0)
         if self.infos_past['xnode_name'] != self.infos['xnode_name']:
-            self.lcd_message(self.infos['xnode_name'], 1)
+            self.lcd_message(self.infos['xnode_name'], 1, **options)

@@ -153,7 +153,13 @@ class View(object):
     #           encoding errors did not trigger any error in pilberry, but they
     #           did later in the LCD driver.
     #   @todo   Check if line == 0 or line == 1
-    def lcd_message(self, msg, line):
+    def lcd_message(self, msg, line, **options):
+        cursor_position = 0
+        if 'last_chars' in options \
+            and type(options['last_chars']) == int:
+        #___
+            cursor_position = 16 - options['last_chars']
+
         bmsg = msg.encode('utf-8', 'replace')
 
         if b'\xef\xbf\xbd' in bmsg:
@@ -161,7 +167,7 @@ class View(object):
 
         msg = bmsg.decode()
 
-        self._lcd.setCursor(0,line)
+        self._lcd.setCursor(cursor_position, line)
 
         carriage_return = "\n" if line == 0 else ""
 
@@ -169,7 +175,11 @@ class View(object):
         # either the 16 first chars of a msg that would be longer than 16 chars,
         # or all the msg plus the right number of spaces to delete the possibly
         # remaining chars of the string previously displayed
-        self._lcd.message((msg + "                ")[0:16] + carriage_return)
+        if cursor_position == 0:
+            self._lcd.message((msg + "                ")[0:16] + carriage_return)
+        else:
+            self._lcd.message(msg[len(msg) - options['last_chars']:] \
+                                                               + carriage_return)
 
 
 

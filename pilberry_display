@@ -92,7 +92,12 @@ def core_state_callback(socket, data):
     else:
         v.set_infos_memory({'xnode_name': info['msg'],
                             'xnode_parent': v.infos['xnode_parent']})
-        v.handle('UPDATE')
+        if 'last_chars' in info \
+            and type(info['last_chars']) == int:
+        #___
+            v.handle('UPDATE', last_chars=info['last_chars'])
+        else:
+            v.handle('UPDATE')
 
 
 def core_mode_color_callback(socket, data):
