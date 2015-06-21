@@ -253,6 +253,8 @@ class MusicDriver(object):
         #___
             self.prepend_song(n)
 
+        self._next_songs.appendleft(self._past_songs.pop())
+
         for n in globals.current_mode.head.neighbours_before:
             self._past_songs.append(n)
 
