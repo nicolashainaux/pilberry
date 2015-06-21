@@ -108,14 +108,16 @@ class State(object, metaclass=ABCMeta):
 
         with Carrier() as C:
             if len(self.xnode.children) >= 1:
-                C.send('CORE_STATE_TO_DISPLAY', "Queuing songs...")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queuing songs..."})
                 for elt in self.xnode.children:
                     if len(elt.children) == 0:
                         self.md.append_song(elt)
-                C.send('CORE_STATE_TO_DISPLAY', "Queued all songs")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued all songs",
+                                                 'timeout' : 1})
             else:
                 self.md.append_song(self.xnode)
-                C.send('CORE_STATE_TO_DISPLAY', "Queued a song")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued a song",
+                                                 'timeout' : 1})
 
 
     ##
@@ -125,14 +127,16 @@ class State(object, metaclass=ABCMeta):
 
         with Carrier() as C:
             if len(self.xnode.children) >= 1:
-                C.send('CORE_STATE_TO_DISPLAY', "Queuing songs...")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queuing songs..."})
                 for elt in reversed(self.xnode.children):
                     if len(elt.children) == 0:
                         self.md.prepend_song(elt)
-                C.send('CORE_STATE_TO_DISPLAY', "Queued all songs")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued all songs",
+                                                 'timeout' : 1})
             else:
                 self.md.prepend_song(self.xnode)
-                C.send('CORE_STATE_TO_DISPLAY', "Queued a song")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued a song",
+                                                 'timeout' : 1})
 
 
     ##
@@ -141,7 +145,8 @@ class State(object, metaclass=ABCMeta):
         self.unactivate_playlist_mode()
         self.md.clear_playlist()
         with Carrier() as C:
-            C.send('CORE_STATE_TO_DISPLAY', "Playlist cleared")
+            C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Playlist cleared",
+                                             'timeout' : 1})
 
 
     ##
@@ -149,7 +154,7 @@ class State(object, metaclass=ABCMeta):
     def save_playlist(self):
         if self.playlist_mode_activated:
             with Carrier() as C:
-                C.send('CORE_STATE_TO_DISPLAY', "Saving playlist")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Saving playlist"})
 
                 playlist = deque()
 
@@ -161,14 +166,15 @@ class State(object, metaclass=ABCMeta):
                 #___
                     pickle.dump([self._tree, playlist], outfile)
 
-                C.send('CORE_STATE_TO_DISPLAY', "Playlist saved")
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Playlist saved",
+                                                 'timeout' : 1})
 
 
     ##
     #   @brief
     def load_playlist(self, **options):
         with Carrier() as C:
-            C.send('CORE_STATE_TO_DISPLAY', "Loading playlist")
+            C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Loading playlist"})
 
             data = None
 
@@ -182,7 +188,8 @@ class State(object, metaclass=ABCMeta):
 
             self.activate_playlist_mode()
 
-            C.send('CORE_STATE_TO_DISPLAY', "Playlist loaded")
+            C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Playlist loaded",
+                                             'timeout' : 1})
 
 
     ##

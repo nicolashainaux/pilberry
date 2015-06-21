@@ -75,19 +75,22 @@ def core_data_callback(socket, data):
     #                  'head_parent': info['head_parent']})
     v.handle('UPDATE')
 
+
 def core_state_callback(socket, data):
+    # Received data is in a dictionary like: {'timeout' : 1, 'msg' : "Message"}
     info = pickle.loads(data)
-    if info[:6] == 'Queued' or info[:8] == 'Playlist':
-        v.set_infos_memory({'xnode_name': info,
+
+    if 'timeout' in info and type(info['timeout']) == int:
+        v.set_infos_memory({'xnode_name': info['msg'],
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
-        time.sleep(1)
+        time.sleep(info['timeout'])
         v.set_infos_memory({'xnode_name': v.infos_past['xnode_name'],
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
 
-    elif info[:7] == 'Queuing' or info[:6] == 'Saving' or info[:7] == 'Loading':
-        v.set_infos_memory({'xnode_name': info,
+    else:
+        v.set_infos_memory({'xnode_name': info['msg'],
                             'xnode_parent': v.infos['xnode_parent']})
         v.handle('UPDATE')
 
