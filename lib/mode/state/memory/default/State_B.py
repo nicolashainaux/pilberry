@@ -31,12 +31,11 @@ from .State import State
 from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
 from lib.globals import LOG_DIR
 from lib import globals
+from lib.utils import current_milli_time
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
 stateBLog = logging.getLogger('stateBLog')
-
-current_milli_time = lambda: int(round(time.time() * 1000))
 
 globals.last_playing_notification = current_milli_time()
 

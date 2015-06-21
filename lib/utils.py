@@ -22,9 +22,11 @@
 
 # Python packages|modules imports
 import re
+import time
 
 # Pilberry packages|modules imports
 
+current_milli_time = lambda: int(round(time.time() * 1000))
 
 ##
 #   @brief  Natural sort of a list; e.g. ['file2', 'file1', 'file10'] becomes

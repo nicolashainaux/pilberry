@@ -29,8 +29,8 @@ from .State_CD import State_CD
 #import lib.globals as globals
 from lib import globals
 from lib.globals import PLAYLIST_FILE_EXTENSIONS
+from lib.utils import current_milli_time
 
-current_milli_time = lambda: int(round(time.time() * 1000))
 
 ##
 # @class State_C
