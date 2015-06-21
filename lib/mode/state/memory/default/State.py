@@ -30,6 +30,7 @@ from collections import deque
 from lib.globals import SOCKETS_CONFIG, USER_CONFIG
 import lib.globals as globals
 from lib.carrier.Carrier import Carrier
+from lib.utils import current_milli_time
 
 
 ##
@@ -183,8 +184,19 @@ class State(object, metaclass=ABCMeta):
 
             self._tree = data[0]
             self.md.clear_playlist()
+
+            last_time = current_milli_time()
+            how_many = len(data[1])
+            i = 1
+
             for n in data[1]:
                 self.md.append_song(n)
+                i += 1
+                if current_milli_time() - last_time > 500:
+                    last_time = current_milli_time()
+                    progress = str(int(100*i/how_many)) + " %"
+                    C.send('CORE_STATE_TO_DISPLAY',
+                           {'msg' : "Loading... " + progress})
 
             self.activate_playlist_mode()
 
