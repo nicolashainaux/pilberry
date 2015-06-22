@@ -32,6 +32,7 @@ from lib.globals import AUDIO_FEEDBACK_LOCK_FILE
 from lib.globals import LOG_DIR
 from lib import globals
 from lib.utils import current_milli_time
+from lib.carrier.Carrier import Carrier
 
 logging.config.fileConfig(LOG_DIR + 'logging.conf')
 
@@ -44,6 +45,23 @@ globals.last_playing_notification = current_milli_time()
 # @class State_B
 # @brief
 class State_B(State):
+
+
+    ##
+    #   @brief
+    def clear_playlist(self):
+        if self.playlist_mode_activated:
+            self.md.remove_current_song()
+            self.md.jump_to_next_song()
+            self.set_xnode(self.md.current_song)
+            self.set_head(self.xnode)
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Removed a song",
+                                                 'timeout' : 1})
+        else:
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Can't remove",
+                                                 'timeout' : 1})
 
 
     ##

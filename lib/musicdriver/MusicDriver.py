@@ -267,6 +267,13 @@ class MusicDriver(object):
     def unqueue_next(self):
         self._send(['-C', 'player-next'])
 
+
+    ##
+    #   @brief
+    def remove_current_song(self):
+        self._past_songs.pop()
+
+
     ##
     #   @brief
     def play_playlist(self):

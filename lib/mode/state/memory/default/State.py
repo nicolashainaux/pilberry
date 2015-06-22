@@ -143,11 +143,16 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def clear_playlist(self):
-        self.unactivate_playlist_mode()
-        self.md.clear_playlist()
-        with Carrier() as C:
-            C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Playlist cleared",
-                                             'timeout' : 1})
+        if self.playlist_mode_activated:
+            self.unactivate_playlist_mode()
+            self.md.clear_playlist()
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Playlist cleared",
+                                                 'timeout' : 1})
+        else:
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Can't clear",
+                                                 'timeout' : 1})
 
 
     ##
