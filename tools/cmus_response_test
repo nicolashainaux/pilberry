@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+# -*- coding: utf-8 -*-
+
+# Pilberry runs a car radio based on Raspberry Pi
+# Copyright 2014 Olivier Cecillon <ocecillon@users.sourceforge.net>
+# and Nicolas Hainaux <nico_h@users.sourceforge.net>
+
+# This file is part of Pilberry.
+
+# Pilberry is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+
+# Pilberry is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pilberry; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+# This is only intented to know how long it takes to get an answer from cmus
+# when he's asked for its status. In our tests, this time was between 35 ms and
+# 76 ms. So way less than 150 or 200 ms.
+
+t1=$(($(date +%s%N)/1000000))
+cmus-remote --server /tmp/cmus_socket -C status | grep vol_left && t2=$(($(date +%s%N)/1000000))
+echo $(($t2-$t1))
