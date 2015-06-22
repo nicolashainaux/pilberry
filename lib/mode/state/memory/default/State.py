@@ -202,7 +202,6 @@ class State(object, metaclass=ABCMeta):
                     number = str(int(100*i/how_many))
                     progress_raw = "    " + number + " %"
                     progress = progress_raw[len(progress_raw) - 5:]
-                    print("progress: " + progress)
                     C.send('CORE_STATE_TO_DISPLAY',
                            {'msg' : "Loading..." + progress,
                             'last_chars' : 5})
