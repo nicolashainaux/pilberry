@@ -48,7 +48,7 @@ with Carrier() as C:
     rswitch = RotaryEncoder(PIN_A,PIN_B,BUTTON,callback)
 
     while True:
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 
 
