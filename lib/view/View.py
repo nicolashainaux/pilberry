@@ -59,6 +59,10 @@ class View(object):
                              'xnode_parent' : None
                            }
 
+        self._short_message = ""
+
+        self._volume_info = ""
+
         self._HANDLE = {}
 
         ##
@@ -134,6 +138,30 @@ class View(object):
 
         self._infos_past['xnode_parent'] = self._infos['xnode_parent']
         self._infos['xnode_parent'] = new_infos['xnode_parent']
+
+
+    ##
+    #   @brief
+    def set_short_message(self, new_infos):
+        self._short_message = new_infos
+
+
+    ##
+    #   @brief
+    def reset_short_message(self):
+        self._short_message = ""
+
+
+    ##
+    #   @brief
+    def set_volume_info(self, new_infos):
+        self._volume_info = new_infos
+
+
+    ##
+    #   @brief
+    def reset_volume_info(self):
+        self._volume_info = ""
 
 
     ##

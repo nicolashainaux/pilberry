@@ -63,5 +63,12 @@ class View_memory(View_infos):
     def update(self, **options):
         if self.infos_past['xnode_parent'] != self.infos['xnode_parent']:
             self.lcd_message(self.infos['xnode_parent'], 0)
-        if self.infos_past['xnode_name'] != self.infos['xnode_name']:
+
+        if self._volume_info != "":
+            self.lcd_message(self._volume_info, 1, **options)
+
+        elif self._short_message != "":
+            self.lcd_message(self._short_message, 1, **options)
+
+        else:
             self.lcd_message(self.infos['xnode_name'], 1, **options)

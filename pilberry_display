@@ -80,18 +80,22 @@ def core_state_callback(socket, data):
     # Received data is in a dictionary like: {'timeout' : 1, 'msg' : "Message"}
     info = pickle.loads(data)
 
-    if 'timeout' in info and type(info['timeout']) == int:
-        v.set_infos_memory({'xnode_name': info['msg'],
-                            'xnode_parent': v.infos['xnode_parent']})
+    if 'timeout' in info and type(info['timeout']) == int \
+        and 'msg' in info and type(info['msg']) == str:
+    #___
+        v.set_short_message(info['msg'])
+
         v.handle('UPDATE')
+
         time.sleep(info['timeout'])
-        v.set_infos_memory({'xnode_name': v.infos_past['xnode_name'],
-                            'xnode_parent': v.infos['xnode_parent']})
+
+        v.reset_short_message()
+
         v.handle('UPDATE')
 
     else:
-        v.set_infos_memory({'xnode_name': info['msg'],
-                            'xnode_parent': v.infos['xnode_parent']})
+        v.set_short_message(info['msg'])
+
         if 'last_chars' in info \
             and type(info['last_chars']) == int:
         #___
