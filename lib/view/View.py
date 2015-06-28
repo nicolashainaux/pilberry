@@ -29,6 +29,7 @@ from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 # Pilberry packages|modules imports
 #from lib.globals import current_mode_id, MODES_CONFIG, USER_CONFIG
 import lib.globals as globals
+from lib.utils import current_milli_time
 
 import lib.view.default as display_view
 VIEWS_LIST = ['View_memory']
@@ -77,6 +78,8 @@ class View(object):
          'State_D' : getattr(display_view, v).State_D
         }
 
+        self._volume_display_elapsed_time = current_milli_time()
+
 
     ##
     #   @brief
@@ -104,6 +107,12 @@ class View(object):
 
     ##
     #   @brief
+    def get_volume_display_elapsed_time(self):
+        return self._volume_display_elapsed_time
+
+
+    ##
+    #   @brief
     def get_HANDLE(self):
         return self._HANDLE
 
@@ -118,6 +127,10 @@ class View(object):
                      doc="Current infos about xnode and head")
     infos_past = property(get_infos_past,
                      doc ="Previous infos about xnode and head")
+    volume_display_elapsed_time = property(get_volume_display_elapsed_time,
+                                           doc = "Over this time, volume info"\
+                                                 + " shouldn't be displayed" \
+                                                 + " any longer.")
 
 
 
@@ -128,6 +141,12 @@ class View(object):
         #   @todo   Check that the argument v belongs to the 'authorized' views
     #    logging.debug("setting view at: " + v)
     #    self._view = v
+
+
+    ##
+    #   @brief
+    def reset_volume_display_elapsed_time(self):
+        self._volume_display_elapsed_time = current_milli_time() + 100
 
 
     ##

@@ -25,10 +25,14 @@
 
 # Python packages|modules imports
 import time
+import os.path
 
 # Pilberry packages|modules imports
 from lib.hardware_drivers.rotary_encoder import RotaryEncoder
 from lib.carrier.Carrier import Carrier
+from lib.globals import VOLUME_LOCK_FILE
+#from lib.utils import get_cmus_volume
+#import lib.globals as globals
 
 # Define GPIO inputs
 PIN_A = 14  # Pin 8
@@ -44,6 +48,10 @@ with Carrier() as C:
     # This is the event callback routine to handle events
     def callback(event):
         C.send('VOLUME_TO_CORE', ROTARY_CMD[event])
+
+        if not os.path.isfile(VOLUME_LOCK_FILE):
+            C.send('VOLUME_TO_DISPLAY', None)
+            #globals.volume_watcher = True
 
     rswitch = RotaryEncoder(PIN_A,PIN_B,BUTTON,callback)
 

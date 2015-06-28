@@ -29,6 +29,7 @@ import pickle
 import socket
 import sys, os
 import RPIO
+import subprocess
 import logging
 import logging.config
 
@@ -39,8 +40,11 @@ from lib.hardware_drivers.Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 import lib.globals as globals
 from lib.view import View
 from lib.globals import SOCKETS_CONFIG, LOG_DIR
+from lib.globals import VOLUME_LOCK_FILE
 #from lib.tree.Node import Node
 #from lib.tree.NodeFileSystem import NodeFileSystem
+from lib.utils import current_milli_time
+from lib.utils import get_cmus_volume
 
 lcd = Adafruit_CharLCDPlate()
 
@@ -53,26 +57,35 @@ CORE_TCP_PORT = int(SOCKETS_CONFIG['CORE_TO_DISPLAY']['PORT'])
 CORE_DATA_TCP_PORT = int(SOCKETS_CONFIG['CORE_DATA_TO_DISPLAY']['PORT'])
 CORE_STATE_TCP_PORT = int(SOCKETS_CONFIG['CORE_STATE_TO_DISPLAY']['PORT'])
 CORE_MODE_COLOR_TCP_PORT = int(SOCKETS_CONFIG['CORE_MODE_COLOR_TO_DISPLAY']['PORT'])
+VOLUME_TCP_PORT = int(SOCKETS_CONFIG['VOLUME_TO_DISPLAY']['PORT'])
 
 displayLog.debug("Waiting for the first info to come...")
 
 v = View.View()
 
 def core_callback(socket, data):
-    info = pickle.loads(data)
-    if info == 'QUIT':
-        displayLog.debug("Exit")
-        sys.exit()
-
+    try:
+        info = pickle.loads(data)
+    except:
+        print("Exception catched")
     else:
-        v.handle(info)
+        if info == 'QUIT':
+            displayLog.debug("Exit")
+            sys.exit()
+
+        else:
+            v.handle(info)
 
 def core_data_callback(socket, data):
-    info = pickle.loads(data)
-    v.set_infos_memory({'xnode_name': info['xnode_name'],
-                        'xnode_parent': info['xnode_parent']})
-    #v.set_infos_head({'head_name': info['head_name'],
-    #                  'head_parent': info['head_parent']})
+    try:
+        info = pickle.loads(data)
+    except:
+        print("Exception catched")
+    else:
+        v.set_infos_memory({'xnode_name': info['xnode_name'],
+                            'xnode_parent': info['xnode_parent']})
+        #v.set_infos_head({'head_name': info['head_name'],
+        #                  'head_parent': info['head_parent']})
     v.handle('UPDATE')
 
 
@@ -104,6 +117,44 @@ def core_state_callback(socket, data):
             v.handle('UPDATE')
 
 
+def volume_callback(socket, data):
+    #info = pickle.loads(data)
+    open(VOLUME_LOCK_FILE, 'w').close()
+
+    keep_watching = True
+
+    new_vol = get_cmus_volume()
+
+    v.set_volume_info("      Volume " + new_vol)
+
+    v.handle('UPDATE')
+
+    last_check = current_milli_time()
+
+    while keep_watching:
+        time.sleep(0.1)
+        old_vol = new_vol
+        new_vol = get_cmus_volume()
+
+        if new_vol != old_vol:
+            last_check = current_milli_time()
+            v.set_volume_info("      Volume " + new_vol)
+            v.handle('UPDATE', last_chars=3)
+        else:
+            if current_milli_time() - last_check > 1000:
+                keep_watching = False
+
+    v.reset_volume_info()
+    v.handle('UPDATE')
+
+    print("end of watching volume")
+
+    os.remove(VOLUME_LOCK_FILE)
+
+
+
+
+
 def core_mode_color_callback(socket, data):
     info = pickle.loads(data)
     if info == "on":
@@ -118,6 +169,7 @@ RPIO.add_tcp_callback(CORE_TCP_PORT, core_callback)
 RPIO.add_tcp_callback(CORE_DATA_TCP_PORT, core_data_callback)
 RPIO.add_tcp_callback(CORE_STATE_TCP_PORT, core_state_callback)
 RPIO.add_tcp_callback(CORE_MODE_COLOR_TCP_PORT, core_mode_color_callback)
+RPIO.add_tcp_callback(VOLUME_TCP_PORT, volume_callback)
 
 # Blocking main epoll loop
 RPIO.wait_for_interrupts()

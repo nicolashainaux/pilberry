@@ -35,6 +35,8 @@ LOCKS_DIR = PILBERRY_ROOT + 'locks/'
 LOG_DIR = PILBERRY_ROOT + 'log/'
 VAR_RUN = PILBERRY_ROOT + 'var/run/'
 
+VOLUME_LOCK_FILE = LOCKS_DIR + 'vol'
+
 SOCKETS_CONF_FILE = CONF_DIR + 'sockets.conf'
 MODES_CONF_FILE = CONF_DIR + 'modes.conf'
 CMD_CONF_FILE = CONF_DIR + 'cmd.conf'
@@ -102,3 +104,5 @@ cmus_file = ''
 
 last_playing_notification = 0
 cmus_playing_notifications_disabled = True
+
+#volume_watcher = False

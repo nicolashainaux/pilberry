@@ -23,8 +23,10 @@
 # Python packages|modules imports
 import re
 import time
+import subprocess
 
 # Pilberry packages|modules imports
+from lib.globals import SOCKETS_CONFIG
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -35,3 +37,24 @@ def natural_sort(l):
     convert = lambda text: int(text) if text.isdigit() else text.lower()
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
     return sorted(l, key = alphanum_key)
+
+
+##
+#   @brief
+def get_cmus_volume():
+    cmus_status = subprocess.Popen(['cmus-remote',
+                                    '--server',
+                                    SOCKETS_CONFIG['TO_CMUS']['FILE'],
+                                    '-C',
+                                    'status'],
+                                    stdout=subprocess.PIPE)
+
+    grep_cmd = subprocess.Popen(['grep', 'vol_left'],
+                                stdin=cmus_status.stdout,
+                                stdout=subprocess.PIPE)
+
+    raw_info = grep_cmd.communicate()[0].decode()
+
+    print("vol: " + raw_info)
+
+    return raw_info[12:len(raw_info)-1]
