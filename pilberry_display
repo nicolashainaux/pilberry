@@ -74,6 +74,7 @@ def core_callback(socket, data):
             sys.exit()
 
         else:
+            v.store_core_state(info)
             v.handle(info)
 
 def core_data_callback(socket, data):
@@ -146,6 +147,7 @@ def volume_callback(socket, data):
 
     v.reset_volume_info()
     v.handle('UPDATE')
+    v.lcd_set_indicator()
 
     print("end of watching volume")
 

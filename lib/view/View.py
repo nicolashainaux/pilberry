@@ -78,6 +78,8 @@ class View(object):
          'State_D' : getattr(display_view, v).State_D
         }
 
+        self._core_state = 'State_A'
+
         self._volume_display_elapsed_time = current_milli_time()
 
 
@@ -256,4 +258,18 @@ class View(object):
         self._lcd.setCursor(15, 1)
         self._lcd.noBlink()
         self._lcd.noCursor()
+
+    ##
+    #   @brief
+    def lcd_set_indicator(self):
+          self.handle(self._core_state)
+
+
+    ##
+    #   @brief
+    #   @todo   The list of the states' names should be a constant somewhere.
+    #           It is also used in __init__()
+    def store_core_state(self, info):
+        if info in ['State_A', 'State_B', 'State_C', 'State_D']:
+            self._core_state = info
 
