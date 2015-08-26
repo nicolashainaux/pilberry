@@ -170,7 +170,7 @@ class State(object, metaclass=ABCMeta):
                 with open(r"/data/music/05 - Playlists/current.pil", 'wb') \
                     as outfile:
                 #___
-                    pickle.dump([self._tree, playlist], outfile)
+                    pickle.dump([playlist], outfile)
 
                 C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Playlist saved",
                                                  'timeout' : 1})
@@ -187,11 +187,10 @@ class State(object, metaclass=ABCMeta):
             with open(options['file'].full_path, "rb") as f:
                 data = pickle.load(f)
 
-            self._tree = data[0]
             self.md.clear_playlist()
 
             last_time = current_milli_time()
-            how_many = len(data[1])
+            how_many = len(data[0])
             i = 1
 
             for n in data[1]:
