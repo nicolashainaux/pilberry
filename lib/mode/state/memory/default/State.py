@@ -28,6 +28,7 @@ from collections import deque
 
 # Pilberry packages|modules imports
 from lib.globals import SOCKETS_CONFIG, USER_CONFIG
+from lib.globals import PLAYLIST_FILE_EXTENSIONS, CURRENT_PLAYLIST_PATH
 import lib.globals as globals
 from lib.carrier.Carrier import Carrier
 from lib.utils import current_milli_time
@@ -167,7 +168,12 @@ class State(object, metaclass=ABCMeta):
                 playlist.extend(self.md.past_songs)
                 playlist.extend(self.md.next_songs)
 
-                with open(r"/data/music/05 - Playlists/current.pil", 'wb') \
+                playlist_path = CURRENT_PLAYLIST_PATH
+
+                if self.xnode.extension in PLAYLIST_FILE_EXTENSIONS:
+                    playlist_path = self.xnode.full_path
+
+                with open(playlist_path, 'wb') \
                     as outfile:
                 #___
                     pickle.dump([playlist], outfile)

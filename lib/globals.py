@@ -94,6 +94,7 @@ MUSIC_FILE_EXTENSIONS = ['.ogg', '.mp3', '.flac', '.wma', '.m4a',
                          '.aac', '.mp4', '.mod', '.s3m']
 
 PLAYLIST_FILE_EXTENSIONS = ['.pil']
+CURRENT_PLAYLIST_PATH = r"/data/music/05 - Playlists/current.pil"
 
 CMUS_NOTIFICATIONS = ['stopped',
                       'playing',
