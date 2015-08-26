@@ -67,6 +67,8 @@ class State_ACD(State, metaclass=ABCMeta):
     ##
     #   @brief
     def move_to_1st_child(self):
+        self.xnode.refresh_children()
+
         # There it is not useful to use the is_a_leaf() method on self.xnode
         # because we don't need to check the filesystem neither to make a
         # request in the DB. If there are children, they are already here.

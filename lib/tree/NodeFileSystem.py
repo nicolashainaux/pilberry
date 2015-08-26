@@ -23,6 +23,7 @@
 
 # Python packages|modules imports
 import os
+import hashlib
 
 # Pilberry packages|modules imports
 from .Node import Node
@@ -97,6 +98,16 @@ class NodeFileSystem(Node):
 
 
 
+    ##
+    #   @brief  Returns the md5 sum of the list of the current directory, or
+    #           "" if current Node is a leaf.
+    def dirlist_hash(self):
+        if os.path.isdir(self.full_path):
+            return hashlib.md5(''.join(os.listdir(self.full_path)\
+                                      ).encode('utf-8', 'replace')\
+                              ).hexdigest()
+        else:
+            return ""
 
 
 

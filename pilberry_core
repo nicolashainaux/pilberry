@@ -151,6 +151,9 @@ with Carrier() as C:
                 coreLog.debug("Received: \033[92m" + cmd + "\033[0m")
                 m.handle(cmd)
 
+                coreLog.debug("xnode._dirlist_hash: " + m.xnode._dirlist_hash)
+                coreLog.debug("xnode.dirlist_hash(): " + m.xnode.dirlist_hash())
+
                 report()
 
                 data = {'xnode_name' : m.xnode['file_name'],

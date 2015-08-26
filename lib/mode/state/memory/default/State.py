@@ -193,7 +193,7 @@ class State(object, metaclass=ABCMeta):
             how_many = len(data[0])
             i = 1
 
-            for n in data[1]:
+            for n in data[0]:
                 self.md.append_song(n)
                 i += 1
                 if current_milli_time() - last_time > 500:

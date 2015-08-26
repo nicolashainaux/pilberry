@@ -48,7 +48,7 @@ class Node(object, metaclass=ABCMeta):
     #   @brief  Checks if current Node is actually a leaf
     @staticmethod
     @abstractmethod
-    def is_a_leaf(self):
+    def is_a_leaf(full_path):
         # /!\ Take care, this should not only be:
         # return len(self._children) == 0
         # Because this should actually check, in the database or filesystem,
@@ -72,6 +72,15 @@ class Node(object, metaclass=ABCMeta):
     def get_children_list(self, full_path):
         pass
         #getattr(self, self.get_children_list(full_path))()
+
+
+
+    ##
+    #   @brief  Returns the md5 sum of the list of the current directory, or
+    #           "" if current Node is a leaf.
+    @abstractmethod
+    def dirlist_hash(self):
+        pass
 
 
 
@@ -122,6 +131,21 @@ class Node(object, metaclass=ABCMeta):
         #___
             for n in self._children:
                 n.add_children(deeper - 1)
+
+
+
+    ##
+    #   @brief
+    def refresh_children(self):
+        if not self.is_a_leaf(self.full_path):
+            current_hash = self.dirlist_hash()
+            if current_hash != self._dirlist_hash:
+                logging.debug("Node: " \
+                          + self['file_name'] \
+                          + " will refresh its children")
+                self._dirlist_hash = current_hash
+                self._children = []
+                self.add_children(2)
 
 
 
@@ -186,6 +210,11 @@ class Node(object, metaclass=ABCMeta):
 
         if deeper > 0:
             self.add_children(deeper)
+
+        self._dirlist_hash = self.dirlist_hash()
+
+
+
 
 
 
