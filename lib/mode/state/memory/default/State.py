@@ -106,20 +106,24 @@ class State(object, metaclass=ABCMeta):
     ##
     #   @brief
     def append_song(self):
-        self.activate_playlist_mode()
+        # So far, we ignore the playlist files.
+        # Later it may be possible to let the user add the files of a playlist
+        # to the current playlist. (And so, to merge playlists together).
+        if not self.xnode.extension in PLAYLIST_FILE_EXTENSIONS:
+            self.activate_playlist_mode()
 
-        with Carrier() as C:
-            if len(self.xnode.children) >= 1:
-                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queuing songs..."})
-                for elt in self.xnode.children:
-                    if len(elt.children) == 0:
-                        self.md.append_song(elt)
-                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued all songs",
-                                                 'timeout' : 1})
-            else:
-                self.md.append_song(self.xnode)
-                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued a song",
-                                                 'timeout' : 1})
+            with Carrier() as C:
+                if len(self.xnode.children) >= 1:
+                    C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queuing songs..."})
+                    for elt in self.xnode.children:
+                        if len(elt.children) == 0:
+                            self.md.append_song(elt)
+                    C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued all songs",
+                                                     'timeout' : 1})
+                else:
+                    self.md.append_song(self.xnode)
+                    C.send('CORE_STATE_TO_DISPLAY', {'msg' : "Queued a song",
+                                                     'timeout' : 1})
 
 
     ##
