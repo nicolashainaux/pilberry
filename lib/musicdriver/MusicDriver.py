@@ -110,10 +110,7 @@ class MusicDriver(object):
             self._next_songs.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -129,10 +126,7 @@ class MusicDriver(object):
 
         self._send(['-C', 'add -Q ' + n.full_path])
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -162,10 +156,8 @@ class MusicDriver(object):
                 self._send(['-C', 'add -q ' + n.full_path])
             self._past_songs.append(self._next_songs.popleft())
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+
+        self.log_md()
 
 
     ##
@@ -193,10 +185,7 @@ class MusicDriver(object):
         if requeue:
             self._send(['-C', 'add -Q ' + self.current_song.full_path])
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -207,10 +196,7 @@ class MusicDriver(object):
         self._past_songs.clear()
         self._send(['-c', '-q'])
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -222,10 +208,7 @@ class MusicDriver(object):
         self._send(['-C', 'player-next'])
         globals.cmus_playing_notifications_disabled = True
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -237,10 +220,7 @@ class MusicDriver(object):
         self._send(['-C', 'player-next'])
         globals.cmus_playing_notifications_disabled = True
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -297,10 +277,7 @@ class MusicDriver(object):
 
         self._send(['-s'])
 
-        mdLog.debug('past songs: ' \
-                    + str([n['file_name'] for n in self._past_songs]))
-        mdLog.debug('future songs: ' \
-                    + str([n['file_name'] for n in self._next_songs]))
+        self.log_md()
 
 
     ##
@@ -339,3 +316,39 @@ class MusicDriver(object):
         #   @todo   Send the quit signal to cmus
         pass
 
+
+
+    def log_md(self):
+        log_past_songs = 'past songs: '
+
+        if len(self._past_songs) == 0:
+            log_past_songs += 'empty'
+        elif len(self._past_songs) == 1:
+            log_past_songs += '\033[33m' \
+                           +  self._past_songs[0]['file_name'] \
+                           +  '\033[0m'
+        else:
+            for i in range(len(self._past_songs) - 1):
+                log_past_songs += self._past_songs[i]['file_name'] + ", "
+
+            log_past_songs += '\033[33m' \
+                           +  self._past_songs[len(self._past_songs) - 1]['file_name'] \
+                           +  '\033[0m'
+
+        log_next_songs = 'next songs: '
+
+        if len(self._next_songs) == 0:
+            log_next_songs += 'empty'
+        else:
+            log_next_songs += '\033[34m' \
+                           +  self._next_songs[0]['file_name'] \
+                           +  '\033[0m'
+
+            if len(self._next_songs) > 1:
+                for i in range(len(self._next_songs) - 1):
+                    log_next_songs += ", " + self._next_songs[i+1]['file_name']
+
+
+        mdLog.debug(log_past_songs)
+
+        mdLog.debug(log_next_songs)
