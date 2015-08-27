@@ -107,6 +107,9 @@ def core_state_callback(socket, data):
 
         v.handle('UPDATE')
 
+    elif 'done' in info:
+        v.reset_short_message()
+
     else:
         v.set_short_message(info['msg'])
 

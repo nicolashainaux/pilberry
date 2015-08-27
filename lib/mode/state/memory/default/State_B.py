@@ -98,6 +98,8 @@ class State_B(State):
     #   @brief
     def jump_to_album_next(self):
         if self.playlist_mode_activated:
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "  >> jumping >>>"})
             self.md.stop()
             current_parent = self.md.current_song.parent
 
@@ -113,12 +115,16 @@ class State_B(State):
             self.md.shift_playlist_to_left(dont_loop=True)
             self.set_xnode(self.md.current_song)
             self.set_head(self.xnode)
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'done' : True})
 
 
     ##
     #   @brief
     def jump_to_album_prev(self):
         if self.playlist_mode_activated:
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'msg' : "<<< jumping <<  "})
             self.md.stop()
             current_parent = self.md.current_song.parent
 
@@ -144,6 +150,8 @@ class State_B(State):
             self.md.play_playlist()
             self.set_xnode(self.md.current_song)
             self.set_head(self.xnode)
+            with Carrier() as C:
+                C.send('CORE_STATE_TO_DISPLAY', {'done' : True})
 
 
     ##

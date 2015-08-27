@@ -72,3 +72,5 @@ class View_memory(View_infos):
 
         else:
             self.lcd_message(self.infos['xnode_name'], 1, **options)
+
+        self.lcd_set_indicator()
