@@ -110,7 +110,7 @@ class MusicDriver(object):
             self._next_songs.append(n)
         self._send(['-C', 'add -q ' + n.full_path])
 
-        self.log_md()
+        self.log_md("append_song")
 
 
     ##
@@ -126,7 +126,7 @@ class MusicDriver(object):
 
         self._send(['-C', 'add -Q ' + n.full_path])
 
-        self.log_md()
+        self.log_md("prepend_song")
 
 
     ##
@@ -157,7 +157,7 @@ class MusicDriver(object):
             self._past_songs.append(self._next_songs.popleft())
 
 
-        self.log_md()
+        self.log_md("shift_playlist_to_left")
 
 
     ##
@@ -185,7 +185,7 @@ class MusicDriver(object):
         if requeue:
             self._send(['-C', 'add -Q ' + self.current_song.full_path])
 
-        self.log_md()
+        self.log_md("shift_playlist_to_right")
 
 
     ##
@@ -196,7 +196,7 @@ class MusicDriver(object):
         self._past_songs.clear()
         self._send(['-c', '-q'])
 
-        self.log_md()
+        self.log_md("clear_playlist")
 
 
     ##
@@ -208,7 +208,7 @@ class MusicDriver(object):
         self._send(['-C', 'player-next'])
         globals.cmus_playing_notifications_disabled = True
 
-        self.log_md()
+        self.log_md("jump_to_next_song")
 
 
     ##
@@ -220,7 +220,7 @@ class MusicDriver(object):
         self._send(['-C', 'player-next'])
         globals.cmus_playing_notifications_disabled = True
 
-        self.log_md()
+        self.log_md("jump_to_prev_song")
 
 
     ##
@@ -277,7 +277,7 @@ class MusicDriver(object):
 
         self._send(['-s'])
 
-        self.log_md()
+        self.log_md("stop")
 
 
     ##
@@ -318,8 +318,8 @@ class MusicDriver(object):
 
 
 
-    def log_md(self):
-        log_past_songs = 'past songs: '
+    def log_md(self, mthd_name):
+        log_past_songs = mthd_name + ' past songs: '
 
         if len(self._past_songs) == 0:
             log_past_songs += 'empty'
@@ -335,7 +335,7 @@ class MusicDriver(object):
                            +  self._past_songs[len(self._past_songs) - 1]['file_name'] \
                            +  '\033[0m'
 
-        log_next_songs = 'next songs: '
+        log_next_songs = mthd_name + ' next songs: '
 
         if len(self._next_songs) == 0:
             log_next_songs += 'empty'
