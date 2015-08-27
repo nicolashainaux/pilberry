@@ -136,7 +136,11 @@ class State_B(State):
                 self.md.shift_playlist_to_right(dont_loop=True,
                                                 dont_requeue=True)
 
-            self.md.shift_playlist_to_left(dont_loop=True)
+            if len(self.md.past_songs) > 1:
+                self.md.shift_playlist_to_left(dont_loop=True)
+            else:
+                self.md.reinsert_current_song()
+
             self.md.play_playlist()
             self.set_xnode(self.md.current_song)
             self.set_head(self.xnode)
